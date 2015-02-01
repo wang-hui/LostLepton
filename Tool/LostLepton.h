@@ -38,7 +38,6 @@ class AccRecoIsoEffs
   double mus_recoeff_err[PT_BINS] = {0}, els_recoeff_err[PT_BINS] = {0};
   double mus_isoeff_err[PT_BINS] = {0}, els_isoeff_err[PT_BINS] = {0};
 
- //private:
   //here we defin the muon/electron number we need to count in the loop
   double nmus = 0, nmus_acc = 0, nels = 0, nels_acc =0;
   double nmus_acc_bin[PT_BINS] = {0}, nels_acc_bin[PT_BINS] = {0};
@@ -46,6 +45,8 @@ class AccRecoIsoEffs
   double nmus_iso[PT_BINS] = {0}, nels_iso[PT_BINS] = {0};
 
   void NumberstoEffs();
+
+ private:
   double get_stat_Error(double a,
                         double an
                        );
