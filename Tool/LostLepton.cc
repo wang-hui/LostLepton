@@ -25,9 +25,6 @@
 #include "TMath.h"
 #include "TLorentzVector.h"
 
-//here we define the number of Pt bins for reco and iso efficiencies
-#define PT_BINS 8
-
 using namespace std;
 
 int main()
@@ -45,21 +42,8 @@ int main()
 
   NTupleReader tr(fChain);
 
-  //here we define the overall information for ttbar sample
-  int nevents_tot = 0;
-  int nevents_sel_base = 0;
-  int nevents_sel_mus = 0;
-  int nevents_sel_els = 0;
-
-  //here we defin the muon/electron number we need to count in the loop
-  double nmus,nmus_acc,nels,nels_acc;
-  nmus = 0;
-  nmus_acc = 0;
-  nels = 0;
-  nels_acc = 0;
-
-  double nmus_iso[PT_BINS] = {0}, nmus_reco[PT_BINS] = {0}, nels_iso[PT_BINS] = {0}, nels_reco[PT_BINS] = {0};
-  double nmus_acc_bin[PT_BINS] = {0}, nels_acc_bin[PT_BINS] = {0};
+  //define my AccRecoIsoEffs class to stroe counts and efficiencies
+  AccRecoIsoEffs myAccRecoIsoEffs;
 
   //here we define the baseline cut variables
   vector<TLorentzVector> jetsLVec;
@@ -76,7 +60,7 @@ int main()
   {    
     if(tr.getEvtNum()%10000 == 0) std::cout << tr.getEvtNum() << "\t" << ((clock() - t0)/1000000.0) << std::endl;
     
-    nevents_tot++;
+    myAccRecoIsoEffs.nevents_tot++;
 
     //get baseline cut variables from root file
     jetsLVec = tr.getVec<TLorentzVector>("jetsLVec");
@@ -113,7 +97,7 @@ int main()
        jet3_met_phi_diff>=0.3
       )
     {
-      nevents_sel_base++;
+      myAccRecoIsoEffs.nevents_sel_base++;
 
       int nElectrons = tr.getVar<int>("nElectrons");
       int nMuons = tr.getVar<int>("nMuons");
@@ -128,7 +112,7 @@ int main()
 
       if(nElectrons == 0)
       {
-        nevents_sel_mus++;
+        myAccRecoIsoEffs.nevents_sel_mus++;
 
         vector<TLorentzVector> muonsLVec = tr.getVec<TLorentzVector>("muonsLVec");
         int reco_mus_count = muonsLVec.size();
@@ -143,7 +127,7 @@ int main()
 
           if( isMuon )
           {
-            nmus++;
+            myAccRecoIsoEffs.nmus++;
             
             double gen_mus_eta, gen_mus_phi, gen_mus_pt;
             int genId;
@@ -156,43 +140,11 @@ int main()
 
             if((std::abs(gen_mus_eta)) < 2.4 && gen_mus_pt > 5)
             {
-              nmus_acc++;
-              int ptbin_number;
+              myAccRecoIsoEffs.nmus_acc++;
 
-              if(gen_mus_pt < 10)
-              {
-                ptbin_number = 0;
-              }
-              else if(gen_mus_pt >= 10 && gen_mus_pt < 20)
-              {
-                ptbin_number = 1;
-              }
-              else if(gen_mus_pt >= 20 && gen_mus_pt < 30)
-              {
-                ptbin_number = 2;
-              }
-              else if(gen_mus_pt >= 30 && gen_mus_pt < 40)
-              {
-                ptbin_number = 3;
-              }
-              else if(gen_mus_pt >= 40 && gen_mus_pt < 50)
-              {
-                ptbin_number = 4;
-              }
-              else if(gen_mus_pt >= 50 && gen_mus_pt < 70)
-              {
-                ptbin_number = 5;
-              }
-              else if(gen_mus_pt >= 70 && gen_mus_pt < 100)
-              {
-                ptbin_number = 6;
-              }
-              else if(gen_mus_pt >= 100 )
-              {
-                ptbin_number = 7;
-              }
+              int ptbin_number = Set_ptbin_number(gen_mus_pt);
 
-              nmus_acc_bin[ptbin_number]++;
+              myAccRecoIsoEffs.nmus_acc_bin[ptbin_number]++;
 
               //loop over reco lepton information to find out smallest deltaR value
               vector<double> deltar_mus_pool;
@@ -228,7 +180,7 @@ int main()
                  //isgoodmuonid
                 )
               {
-                nmus_reco[ptbin_number]++;
+                myAccRecoIsoEffs.nmus_reco[ptbin_number]++;
 
                 vector<double> muonsRelIso = tr.getVec<double>("muonsRelIso");
                 bool mus_pass_iso;
@@ -237,7 +189,7 @@ int main()
                 
                 if(mus_pass_iso)
                 {
-                  nmus_iso[ptbin_number]++;
+                  myAccRecoIsoEffs.nmus_iso[ptbin_number]++;
                 }//if isolated
               }//if reconstructed
             }//if accepted
@@ -247,7 +199,7 @@ int main()
 
       if(nMuons == 0)
       {
-        nevents_sel_els++;
+        myAccRecoIsoEffs.nevents_sel_els++;
 
         vector<TLorentzVector> elesLVec = tr.getVec<TLorentzVector>("elesLVec");
         int reco_els_count = elesLVec.size();
@@ -262,7 +214,7 @@ int main()
           
           if( isElectron )
           {
-            nels++;
+            myAccRecoIsoEffs.nels++;
           
             double gen_els_eta, gen_els_phi, gen_els_pt;
             int genId;
@@ -275,43 +227,11 @@ int main()
     
             if((std::abs(gen_els_eta)) < 2.5 && gen_els_pt > 5)
             {
-              nels_acc++;
-              int ptbin_number;
+              myAccRecoIsoEffs.nels_acc++;
 
-              if(gen_els_pt < 10)
-              {
-                ptbin_number = 0;
-              }
-              else if(gen_els_pt >= 10 && gen_els_pt < 20)
-              {
-                ptbin_number = 1;
-              }
-              else if(gen_els_pt >= 20 && gen_els_pt < 30)
-              {
-                ptbin_number = 2;
-              }
-              else if(gen_els_pt >= 30 && gen_els_pt < 40)
-              {
-                ptbin_number = 3;
-              }
-              else if(gen_els_pt >= 40 && gen_els_pt < 50)
-              {
-                ptbin_number = 4;
-              }
-              else if(gen_els_pt >= 50 && gen_els_pt < 70)
-              {
-                ptbin_number = 5;
-              }
-              else if(gen_els_pt >= 70 && gen_els_pt < 100)
-              {
-                ptbin_number = 6;
-              }
-              else if(gen_els_pt >= 100 )
-              {
-                ptbin_number = 7;
-              }
+              int ptbin_number = Set_ptbin_number(gen_els_pt);
 
-              nels_acc_bin[ptbin_number]++;
+              myAccRecoIsoEffs.nels_acc_bin[ptbin_number]++;
        
               //loop over reco lepton information to determine the smallest deltar
               vector<double> deltar_els_pool;
@@ -347,7 +267,7 @@ int main()
                  //isgoodmuonid
                 )
               {
-                nels_reco[ptbin_number]++;
+                myAccRecoIsoEffs.nels_reco[ptbin_number]++;
 
                 vector<double> elesRelIso = tr.getVec<double>("elesRelIso");
                 bool els_pass_iso;
@@ -356,7 +276,7 @@ int main()
 
                 if(els_pass_iso)
                 {
-                  nels_iso[ptbin_number]++;
+                  myAccRecoIsoEffs.nels_iso[ptbin_number]++;
                 }//if isolated
               }//if reconstructed
             }//if accepted
@@ -371,6 +291,18 @@ int main()
     //<< "\t" << tr.getVar<double>("joe") << "\t" << tr.getVar<int>("five") << "\t" << tr.getVec<double>("muonsMtw").size() << "\t" << tr.getVec<double>("threeNum")[2] << std::endl;
   }
 
+  myAccRecoIsoEffs.printOverview();
+
+  myAccRecoIsoEffs.NumberstoEffs();
+
+  myAccRecoIsoEffs.printAccRecoIsoEffs();
+
+  return 0;
+}
+
+
+void AccRecoIsoEffs::printOverview()
+{
   std::cout << "Lost Lepton Sample(ttbar sample) Overview:" << std::endl;
   std::cout << "nevents_tot = " << nevents_tot << std::endl;
   std::cout << "nevents_sel_base: = " << nevents_sel_base << std::endl;
@@ -383,14 +315,11 @@ int main()
   std::cout << "nevents_sel_mus = " << nevents_sel_mus << std::endl;
   std::cout << "nevents_sel_els = " << nevents_sel_els << std::endl;
 
-  //define acceptance, reco eff and iso eff to be calculated
-  double mus_acc, els_acc;
-  double mus_acc_err, els_acc_err;
-  double mus_recoeff[PT_BINS]={0}, els_recoeff[PT_BINS]={0};
-  double mus_isoeff[PT_BINS]={0}, els_isoeff[PT_BINS]={0};
-  double mus_recoeff_err[PT_BINS]={0}, els_recoeff_err[PT_BINS]={0};
-  double mus_isoeff_err[PT_BINS]={0}, els_isoeff_err[PT_BINS]={0};
-  
+  return ;
+}
+
+void AccRecoIsoEffs::NumberstoEffs()
+{
   mus_acc=nmus_acc/nmus;
   els_acc=nels_acc/nels;
 
@@ -412,10 +341,20 @@ int main()
     els_isoeff[i_cal]=nels_iso[i_cal]/nels_reco[i_cal];
     els_isoeff_err[i_cal]=get_stat_Error(nels_iso[i_cal],nels_reco[i_cal]);
   }
+  
+  return ;
+}
 
+void AccRecoIsoEffs::printAccRecoIsoEffs()
+{
+  int i_cal = 0;
+  
   std::cout<<std::endl<<"Muon information: "<<std::endl;
+
   std::cout<<"number of muons from top: "<<nmus<<std::endl;
+
   std::cout<<"number of muons from top, accepted: "<<nmus_acc<<std::endl;
+
   std::cout<<"number of muons from top, accepted, bins: ";
   for(i_cal=0;i_cal<PT_BINS;i_cal++)
   {
@@ -425,6 +364,7 @@ int main()
       std::cout<<std::endl;
     }
   }
+
   std::cout<<"number of muons from top, reconstructed: ";
   for(i_cal=0;i_cal<PT_BINS;i_cal++)
   {
@@ -434,6 +374,7 @@ int main()
       std::cout<<std::endl;
     }
   }
+
   std::cout<<"number of muons from top, isolated: ";
   for(i_cal=0;i_cal<PT_BINS;i_cal++)
   {
@@ -443,7 +384,9 @@ int main()
       std::cout<<std::endl;
     }
   }
+
   std::cout<<"muons from top, acceptance: "<<mus_acc<<"("<<mus_acc_err<<")"<<std::endl;
+
   std::cout<<"muons from top, reconstruction efficiency: ";
   for(i_cal=0;i_cal<PT_BINS;i_cal++)
   {
@@ -453,6 +396,7 @@ int main()
       std::cout<<std::endl;
     }
   }
+
   std::cout<<"muons from top, isolation efficiency: ";
   for(i_cal=0;i_cal<PT_BINS;i_cal++)
   {
@@ -463,10 +407,12 @@ int main()
     }
   }
  
- 
   std::cout<<std::endl<<"Electron information: "<<std::endl;
+
   std::cout<<"number of electrons from top: "<<nels<<std::endl;
+
   std::cout<<"number of electrons from top, accepted: "<<nels_acc<<std::endl;
+
   std::cout<<"number of electrons from top, accepted, bins: ";
   for(i_cal=0;i_cal<PT_BINS;i_cal++)
   {
@@ -486,6 +432,7 @@ int main()
       std::cout<<std::endl;
     }
   }
+
   std::cout<<"number of electrons from top, isolated: ";
   for(i_cal=0;i_cal<PT_BINS;i_cal++)
   {
@@ -495,7 +442,9 @@ int main()
       std::cout<<std::endl;
     }
   }
+
   std::cout<<"electrons from top, acceptance: "<<els_acc<<"("<<els_acc_err<<")"<<std::endl;
+
   std::cout<<"electrons from top, reconstruction efficiency: ";
   for(i_cal=0;i_cal<PT_BINS;i_cal++)
   {
@@ -505,6 +454,7 @@ int main()
       std::cout<<std::endl;
     }
   }
+
   std::cout<<"electrons from top, isolation efficiency: ";
   for(i_cal=0;i_cal<PT_BINS;i_cal++)
   {
@@ -515,6 +465,6 @@ int main()
     }
   }
 
-  return 0;
+  return ;
 }
 

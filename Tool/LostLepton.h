@@ -13,6 +13,91 @@
 
 #include "NTupleReader.h"
 
+#define PT_BINS 8
+
+class AccRecoIsoEffs
+{
+ public:
+  void printOverview();
+  void printAccRecoIsoEffs();
+
+  //define the number of Pt bins we need in the calculation
+  //static int PT_BINS = 8;
+
+  //here we define the overall information for ttbar sample
+  int nevents_tot = 0;
+  int nevents_sel_base = 0;
+  int nevents_sel_mus = 0;
+  int nevents_sel_els = 0;
+
+  //define acceptance, reco eff and iso eff to be calculated
+  double mus_acc = 0, els_acc = 0;
+  double mus_acc_err = 0, els_acc_err = 0;
+  double mus_recoeff[PT_BINS] = {0}, els_recoeff[PT_BINS] = {0};
+  double mus_isoeff[PT_BINS] = {0}, els_isoeff[PT_BINS] = {0};
+  double mus_recoeff_err[PT_BINS] = {0}, els_recoeff_err[PT_BINS] = {0};
+  double mus_isoeff_err[PT_BINS] = {0}, els_isoeff_err[PT_BINS] = {0};
+
+ //private:
+  //here we defin the muon/electron number we need to count in the loop
+  double nmus = 0, nmus_acc = 0, nels = 0, nels_acc =0;
+  double nmus_acc_bin[PT_BINS] = {0}, nels_acc_bin[PT_BINS] = {0};
+  double nmus_reco[PT_BINS] = {0}, nels_reco[PT_BINS] = {0};
+  double nmus_iso[PT_BINS] = {0}, nels_iso[PT_BINS] = {0};
+
+  void NumberstoEffs();
+  double get_stat_Error(double a,
+                        double an
+                       );
+  
+  double get_sys_Error(double r,
+                       double p
+                      );
+};
+
+
+
+int Set_ptbin_number(double gen_pt
+                       )
+{
+  int ptbin_num;
+
+  if(gen_pt < 10)
+  {
+    ptbin_num = 0;
+  }
+  else if(gen_pt >= 10 && gen_pt < 20)
+  {
+    ptbin_num = 1;
+  }
+  else if(gen_pt >= 20 && gen_pt < 30)
+  {
+    ptbin_num = 2;
+  }
+  else if(gen_pt >= 30 && gen_pt < 40)
+  {
+    ptbin_num = 3;
+  }
+  else if(gen_pt >= 40 && gen_pt < 50)
+  {
+    ptbin_num = 4;
+  }
+  else if(gen_pt >= 50 && gen_pt < 70)
+  {
+    ptbin_num = 5;
+  }
+  else if(gen_pt >= 70 && gen_pt < 100)
+  {
+    ptbin_num = 6;
+  }
+  else if(gen_pt >= 100 )
+  {
+    ptbin_num = 7;
+  }
+  
+  return ptbin_num;
+}
+
 double DeltaPhi(double phi1, double phi2) 
 {
   double result = phi1 - phi2;
@@ -142,9 +227,9 @@ bool isPassMuonIso(double mus_pfIsoR04_sumNeutralHadronEt,
 
 
 
-double get_stat_Error(double a,
-                      double an
-                     )
+double AccRecoIsoEffs::get_stat_Error(double a,
+                                      double an
+                                     )
 {
   double n;
   n = an - a;
@@ -166,9 +251,9 @@ double get_stat_Error(double a,
   }
 }
 
-double get_sys_Error(double r,
-                     double p
-                    )
+double AccRecoIsoEffs::get_sys_Error(double r,
+                                     double p
+                                    )
 {
   double err;
   err = 1000;
