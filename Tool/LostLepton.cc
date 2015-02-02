@@ -14,6 +14,7 @@
 #include "TGraph.h"
 #include "TCanvas.h"
 #include "TH1F.h"
+#include "TH1D.h"
 #include "THStack.h"
 #include "TLatex.h"
 #include "TLegend.h"
@@ -27,23 +28,33 @@
 
 using namespace std;
 
-int main()
+int main(int argc, char* argv[])
 {
-  char nBase[] = "/afs/cern.ch/user/h/hua/stop/AllHadronicSUSY/CMSSW_7_2_0/stop_ttbar_skimmed_tree.root";
+
+  if (argc < 2)
+  {
+    cerr <<"Please give 3 arguments " << "runList " << " " << "outputFileName" << endl;
+    cerr <<" Valid configurations are " << std::endl;
+    cerr <<" ./LostLepton runlist_ttjets.txt closure_plots.root" << std::endl;
+    return -1;
+  }
+  const char *inputFileList = argv[1];
+  const char *outFileName   = argv[2];
+
 
   TChain *fChain = new TChain("AUX");
 
-  size_t t0 = clock();
+  FillChain(fChain,inputFileList);
 
-  char fname[512];
- 
-  sprintf(fname, nBase, 1);
-  fChain->Add(fname);
+  size_t t0 = clock();
 
   NTupleReader tr(fChain);
 
   //define my AccRecoIsoEffs class to stroe counts and efficiencies
   AccRecoIsoEffs myAccRecoIsoEffs;
+
+  BaseHistgram myBaseHistgram;
+  myBaseHistgram.BookHistgram(outFileName);
 
   //here we define the baseline cut variables
   vector<TLorentzVector> jetsLVec;
@@ -69,6 +80,8 @@ int main()
     remainPassCSVS = tr.getVar<unsigned int>("remainPassCSVS");
     linearCombmTbJetPlusmTbestTopJet = tr.getVar<double>("linearCombmTbJetPlusmTbestTopJet");
     bestTopJetMass = tr.getVar<double>("bestTopJetMass");
+
+    (myBaseHistgram.h_b_all_MET)->Fill(met);
 
     //to avoid the segmentation error, we need to we have at least 4 jets in the final state
     if( jetsLVec.size() < 5)
@@ -296,6 +309,8 @@ int main()
   myAccRecoIsoEffs.NumberstoEffs();
 
   myAccRecoIsoEffs.printAccRecoIsoEffs();
+
+  (myBaseHistgram.oFile)->Write();
 
   return 0;
 }
