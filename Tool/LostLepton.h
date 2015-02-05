@@ -7,8 +7,6 @@
 #include "TFile.h"
 #include "TLorentzVector.h"
 #include "TVector3.h"
-#include "TChain.h"
-
 
 #include "Math/QuantFuncMathCore.h"
 #include "TMath.h"
@@ -18,7 +16,7 @@
 #define PT_BINS 8
 
 
-//############################begin to define class AccRecoIsoEffs###################
+//############################begin to defin class AccRecoIsoEffs###################
 
 
 class AccRecoIsoEffs
@@ -105,8 +103,6 @@ double AccRecoIsoEffs::get_sys_Error(double r,
 
 //############finish the definition of class AccRecoEffs######################
 
-//############begin to define class BaseHistgram############
-
 class BaseHistgram
 {
  public:
@@ -118,6 +114,14 @@ class BaseHistgram
   TH1D *h_b_acc_njets, *h_b_acc_nbjetsCSVM, *h_b_acc_bestTopMass, *h_b_acc_MET, *h_b_acc_jetpt2, *h_b_acc_jetpt4, *h_b_acc_jet1_met_phi_diff, *h_b_acc_jet2_met_phi_diff, *h_b_acc_jet3_met_phi_diff;
   TH1D *h_b_reco_nMuons, *h_b_reco_njets, *h_b_reco_nbjetsCSVM, *h_b_reco_bestTopMass, *h_b_reco_MET, *h_b_reco_jetpt2, *h_b_reco_jetpt4, *h_b_reco_jet1_met_phi_diff, *h_b_reco_jet2_met_phi_diff, *h_b_reco_jet3_met_phi_diff;
   TH1D *h_b_deltaR_mus, *h_b_deltaR_els;
+  TH1D *h_pred_mu_iso_met, *h_pred_mu_iso_njets, *h_pred_mu_iso_mt2, *h_pred_mu_iso_topmass;
+  TH1D *h_pred_mu_id_met, *h_pred_mu_id_njets, *h_pred_mu_id_mt2, *h_pred_mu_id_topmass;
+  TH1D *h_pred_mu_acc_met, *h_pred_mu_acc_njets, *h_pred_mu_acc_mt2, *h_pred_mu_acc_topmass;
+  TH1D *h_pred_mu_all_met, *h_pred_mu_all_njets, *h_pred_mu_all_mt2, *h_pred_mu_all_topmass;
+  TH1D *h_exp_mu_iso_met, *h_exp_mu_iso_njets, *h_exp_mu_iso_mt2, *h_exp_mu_iso_topmass;
+  TH1D *h_exp_mu_id_met, *h_exp_mu_id_njets, *h_exp_mu_id_mt2, *h_exp_mu_id_topmass;
+  TH1D *h_exp_mu_acc_met, *h_exp_mu_acc_njets, *h_exp_mu_acc_mt2, *h_exp_mu_acc_topmass;
+  TH1D *h_exp_mu_all_met, *h_exp_mu_all_njets, *h_exp_mu_all_mt2, *h_exp_mu_all_topmass;
 };
 
 void BaseHistgram::BookHistgram(const char *outFileName)
@@ -161,35 +165,48 @@ void BaseHistgram::BookHistgram(const char *outFileName)
 
   h_b_deltaR_mus = new TH1D("h_b_deltaR_mus","",1000,0,0.5);
   h_b_deltaR_els = new TH1D("h_b_deltaR_els","",1000,0,0.5);
+
+  h_pred_mu_iso_met = new TH1D("h_pred_mu_iso_met","",100,0,1000);
+  h_pred_mu_iso_njets = new TH1D("h_pred_mu_iso_njets","",20,0,20);
+  h_pred_mu_iso_mt2 = new TH1D("h_pred_mu_iso_mt2","",100,0,1000);
+  h_pred_mu_iso_topmass = new TH1D("h_pred_mu_iso_topmass","",100,50,300);
+
+  h_pred_mu_id_met = new TH1D("h_pred_mu_id_met","",100,0,1000);
+  h_pred_mu_id_njets = new TH1D("h_pred_mu_id_njets","",20,0,20);
+  h_pred_mu_id_mt2 = new TH1D("h_pred_mu_id_mt2","",100,0,1000);
+  h_pred_mu_id_topmass = new TH1D("h_pred_mu_id_topmass","",100,50,300);
+
+  h_pred_mu_acc_met = new TH1D("h_pred_mu_acc_met","",100,0,1000);
+  h_pred_mu_acc_njets = new TH1D("h_pred_mu_acc_njets","",20,0,20);
+  h_pred_mu_acc_mt2 = new TH1D("h_pred_mu_acc_mt2","",100,0,1000);
+  h_pred_mu_acc_topmass = new TH1D("h_pred_mu_acc_topmass","",100,50,300);
+
+  h_pred_mu_all_met = new TH1D("h_pred_mu_all_met","",100,0,1000);
+  h_pred_mu_all_njets = new TH1D("h_pred_mu_all_njets","",20,0,20);
+  h_pred_mu_all_mt2 = new TH1D("h_pred_mu_all_mt2","",100,0,1000);
+  h_pred_mu_all_topmass = new TH1D("h_pred_mu_all_topmass","",100,50,300);
+
+  h_exp_mu_iso_met = new TH1D("h_exp_mu_iso_met","",100,0,1000);
+  h_exp_mu_iso_njets = new TH1D("h_exp_mu_iso_njets","",20,0,20);
+  h_exp_mu_iso_mt2 = new TH1D("h_exp_mu_iso_mt2","",100,0,1000);
+  h_exp_mu_iso_topmass = new TH1D("h_exp_mu_iso_topmass","",100,50,300);
+
+  h_exp_mu_id_met = new TH1D("h_exp_mu_id_met","",100,0,1000);
+  h_exp_mu_id_njets = new TH1D("h_exp_mu_id_njets","",20,0,20);
+  h_exp_mu_id_mt2 = new TH1D("h_exp_mu_id_mt2","",100,0,1000);
+  h_exp_mu_id_topmass = new TH1D("h_exp_mu_id_topmass","",100,50,300);
+
+  h_exp_mu_acc_met = new TH1D("h_exp_mu_acc_met","",100,0,1000);
+  h_exp_mu_acc_njets = new TH1D("h_exp_mu_acc_njets","",20,0,20);
+  h_exp_mu_acc_mt2 = new TH1D("h_exp_mu_acc_mt2","",100,0,1000);
+  h_exp_mu_acc_topmass = new TH1D("h_exp_mu_acc_topmass","",100,50,300);
+
+  h_exp_mu_all_met = new TH1D("h_exp_mu_all_met","",100,0,1000);
+  h_exp_mu_all_njets = new TH1D("h_exp_mu_all_njets","",20,0,20);
+  h_exp_mu_all_mt2 = new TH1D("h_exp_mu_all_mt2","",100,0,1000);
+  h_exp_mu_all_topmass = new TH1D("h_exp_mu_all_topmass","",100,50,300);
+
 }
-
-//############finishe to define class BaseHistgram############
-
-void FillChain(TChain *chain, const TString &inputFileList)
-{
-  ifstream infile(inputFileList, ifstream::in);
-  std::string buffer;
-
-  if(!infile.is_open())
-  {
-    std::cerr << "** ERROR: Can't open '" << inputFileList << "' for input" << std::endl;
-    return ;
-  }
-
-  std::cout << "TreeUtilities : FillChain " << std::endl;
-  while(1)
-  {
-    infile >> buffer;
-    if(!infile.good()) 
-      break;
-    std::cout << "Adding tree from " << buffer.c_str() << std::endl;                                                              
-    chain->Add(buffer.c_str());
-  }
-  std::cout << "No. of Entries in this tree : " << chain->GetEntries() << std::endl;
-
-  return ;
-}
-    
 
 //############determine the pt bin number from generation level pt############
 int Set_ptbin_number(double gen_pt
