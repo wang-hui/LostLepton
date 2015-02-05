@@ -16,7 +16,7 @@ For now it is in my public area, but soon it will be in git.
 cd SusyAnaTools
 mkdir LostLepton
 cd LostLepton
-cp /afs/cern.ch/work/l/lacroix/public/stop_v150204 .
+cp /afs/cern.ch/work/l/lacroix/public/stop_v150204/* .
 mkdir obj
 make
 
