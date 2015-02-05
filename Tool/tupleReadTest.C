@@ -30,7 +30,7 @@ int main()
   //char nBase[] = "root://cmsxrootd-site.fnal.gov//store/user/pastika/DYJetsToLL_M-50_13TeV-madgraph-pythia8/PHYS14_PU20bx25_PHYS14_25_V1-FLAT/141227_223539/0000/stopFlatNtuples_%d.root";
   //char nBase[] = "/eos/uscms/store/user/pastika/DYJetsToLL_M-50_13TeV-madgraph-pythia8/PHYS14_PU20bx25_PHYS14_25_V1-FLAT/141227_223539/0000/stopFlatNtuples_%d.root";
   //char nBase[] = "/eos/uscms/store/user/lpcsusyhad/PHYS14_720_Dec23_2014/pastika/DYJetsToLL_M-50_13TeV-madgraph-pythia8/PHYS14_PU20bx25_PHYS14_25_V1-FLAT/141227_223539/0000/stopFlatNtuples_%d.root";
-  char nBase[] = "/afs/cern.ch/user/h/hua/stop/AllHadronicSUSY/CMSSW_7_2_0/src/stop_ttbar_skimmed_tree.root";
+  char nBase[] = "/afs/cern.ch/user/h/hua/stop/AllHadronicSUSY/CMSSW_7_2_0/src/SusyAnaTools/LostLepton/stop_ttbar_skimmed_tree.root";
 
   TChain *f = new TChain("AUX");
 

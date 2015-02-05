@@ -42,13 +42,18 @@ class AccRecoIsoEffs
   double mus_recoeff_err[PT_BINS] = {0}, els_recoeff_err[PT_BINS] = {0};
   double mus_isoeff_err[PT_BINS] = {0}, els_isoeff_err[PT_BINS] = {0};
 
-  //here we defin the muon/electron number we need to count in the loop
+  //here we define the muon/electron number we need to count in the loop
   double nmus = 0, nmus_acc = 0, nels = 0, nels_acc =0;
   double nmus_acc_bin[PT_BINS] = {0}, nels_acc_bin[PT_BINS] = {0};
   double nmus_reco[PT_BINS] = {0}, nels_reco[PT_BINS] = {0};
   double nmus_iso[PT_BINS] = {0}, nels_iso[PT_BINS] = {0};
 
+  //here we define the event weight we are going to use in the second loop ( muon/electron CS and prediction plots)
+  double mus_EventWeight_iso[PT_BINS] = {0}, mus_EventWeight_reco[PT_BINS] = {0}, mus_EventWeight_acc[PT_BINS] = {0};
+  double els_EventWeight_iso[PT_BINS] = {0}, els_EventWeight_reco[PT_BINS] = {0}, els_EventWeight_acc[PT_BINS] = {0};
+
   void NumberstoEffs();
+  void EffstoWeights();
 
  private:
   double get_stat_Error(double a,
