@@ -11,7 +11,7 @@
 #include "Math/QuantFuncMathCore.h"
 #include "TMath.h"
 
-#include "NTupleReader.h"
+#include "SusyAnaTools/Tools/NTupleReader.h"
 
 #define PT_BINS 8
 

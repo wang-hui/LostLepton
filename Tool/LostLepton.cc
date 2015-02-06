@@ -18,7 +18,7 @@
 #include "TStopwatch.h"
 #include "TString.h"
 
-#include "NTupleReader.h"
+#include "SusyAnaTools/Tools/NTupleReader.h"
 #include "LostLepton.h"
 #include "TGraph.h"
 #include "TCanvas.h"
