@@ -2,11 +2,13 @@
 #include <fstream>
 #include <cmath>
 #include <vector>
+
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TFile.h"
 #include "TLorentzVector.h"
 #include "TVector3.h"
+#include "TChain.h"
 
 #include "Math/QuantFuncMathCore.h"
 #include "TMath.h"
@@ -212,6 +214,31 @@ void BaseHistgram::BookHistgram(const char *outFileName)
   h_exp_mu_all_topmass = new TH1D("h_exp_mu_all_topmass","",100,50,300);
 
 }
+
+//Fill chain from txt file
+bool FillChain(TChain *chain, const TString &inputFileList)
+{
+  ifstream infile(inputFileList, ifstream::in);
+  std::string buffer;
+
+  if(!infile.is_open())
+  {
+    std::cerr << "** ERROR: Can't open '" << inputFileList << "' for input" << std::endl;
+    return false;
+  }
+
+  std::cout << "TreeUtilities : FillChain " << std::endl;
+  while(1)
+  {
+    infile >> buffer;
+    if(!infile.good()) break;
+    //std::cout << "Adding tree from " << buffer.c_str() << std::endl;                                                              
+    chain->Add(buffer.c_str());
+  }
+  std::cout << "No. of Entries in this tree : " << chain->GetEntries() << std::endl;
+  return true;
+}
+
 
 //############determine the pt bin number from generation level pt############
 int Set_ptbin_number(double gen_pt

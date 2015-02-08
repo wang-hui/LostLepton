@@ -1,1 +1,1 @@
-/afs/cern.ch/user/h/hua/stop/AllHadronicSUSY/CMSSW_7_2_0/stop_ttbar_skimmed_tree.root
+/afs/cern.ch/user/h/hua/stop/AllHadronicSUSY/data/stop_ttbar_skimmed_tree.root

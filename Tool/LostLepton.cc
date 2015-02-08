@@ -171,20 +171,28 @@ void passBaselineFunc(NTupleReader &tr)
 }
 
 
-int main()
+int main(int argc, char* argv[])
 {
 
-  //char nBase[] = "/afs/cern.ch/user/h/hua/stop/AllHadronicSUSY/CMSSW_7_2_0/stop_ttbar_skimmed_tree.root";
-  char nBase[] = "stop_ttbar_skimmed_tree.root";
+  if (argc < 2)
+  {
+    std::cerr <<"Please give 2 arguments " << "runList " << " " << "outputFileName" << std::endl;
+    std::cerr <<" Valid configurations are " << std::endl;
+    std::cerr <<" ./LostLepton runlist_ttjets.txt isoplots.root" << std::endl;
+    return -1;
+  }
+  const char *inputFileList = argv[1];
+  const char *outFileName   = argv[2];
 
   TChain *fChain = new TChain("AUX");
 
-  size_t t0 = clock();
+  if(!FillChain(fChain, inputFileList))
+  {
+    std::cerr << "Cannot get the tree " << std::endl;
+  }
 
-  char fname[512];
- 
-  sprintf(fname, nBase, 1);
-  fChain->Add(fname);
+  //clock to monitor the run time
+  size_t t0 = clock();
 
   NTupleReader tr(fChain);
   //initialize the type3Ptr defined in the customize.h
@@ -195,7 +203,7 @@ int main()
   AccRecoIsoEffs myAccRecoIsoEffs;
   //define my histgram class
   BaseHistgram myBaseHistgram;
-  myBaseHistgram.BookHistgram("test.root");
+  myBaseHistgram.BookHistgram(outFileName);
 
   int nevents_muonCS= 0;
   int nevents_baseline= 0;

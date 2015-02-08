@@ -43,4 +43,4 @@ And it will be involved into make command automatically and we do not have error
 
 4.Finally, run the code:
 
-./LostLepton
+./LostLepton runList_inputfile.txt outputfile.root
