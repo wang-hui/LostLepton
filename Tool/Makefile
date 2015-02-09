@@ -22,7 +22,7 @@ LDFLAGS    =
 LIBS       = $(shell root-config --glibs)
 
 #OBJS       = $(patsubst %, $(ODIR)/%, $(OBJ))
-PROGRAMS = tupleTest makePlots LostLepton
+PROGRAMS = tupleTest makePlots LostLepton ClosurePlots
 
 all: $(PROGRAMS)
 
@@ -47,10 +47,11 @@ tupleTest: $(ODIR)/NTupleReader.o $(ODIR)/tupleReadTest.o
 makePlots: $(ODIR)/NTupleReader.o $(ODIR)/Plotter.o $(ODIR)/MakePlots.o
 	$(LD) $^ $(LIBS) -L .TupleDict_h.so -o $@
 
-#LostLepton: $(ODIR)/LostLepton.o $(ODIR)/NTupleReader.o
-#	$(LD) $^ $(LIBS) -o $@
 LostLepton: $(ODIR)/LostLepton.o $(ODIR)/NTupleReader.o
 	$(LD) $^ $(LIBS) -L${CMSSW_BASE}/lib/${SCRAM_ARCH}/ -lrecipeAUXOxbridgeMT2 -o $@
+
+ClosurePlots: $(ODIR)/ClosurePlots.o
+	$(LD) $^ $(LIBS)  -o $@
 
 #baselineDef: $(ODIR)/NTupleReader.o $(ODIR)/baselineDef.o
 #	$(LD) $^ $(LIBS) -L${CMSSW_BASE}/lib/${SCRAM_ARCH}/ -lrecipeAUXOxbridgeMT2 -o $@

@@ -41,6 +41,11 @@ This will generate a soft link : libtbb.so.2
 
 And it will be involved into make command automatically and we do not have error report anymore
 
-4.Finally, run the code:
+4.Run the LostLepton code:
 
 ./LostLepton runList_inputfile.txt outputfile.root
+
+5.Make Closure Plots:
+
+./ClosurePlots
+
