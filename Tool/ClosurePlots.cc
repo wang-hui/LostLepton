@@ -21,13 +21,20 @@ using namespace std;
 int main()
 {
   ClosurePlots myClosurePlots;
-  //initialize the closure plots we want to investigate
+  myClosurePlots.Initialization();
+  //initialize the closure plots parameter we want to investigate
   vector<Plotting_Parameter> myPlotting_Paramete = 
   { 
+    //muon closure plots, all
     {"mu_all_met"     , 200 , 600 },
     {"mu_all_njets"   , 2   , 17  }, 
     {"mu_all_mt2"     , 100 , 600 },                                               
-    {"mu_all_topmass" , 50  , 300 }                                                
+    {"mu_all_topmass" , 50  , 300 },
+    //electron closure plots, all
+    {"el_all_met"     , 200 , 600 },
+    {"el_all_njets"   , 2   , 17  },
+    {"el_all_mt2"     , 100 , 600 },
+    {"el_all_topmass" , 50  , 300 }
   };
 
   
@@ -37,10 +44,10 @@ int main()
   {
 
     myClosurePlots.ClosureTemplate(
-                                 (*iter_p).hist_tag,
-                                 (*iter_p).min,
-                                 (*iter_p).max 
-                                );
+                                   (*iter_p).hist_tag,
+                                   (*iter_p).min,
+                                   (*iter_p).max 
+                                  );
   }
 
   return 0;

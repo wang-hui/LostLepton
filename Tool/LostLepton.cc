@@ -379,6 +379,7 @@ int main(int argc, char* argv[])
           
           if( isElectron )
           {
+            ngenel++;
             myAccRecoIsoEffs.nels++;
           
             double gen_els_eta, gen_els_phi, gen_els_pt;
@@ -443,8 +444,20 @@ int main(int argc, char* argv[])
                 {
                   myAccRecoIsoEffs.nels_iso[ptbin_number]++;
                 }//if isolated
+                else
+                {
+                  ngenelnotiso++;
+                }
               }//if reconstructed
+              else
+              {
+                ngenelnotid++;
+              }
             }//if accepted
+            else
+            {
+              ngeneloutacc++;
+            }
           }//if the gen particle is electron 
         }//loop gen electrons/muons
       }//if no muons
@@ -493,6 +506,42 @@ int main(int argc, char* argv[])
 	(myBaseHistgram.h_exp_mu_all_mt2)->Fill(MT2);
 	(myBaseHistgram.h_exp_mu_all_topmass)->Fill(bestTopJetMass);
       }
+
+      // exp 1 electron not iso
+      if (nElectrons == 0 && nMuons==0 && ngenel==1 && ngenelnotiso==1)
+      {
+        (myBaseHistgram.h_exp_el_iso_met)->Fill(met);
+        (myBaseHistgram.h_exp_el_iso_njets)->Fill(njets30);
+        (myBaseHistgram.h_exp_el_iso_mt2)->Fill(MT2);
+        (myBaseHistgram.h_exp_el_iso_topmass)->Fill(bestTopJetMass);
+      }
+
+      // exp 1 electron not id
+      if (nElectrons == 0 && nMuons==0 && ngenel==1 && ngenelnotid==1)
+      {
+        (myBaseHistgram.h_exp_el_id_met)->Fill(met);
+        (myBaseHistgram.h_exp_el_id_njets)->Fill(njets30);
+        (myBaseHistgram.h_exp_el_id_mt2)->Fill(MT2);
+        (myBaseHistgram.h_exp_el_id_topmass)->Fill(bestTopJetMass);
+      }
+
+      // exp 1 electron not acc
+      if (nElectrons == 0 && nMuons==0 && ngenel==1 && ngeneloutacc==1)
+      {
+        (myBaseHistgram.h_exp_el_acc_met)->Fill(met);
+        (myBaseHistgram.h_exp_el_acc_njets)->Fill(njets30);
+        (myBaseHistgram.h_exp_el_acc_mt2)->Fill(MT2);
+        (myBaseHistgram.h_exp_el_acc_topmass)->Fill(bestTopJetMass);
+      }
+
+      // exp 1 electron tot
+      if (nElectrons == 0 && nMuons==0 && ngenel==1 && (ngeneloutacc==1 || ngenelnotid==1 || ngenelnotiso==1))
+      {
+        (myBaseHistgram.h_exp_el_all_met)->Fill(met);
+        (myBaseHistgram.h_exp_el_all_njets)->Fill(njets30);
+        (myBaseHistgram.h_exp_el_all_mt2)->Fill(MT2);
+        (myBaseHistgram.h_exp_el_all_topmass)->Fill(bestTopJetMass);
+      }
     }//baseline, nolepveto
   }//end of first loop
 
@@ -518,11 +567,18 @@ int main(int argc, char* argv[])
 
     if(passBaseline_nolepveto)
     {
-      //muon CS
-      //nMuons in flatree means no iso cut muons; CUT2 we add iso
       int nElectrons = trCS.getVar<int>("nElectrons_CUT2");
       int nMuons = trCS.getVar<int>("nMuons_CUT2");
 
+      double met = trCS.getVar<double>("met");
+      double metphi = trCS.getVar<double>("metphi");
+
+      int njets30 = trCS.getVar<int>("cntNJetsPt30Eta24");
+      double MT2 = trCS.getVar<double>("MT22");
+      double bestTopJetMass = trCS.getVar<double>("bestTopJetMass2");
+
+      //muon CS
+      //nMuons in flatree means no iso cut muons; CUT2 we add iso
       if (nElectrons == 0 && nMuons == 1)
       {
         //get muon variables
@@ -540,8 +596,6 @@ int main(int argc, char* argv[])
             reco_mus_phi = ( muonsLVec.at(im) ).Phi();
 	  }
 	}
-        double met = trCS.getVar<double>("met");
-        double metphi = trCS.getVar<double>("metphi");
 
         double deltaphi = DeltaPhi( reco_mus_phi , metphi );
         double mtW = std::sqrt( 2.0* reco_mus_pt * met * (1.0 - cos(deltaphi) ) );
@@ -557,10 +611,6 @@ int main(int argc, char* argv[])
 
 	  //mtwcorrfactor
 	  EventWeight*=mtwcorrfactor[ptbin_number];
-
-          int njets30 = trCS.getVar<int>("cntNJetsPt30Eta24");
-          double MT2 = trCS.getVar<double>("MT22");
-          double bestTopJetMass = trCS.getVar<double>("bestTopJetMass2");
 	  //dimuon correction factor
 	  //need to be added!!!
 
@@ -587,6 +637,65 @@ int main(int argc, char* argv[])
 	  (myBaseHistgram.h_pred_mu_all_topmass)->Fill(bestTopJetMass, EventWeight_all*EventWeight);
   	}//mtW5<100.0 (muon CS)
       }//nElectrons == 0 && nMuons == 1
+
+      //Electron CS
+      //nElectrons in flatree means no iso cut electrons; CUT2 we add iso
+      if (nElectrons == 1 && nMuons == 0)
+      {
+        //get electron variables
+        vector<TLorentzVector> elesLVec = trCS.getVec<TLorentzVector>("elesLVec");
+        vector<double> elesRelIso = trCS.getVec<double>("elesRelIso");
+
+        double reco_els_pt = 0, reco_els_eta = 0, reco_els_phi = 0;
+
+        for(unsigned int ie = 0 ; ie < elesLVec.size() ; ie++)
+        {
+          if( fabs(elesLVec[ie].Eta()) < 2.5 && elesRelIso[ie] < 0.24 )
+          {
+            reco_els_pt  = ( elesLVec.at(ie) ).Pt();
+            reco_els_eta = ( elesLVec.at(ie) ).Eta();
+            reco_els_phi = ( elesLVec.at(ie) ).Phi();
+          }
+        }
+
+        double deltaphi = DeltaPhi( reco_els_phi , metphi );
+        double mtW = std::sqrt( 2.0* reco_els_pt * met * (1.0 - cos(deltaphi) ) );
+  
+        if ( mtW < 100.0 )
+        {
+          //////////////////////////
+          // prediction computation
+          //////////////////////////
+          double EventWeight=1.0;
+          int ptbin_number = Set_ptbin_number(reco_els_pt);
+
+          //mtwcorrfactor
+          EventWeight*=mtwcorrfactor[ptbin_number];
+          //dielectronon correction factor
+          //need to be added!!!
+          //Fill electron iso closure plots
+          (myBaseHistgram.h_pred_el_iso_met)->Fill(met, myAccRecoIsoEffs.els_EventWeight_iso[ptbin_number]*EventWeight);
+          (myBaseHistgram.h_pred_el_iso_njets)->Fill(njets30, myAccRecoIsoEffs.els_EventWeight_iso[ptbin_number]*EventWeight);
+          (myBaseHistgram.h_pred_el_iso_mt2)->Fill(MT2, myAccRecoIsoEffs.els_EventWeight_iso[ptbin_number]*EventWeight);
+          (myBaseHistgram.h_pred_el_iso_topmass)->Fill(bestTopJetMass, myAccRecoIsoEffs.els_EventWeight_iso[ptbin_number]*EventWeight);
+          //Fill electron id closure plots
+          (myBaseHistgram.h_pred_el_id_met)->Fill(met, myAccRecoIsoEffs.els_EventWeight_reco[ptbin_number]*EventWeight);
+          (myBaseHistgram.h_pred_el_id_njets)->Fill(njets30, myAccRecoIsoEffs.els_EventWeight_reco[ptbin_number]*EventWeight);
+          (myBaseHistgram.h_pred_el_id_mt2)->Fill(MT2, myAccRecoIsoEffs.els_EventWeight_reco[ptbin_number]*EventWeight);
+          (myBaseHistgram.h_pred_el_id_topmass)->Fill(bestTopJetMass, myAccRecoIsoEffs.els_EventWeight_reco[ptbin_number]*EventWeight);
+          //Fill electron acc closure plots
+          (myBaseHistgram.h_pred_el_acc_met)->Fill(met, myAccRecoIsoEffs.els_EventWeight_acc[ptbin_number]*EventWeight);
+          (myBaseHistgram.h_pred_el_acc_njets)->Fill(njets30, myAccRecoIsoEffs.els_EventWeight_acc[ptbin_number]*EventWeight);
+          (myBaseHistgram.h_pred_el_acc_mt2)->Fill(MT2, myAccRecoIsoEffs.els_EventWeight_acc[ptbin_number]*EventWeight);
+          (myBaseHistgram.h_pred_el_acc_topmass)->Fill(bestTopJetMass, myAccRecoIsoEffs.els_EventWeight_acc[ptbin_number]*EventWeight);
+          //Fill all electron closure plots
+          double EventWeight_all = myAccRecoIsoEffs.els_EventWeight_iso[ptbin_number] + myAccRecoIsoEffs.els_EventWeight_reco[ptbin_number] + myAccRecoIsoEffs.els_EventWeight_acc[ptbin_number];
+          (myBaseHistgram.h_pred_el_all_met)->Fill(met, EventWeight_all*EventWeight);
+          (myBaseHistgram.h_pred_el_all_njets)->Fill(njets30, EventWeight_all*EventWeight);
+          (myBaseHistgram.h_pred_el_all_mt2)->Fill(MT2, EventWeight_all*EventWeight);
+          (myBaseHistgram.h_pred_el_all_topmass)->Fill(bestTopJetMass, EventWeight_all*EventWeight);
+        }//mtW cut for electron
+      }//Electron CS sample
     }//baseline_nolepveto
   }
 

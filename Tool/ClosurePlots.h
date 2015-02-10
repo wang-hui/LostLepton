@@ -17,9 +17,10 @@
 class ClosurePlots
 {
  public:
-  TFile * fin = TFile::Open("test.root");
-  TList * list = fin->GetListOfKeys();
-  
+  TFile * fin;
+  TList * list;
+ 
+  void Initialization(); 
   void PrintPlotsName();
   void ClosureTemplate(
                        TString hist_tag,
@@ -28,12 +29,20 @@ class ClosurePlots
                        );
 };
 
+void ClosurePlots::Initialization()
+{
+  fin = TFile::Open("test.root");
+  list = fin->GetListOfKeys();
+}
+
 void ClosurePlots::PrintPlotsName()
 {
   for(int i  = 0 ; i < list->GetSize() ; i++)
   {
     std::cout<<"Name: "<< list->At(i)->GetName() << "("<< i <<")"<<std::endl;
   }
+  
+  return ;
 }
 
 void ClosurePlots::ClosureTemplate(
@@ -86,17 +95,16 @@ void ClosurePlots::ClosureTemplate(
   h_exp->GetXaxis()->SetRangeUser(min,max);
   h_exp->SetLineColor(2);
   
-  
   h_pred->Draw("E"); 
   h_exp->Draw("same");
 
-  const std::string titre="CMS Preliminary 2015, Simulation sqrt(s)=13 TeV";
+  const std::string titre="CMS Preliminary 2015, Simulation sqrt(S)=13 TeV";
   TLatex *title = new TLatex(0.09770115,0.9194915,titre.c_str());
   title->SetNDC();
   title->SetTextSize(0.045);
   title->Draw("same");
 
-  TLegend* leg = new TLegend(0.6,0.75,0.9,0.87);
+  TLegend* leg = new TLegend(0.6,0.75,0.85,0.85);
   leg->SetBorderSize(0);
   leg->SetTextFont(42);
   leg->SetFillColor(0);
@@ -113,13 +121,12 @@ void ClosurePlots::ClosureTemplate(
   pad2->SetTopMargin(small);
   pad2->SetBorderMode(0);
 
-
   TH1D *ratio = (TH1D*) h_pred->Clone();
   TH1D *allmc = (TH1D*) h_exp->Clone();
 
   ratio->Add(allmc, -1);
   ratio->Divide(allmc);
-  ratio->SetTitle( hist_tag + TString("; (pred - exp)/exp") );
+  ratio->SetTitle( "(pred - exp)/exp" );
 
   TAxis* xHT = ratio->GetXaxis();
 

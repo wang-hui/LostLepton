@@ -129,6 +129,16 @@ class BaseHistgram
   TH1D *h_exp_mu_id_met, *h_exp_mu_id_njets, *h_exp_mu_id_mt2, *h_exp_mu_id_topmass;
   TH1D *h_exp_mu_acc_met, *h_exp_mu_acc_njets, *h_exp_mu_acc_mt2, *h_exp_mu_acc_topmass;
   TH1D *h_exp_mu_all_met, *h_exp_mu_all_njets, *h_exp_mu_all_mt2, *h_exp_mu_all_topmass;
+
+  TH1D *h_pred_el_iso_met, *h_pred_el_iso_njets, *h_pred_el_iso_mt2, *h_pred_el_iso_topmass;
+  TH1D *h_pred_el_id_met, *h_pred_el_id_njets, *h_pred_el_id_mt2, *h_pred_el_id_topmass;
+  TH1D *h_pred_el_acc_met, *h_pred_el_acc_njets, *h_pred_el_acc_mt2, *h_pred_el_acc_topmass;
+  TH1D *h_pred_el_all_met, *h_pred_el_all_njets, *h_pred_el_all_mt2, *h_pred_el_all_topmass;
+  TH1D *h_exp_el_iso_met, *h_exp_el_iso_njets, *h_exp_el_iso_mt2, *h_exp_el_iso_topmass;
+  TH1D *h_exp_el_id_met, *h_exp_el_id_njets, *h_exp_el_id_mt2, *h_exp_el_id_topmass;
+  TH1D *h_exp_el_acc_met, *h_exp_el_acc_njets, *h_exp_el_acc_mt2, *h_exp_el_acc_topmass;
+  TH1D *h_exp_el_all_met, *h_exp_el_all_njets, *h_exp_el_all_mt2, *h_exp_el_all_topmass;
+
 };
 
 void BaseHistgram::BookHistgram(const char *outFileName)
@@ -213,6 +223,46 @@ void BaseHistgram::BookHistgram(const char *outFileName)
   h_exp_mu_all_mt2 = new TH1D("h_exp_mu_all_mt2","",100,0,1000);
   h_exp_mu_all_topmass = new TH1D("h_exp_mu_all_topmass","",100,50,300);
 
+
+  h_pred_el_iso_met = new TH1D("h_pred_el_iso_met","",100,0,1000);
+  h_pred_el_iso_njets = new TH1D("h_pred_el_iso_njets","",20,0,20);
+  h_pred_el_iso_mt2 = new TH1D("h_pred_el_iso_mt2","",100,0,1000);
+  h_pred_el_iso_topmass = new TH1D("h_pred_el_iso_topmass","",100,50,300);
+
+  h_pred_el_id_met = new TH1D("h_pred_el_id_met","",100,0,1000);
+  h_pred_el_id_njets = new TH1D("h_pred_el_id_njets","",20,0,20);
+  h_pred_el_id_mt2 = new TH1D("h_pred_el_id_mt2","",100,0,1000);
+  h_pred_el_id_topmass = new TH1D("h_pred_el_id_topmass","",100,50,300);
+
+  h_pred_el_acc_met = new TH1D("h_pred_el_acc_met","",100,0,1000);
+  h_pred_el_acc_njets = new TH1D("h_pred_el_acc_njets","",20,0,20);
+  h_pred_el_acc_mt2 = new TH1D("h_pred_el_acc_mt2","",100,0,1000);
+  h_pred_el_acc_topmass = new TH1D("h_pred_el_acc_topmass","",100,50,300);
+
+  h_pred_el_all_met = new TH1D("h_pred_el_all_met","",100,0,1000);
+  h_pred_el_all_njets = new TH1D("h_pred_el_all_njets","",20,0,20);
+  h_pred_el_all_mt2 = new TH1D("h_pred_el_all_mt2","",100,0,1000);
+  h_pred_el_all_topmass = new TH1D("h_pred_el_all_topmass","",100,50,300);
+
+  h_exp_el_iso_met = new TH1D("h_exp_el_iso_met","",100,0,1000);
+  h_exp_el_iso_njets = new TH1D("h_exp_el_iso_njets","",20,0,20);
+  h_exp_el_iso_mt2 = new TH1D("h_exp_el_iso_mt2","",100,0,1000);
+  h_exp_el_iso_topmass = new TH1D("h_exp_el_iso_topmass","",100,50,300);
+
+  h_exp_el_id_met = new TH1D("h_exp_el_id_met","",100,0,1000);
+  h_exp_el_id_njets = new TH1D("h_exp_el_id_njets","",20,0,20);
+  h_exp_el_id_mt2 = new TH1D("h_exp_el_id_mt2","",100,0,1000);
+  h_exp_el_id_topmass = new TH1D("h_exp_el_id_topmass","",100,50,300);
+
+  h_exp_el_acc_met = new TH1D("h_exp_el_acc_met","",100,0,1000);
+  h_exp_el_acc_njets = new TH1D("h_exp_el_acc_njets","",20,0,20);
+  h_exp_el_acc_mt2 = new TH1D("h_exp_el_acc_mt2","",100,0,1000);
+  h_exp_el_acc_topmass = new TH1D("h_exp_el_acc_topmass","",100,50,300);
+
+  h_exp_el_all_met = new TH1D("h_exp_el_all_met","",100,0,1000);
+  h_exp_el_all_njets = new TH1D("h_exp_el_all_njets","",20,0,20);
+  h_exp_el_all_mt2 = new TH1D("h_exp_el_all_mt2","",100,0,1000);
+  h_exp_el_all_topmass = new TH1D("h_exp_el_all_topmass","",100,50,300);
 }
 
 //Fill chain from txt file
