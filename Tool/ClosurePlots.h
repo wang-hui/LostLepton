@@ -24,6 +24,7 @@ class ClosurePlots
   void PrintPlotsName();
   void ClosureTemplate(
                        TString hist_tag,
+                       TString XTitle,
                        double min,
                        double max
                        );
@@ -47,6 +48,7 @@ void ClosurePlots::PrintPlotsName()
 
 void ClosurePlots::ClosureTemplate(
                                    TString hist_tag,
+                                   TString XTitle,
                                    double min,
                                    double max
                                   )
@@ -89,7 +91,7 @@ void ClosurePlots::ClosureTemplate(
   pad1->SetBorderMode(0);
 
   h_pred->GetXaxis()->SetRangeUser(min,max);
-  h_pred->GetXaxis()->SetTitle(hist_tag);
+  h_pred->GetXaxis()->SetTitle(XTitle);
   h_pred->SetLineColor(1);
 
   h_exp->GetXaxis()->SetRangeUser(min,max);
@@ -98,7 +100,7 @@ void ClosurePlots::ClosureTemplate(
   h_pred->Draw("E"); 
   h_exp->Draw("same");
 
-  const std::string titre="CMS Preliminary 2015, Simulation sqrt(S)=13 TeV";
+  const std::string titre="CMS Preliminary 2015, Simulation #sqrt{s} = 13 TeV";
   TLatex *title = new TLatex(0.09770115,0.9194915,titre.c_str());
   title->SetNDC();
   title->SetTextSize(0.045);
@@ -126,7 +128,7 @@ void ClosurePlots::ClosureTemplate(
 
   ratio->Add(allmc, -1);
   ratio->Divide(allmc);
-  ratio->SetTitle( "(pred - exp)/exp" );
+  ratio->GetYaxis()->SetTitle( "(pred - exp)/exp" );
 
   TAxis* xHT = ratio->GetXaxis();
 
@@ -144,7 +146,7 @@ void ClosurePlots::ClosureTemplate(
 
   ratio->SetTitleSize(0.15);
   ratio->SetStats(kFALSE);
-  ratio->SetMarkerStyle(kFullDotLarge);
+  ratio->SetMarkerStyle(kFullDotMedium);
   ratio->DrawCopy("E");
 
   TH1D *zero = (TH1D*)ratio->Clone(); 
@@ -153,13 +155,14 @@ void ClosurePlots::ClosureTemplate(
   zero->SetLineColor(kRed); zero->SetLineWidth(1);
   zero->DrawCopy("same");
 
-  c->SaveAs( hist_tag + TString(".pdf") );
+  c->SaveAs( hist_tag + TString(".png") );
 }
 
 
 struct Plotting_Parameter
 {
   TString hist_tag;
+  TString XTitle;
   double min;
   double max;
 };

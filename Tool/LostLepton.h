@@ -54,8 +54,15 @@ class AccRecoIsoEffs
   double mus_EventWeight_iso[PT_BINS] = {0}, mus_EventWeight_reco[PT_BINS] = {0}, mus_EventWeight_acc[PT_BINS] = {0};
   double els_EventWeight_iso[PT_BINS] = {0}, els_EventWeight_reco[PT_BINS] = {0}, els_EventWeight_acc[PT_BINS] = {0};
 
+  //di-lepton correction
+  double nevents_single_mus = 0, nevents_di_mus = 0;
+  double nevents_single_els = 0, nevents_di_els = 0;
+  double corrfactor_di_mus = 0;
+  double corrfactor_di_els = 0;
+
   void NumberstoEffs();
   void EffstoWeights();
+  void GetDiLeptonFactor();
 
  private:
   double get_stat_Error(double a,
@@ -121,6 +128,8 @@ class BaseHistgram
   TH1D *h_b_acc_njets, *h_b_acc_nbjetsCSVM, *h_b_acc_bestTopMass, *h_b_acc_MET, *h_b_acc_jetpt2, *h_b_acc_jetpt4, *h_b_acc_jet1_met_phi_diff, *h_b_acc_jet2_met_phi_diff, *h_b_acc_jet3_met_phi_diff;
   TH1D *h_b_reco_nMuons, *h_b_reco_njets, *h_b_reco_nbjetsCSVM, *h_b_reco_bestTopMass, *h_b_reco_MET, *h_b_reco_jetpt2, *h_b_reco_jetpt4, *h_b_reco_jet1_met_phi_diff, *h_b_reco_jet2_met_phi_diff, *h_b_reco_jet3_met_phi_diff;
   TH1D *h_b_deltaR_mus, *h_b_deltaR_els;
+
+  //closure plots definition
   TH1D *h_pred_mu_iso_met, *h_pred_mu_iso_njets, *h_pred_mu_iso_mt2, *h_pred_mu_iso_topmass;
   TH1D *h_pred_mu_id_met, *h_pred_mu_id_njets, *h_pred_mu_id_mt2, *h_pred_mu_id_topmass;
   TH1D *h_pred_mu_acc_met, *h_pred_mu_acc_njets, *h_pred_mu_acc_mt2, *h_pred_mu_acc_topmass;
@@ -129,6 +138,8 @@ class BaseHistgram
   TH1D *h_exp_mu_id_met, *h_exp_mu_id_njets, *h_exp_mu_id_mt2, *h_exp_mu_id_topmass;
   TH1D *h_exp_mu_acc_met, *h_exp_mu_acc_njets, *h_exp_mu_acc_mt2, *h_exp_mu_acc_topmass;
   TH1D *h_exp_mu_all_met, *h_exp_mu_all_njets, *h_exp_mu_all_mt2, *h_exp_mu_all_topmass;
+  TH1D *h_exp_mu1plus2_all_met, *h_exp_mu1plus2_all_njets, *h_exp_mu1plus2_all_mt2, *h_exp_mu1plus2_all_topmass;
+
 
   TH1D *h_pred_el_iso_met, *h_pred_el_iso_njets, *h_pred_el_iso_mt2, *h_pred_el_iso_topmass;
   TH1D *h_pred_el_id_met, *h_pred_el_id_njets, *h_pred_el_id_mt2, *h_pred_el_id_topmass;
@@ -138,7 +149,7 @@ class BaseHistgram
   TH1D *h_exp_el_id_met, *h_exp_el_id_njets, *h_exp_el_id_mt2, *h_exp_el_id_topmass;
   TH1D *h_exp_el_acc_met, *h_exp_el_acc_njets, *h_exp_el_acc_mt2, *h_exp_el_acc_topmass;
   TH1D *h_exp_el_all_met, *h_exp_el_all_njets, *h_exp_el_all_mt2, *h_exp_el_all_topmass;
-
+  TH1D *h_exp_el1plus2_all_met, *h_exp_el1plus2_all_njets, *h_exp_el1plus2_all_mt2, *h_exp_el1plus2_all_topmass;
 };
 
 void BaseHistgram::BookHistgram(const char *outFileName)
@@ -223,6 +234,10 @@ void BaseHistgram::BookHistgram(const char *outFileName)
   h_exp_mu_all_mt2 = new TH1D("h_exp_mu_all_mt2","",100,0,1000);
   h_exp_mu_all_topmass = new TH1D("h_exp_mu_all_topmass","",100,50,300);
 
+  h_exp_mu1plus2_all_met = new TH1D("h_exp_mu1plus2_all_met","",100,0,1000);
+  h_exp_mu1plus2_all_njets = new TH1D("h_exp_mu1plus2_all_njets","",20,0,20);
+  h_exp_mu1plus2_all_mt2 = new TH1D("h_exp_mu1plus2_all_mt2","",100,0,1000);
+  h_exp_mu1plus2_all_topmass = new TH1D("h_exp_mu1plus2_all_topmass","",100,50,300);
 
   h_pred_el_iso_met = new TH1D("h_pred_el_iso_met","",100,0,1000);
   h_pred_el_iso_njets = new TH1D("h_pred_el_iso_njets","",20,0,20);
@@ -263,6 +278,11 @@ void BaseHistgram::BookHistgram(const char *outFileName)
   h_exp_el_all_njets = new TH1D("h_exp_el_all_njets","",20,0,20);
   h_exp_el_all_mt2 = new TH1D("h_exp_el_all_mt2","",100,0,1000);
   h_exp_el_all_topmass = new TH1D("h_exp_el_all_topmass","",100,50,300);
+
+  h_exp_el1plus2_all_met = new TH1D("h_exp_el1plus2_all_met","",100,0,1000);
+  h_exp_el1plus2_all_njets = new TH1D("h_exp_el1plus2_all_njets","",20,0,20);
+  h_exp_el1plus2_all_mt2 = new TH1D("h_exp_el1plus2_all_mt2","",100,0,1000);
+  h_exp_el1plus2_all_topmass = new TH1D("h_exp_el1plus2_all_topmass","",100,50,300);
 }
 
 //Fill chain from txt file

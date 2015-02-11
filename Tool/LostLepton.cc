@@ -499,12 +499,29 @@ int main(int argc, char* argv[])
       }
 
       // exp 1 muon tot
-      if (nElectrons == 0 && nMuons==0 && ngenmu==1 && (ngenmuoutacc==1 || ngenmunotid==1 || ngenmunotiso==1))
+      //if (nElectrons == 0 && nMuons==0 && ngenmu==1 && (ngenmuoutacc==1 || ngenmunotid==1 || ngenmunotiso==1))
+      if (nElectrons == 0 && nMuons==0 && ngenmu==1)
       {
+        myAccRecoIsoEffs.nevents_single_mus++;
 	(myBaseHistgram.h_exp_mu_all_met)->Fill(met);
 	(myBaseHistgram.h_exp_mu_all_njets)->Fill(njets30);
 	(myBaseHistgram.h_exp_mu_all_mt2)->Fill(MT2);
 	(myBaseHistgram.h_exp_mu_all_topmass)->Fill(bestTopJetMass);
+
+        (myBaseHistgram.h_exp_mu1plus2_all_met)->Fill(met);
+        (myBaseHistgram.h_exp_mu1plus2_all_njets)->Fill(njets30);
+        (myBaseHistgram.h_exp_mu1plus2_all_mt2)->Fill(MT2);
+        (myBaseHistgram.h_exp_mu1plus2_all_topmass)->Fill(bestTopJetMass);
+      }
+
+      //if ( nElectrons == 0 && nMuons==0 && ngenmu==2 && ( ngenmuoutacc==2 || ngenmunotid==2 || ngenmunotiso==2 || ( ngenmuoutacc==1 && ngenmunotid==1 ) || (ngenmuoutacc==1 && ngenmunotiso==1 ) || ( ngenmunotiso==1 && ngenmunotid==1 ) ) )
+      if ( nElectrons == 0 && nMuons==0 && ngenmu==2 )
+      {
+        myAccRecoIsoEffs.nevents_di_mus++;
+        (myBaseHistgram.h_exp_mu1plus2_all_met)->Fill(met);
+        (myBaseHistgram.h_exp_mu1plus2_all_njets)->Fill(njets30);
+        (myBaseHistgram.h_exp_mu1plus2_all_mt2)->Fill(MT2);
+        (myBaseHistgram.h_exp_mu1plus2_all_topmass)->Fill(bestTopJetMass);
       }
 
       // exp 1 electron not iso
@@ -535,13 +552,31 @@ int main(int argc, char* argv[])
       }
 
       // exp 1 electron tot
-      if (nElectrons == 0 && nMuons==0 && ngenel==1 && (ngeneloutacc==1 || ngenelnotid==1 || ngenelnotiso==1))
+      //if (nElectrons == 0 && nMuons==0 && ngenel==1 && (ngeneloutacc==1 || ngenelnotid==1 || ngenelnotiso==1))
+      if (nElectrons == 0 && nMuons==0 && ngenel==1)
       {
+        myAccRecoIsoEffs.nevents_single_els++;
         (myBaseHistgram.h_exp_el_all_met)->Fill(met);
         (myBaseHistgram.h_exp_el_all_njets)->Fill(njets30);
         (myBaseHistgram.h_exp_el_all_mt2)->Fill(MT2);
         (myBaseHistgram.h_exp_el_all_topmass)->Fill(bestTopJetMass);
+  
+        (myBaseHistgram.h_exp_el1plus2_all_met)->Fill(met);
+        (myBaseHistgram.h_exp_el1plus2_all_njets)->Fill(njets30);
+        (myBaseHistgram.h_exp_el1plus2_all_mt2)->Fill(MT2);
+        (myBaseHistgram.h_exp_el1plus2_all_topmass)->Fill(bestTopJetMass);
       }
+
+      //if ( nElectrons == 0 && nMuons==0 && ngenel==2 && ( ngeneloutacc==2 || ngenelnotid==2 || ngenelnotiso==2 || ( ngeneloutacc==1 && ngenelnotid==1 ) || (ngeneloutacc==1 && ngenelnotiso==1 ) || ( ngenelnotiso==1 && ngenelnotid==1 ) ) )
+      if (nElectrons == 0 && nMuons==0 && ngenel==2)
+      {
+        myAccRecoIsoEffs.nevents_di_els++;
+        (myBaseHistgram.h_exp_el1plus2_all_met)->Fill(met);
+        (myBaseHistgram.h_exp_el1plus2_all_njets)->Fill(njets30);
+        (myBaseHistgram.h_exp_el1plus2_all_mt2)->Fill(MT2);
+        (myBaseHistgram.h_exp_el1plus2_all_topmass)->Fill(bestTopJetMass);
+      }
+
     }//baseline, nolepveto
   }//end of first loop
 
@@ -549,6 +584,7 @@ int main(int argc, char* argv[])
   myAccRecoIsoEffs.printOverview();
   myAccRecoIsoEffs.NumberstoEffs();
   myAccRecoIsoEffs.EffstoWeights();
+  myAccRecoIsoEffs.GetDiLeptonFactor();
   myAccRecoIsoEffs.printAccRecoIsoEffs();
 
   NTupleReader trCS(fChain);
@@ -610,9 +646,14 @@ int main(int argc, char* argv[])
           int ptbin_number = Set_ptbin_number(reco_mus_pt);
 
 	  //mtwcorrfactor
-	  EventWeight*=mtwcorrfactor[ptbin_number];
+	  EventWeight = EventWeight * mtwcorrfactor[ptbin_number];
 	  //dimuon correction factor
 	  //need to be added!!!
+          //from 2012! need to be updated!
+          //const double corrfactor2muons=0.918701083596747958;
+          //EventWeight*=corrfactor2muons;
+          EventWeight = EventWeight * myAccRecoIsoEffs.corrfactor_di_mus;
+
 
 	  //Fill muon iso closure plots
 	  (myBaseHistgram.h_pred_mu_iso_met)->Fill(met, myAccRecoIsoEffs.mus_EventWeight_iso[ptbin_number]*EventWeight);
@@ -670,9 +711,12 @@ int main(int argc, char* argv[])
           int ptbin_number = Set_ptbin_number(reco_els_pt);
 
           //mtwcorrfactor
-          EventWeight*=mtwcorrfactor[ptbin_number];
+          EventWeight = EventWeight * mtwcorrfactor[ptbin_number];
           //dielectronon correction factor
           //need to be added!!!
+          EventWeight = EventWeight * myAccRecoIsoEffs.corrfactor_di_els;
+
+
           //Fill electron iso closure plots
           (myBaseHistgram.h_pred_el_iso_met)->Fill(met, myAccRecoIsoEffs.els_EventWeight_iso[ptbin_number]*EventWeight);
           (myBaseHistgram.h_pred_el_iso_njets)->Fill(njets30, myAccRecoIsoEffs.els_EventWeight_iso[ptbin_number]*EventWeight);
@@ -772,6 +816,11 @@ void AccRecoIsoEffs::EffstoWeights()
   return ;
 }
 
+void AccRecoIsoEffs::GetDiLeptonFactor()
+{
+  corrfactor_di_mus = ( nevents_single_mus + nevents_di_mus ) / ( nevents_single_mus + 2 * nevents_di_mus );
+  corrfactor_di_els = ( nevents_single_els + nevents_di_els ) / ( nevents_single_els + 2 * nevents_di_els );
+}
 
 void AccRecoIsoEffs::printAccRecoIsoEffs()
 {
@@ -834,7 +883,10 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
       std::cout<<std::endl;
     }
   }
+
+  std::cout<<"correction factor from di muons: "<< corrfactor_di_mus <<std::endl;
  
+
   std::cout<<std::endl<<"Electron information: "<<std::endl;
 
   std::cout<<"number of electrons from top: "<<nels<<std::endl;
@@ -892,6 +944,8 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
       std::cout<<std::endl;
     }
   }
+
+  std::cout<<"correction factor from di electrons: "<< corrfactor_di_els <<std::endl;
 
   return ;
 }
