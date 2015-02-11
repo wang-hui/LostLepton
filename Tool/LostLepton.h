@@ -26,6 +26,7 @@ class AccRecoIsoEffs
  public:
   void printOverview();
   void printAccRecoIsoEffs();
+  void printNormalizeFlowNumber();
 
   //define the number of Pt bins we need in the calculation
   //static int PT_BINS = 8;
@@ -57,12 +58,36 @@ class AccRecoIsoEffs
   //di-lepton correction
   double nevents_single_mus = 0, nevents_di_mus = 0;
   double nevents_single_els = 0, nevents_di_els = 0;
+  
+  //flow number table
+  double nevents_exp_all_mus = 0, nevents_exp_all_els = 0;
+  double nevents_exp_acc_mus = 0, nevents_exp_acc_els = 0;
+  double nevents_exp_id_mus = 0, nevents_exp_id_els = 0;
+  double nevents_exp_iso_mus = 0, nevents_exp_iso_els = 0;
+  double nevents_exp_all_mus_err = 0, nevents_exp_all_els_err = 0;
+  double nevents_exp_acc_mus_err = 0, nevents_exp_acc_els_err = 0;
+  double nevents_exp_id_mus_err = 0, nevents_exp_id_els_err = 0;
+  double nevents_exp_iso_mus_err = 0, nevents_exp_iso_els_err = 0;
+
+  double nevents_pred_all_mus = 0, nevents_pred_all_els = 0;
+  double nevents_pred_acc_mus = 0, nevents_pred_acc_els = 0;
+  double nevents_pred_id_mus = 0, nevents_pred_id_els = 0;
+  double nevents_pred_iso_mus = 0, nevents_pred_iso_els = 0;
+  double nevents_pred_all_mus_err = 0, nevents_pred_all_els_err = 0;
+  double nevents_pred_acc_mus_err = 0, nevents_pred_acc_els_err = 0;
+  double nevents_pred_id_mus_err = 0, nevents_pred_id_els_err = 0;
+  double nevents_pred_iso_mus_err = 0, nevents_pred_iso_els_err = 0;
+
+  //di lepton correction factor
   double corrfactor_di_mus = 0;
   double corrfactor_di_els = 0;
+  double corrfactor_di_mus_err = 0;
+  double corrfactor_di_els_err = 0;
 
   void NumberstoEffs();
   void EffstoWeights();
   void GetDiLeptonFactor();
+  void NormalizeFlowNumber();
 
  private:
   double get_stat_Error(double a,

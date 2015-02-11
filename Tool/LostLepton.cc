@@ -210,14 +210,14 @@ int main(int argc, char* argv[])
   //int nevents_baseline_ref= 0;
 
   double mtwcorrfactor[8];
-  mtwcorrfactor[0] = 1.05;
-  mtwcorrfactor[1] = 1.06;
-  mtwcorrfactor[2] = 1.04;
-  mtwcorrfactor[3] = 1.11;
+  mtwcorrfactor[0] = 1.01;
+  mtwcorrfactor[1] = 1.04;
+  mtwcorrfactor[2] = 1.07;
+  mtwcorrfactor[3] = 1.20;
   mtwcorrfactor[4] = 1.15;
-  mtwcorrfactor[5] = 1.17;
-  mtwcorrfactor[6] = 1.20;
-  mtwcorrfactor[7] = 1.62;
+  mtwcorrfactor[5] = 1.20;
+  mtwcorrfactor[6] = 1.28;
+  mtwcorrfactor[7] = 1.83;
 
   //first loop, to generate Acc, reco and Iso effs and also fill expected histgram
   std::cout<<"First loop begin: "<<std::endl;
@@ -472,8 +472,9 @@ int main(int argc, char* argv[])
       ///////////////////////////
 
       // exp 1 muon not iso
-      if (nElectrons == 0 && nMuons==0 && ngenmu==1 && ngenmunotiso==1)
+      if ( nElectrons == 0 && nMuons==0 && ( (ngenmu==1 && ngenmunotiso==1) || ( ngenmu==2 && ngenmunotiso==2) ) )
       {
+        myAccRecoIsoEffs.nevents_exp_iso_mus++;     
 	(myBaseHistgram.h_exp_mu_iso_met)->Fill(met);
 	(myBaseHistgram.h_exp_mu_iso_njets)->Fill(njets30);
 	(myBaseHistgram.h_exp_mu_iso_mt2)->Fill(MT2);
@@ -481,8 +482,9 @@ int main(int argc, char* argv[])
       }
 
       // exp 1 muon not id
-      if (nElectrons == 0 && nMuons==0 && ngenmu==1 && ngenmunotid==1)
+      if (nElectrons == 0 && nMuons==0 && ( (ngenmu==1 && ngenmunotid==1) || ( ngenmu==2 && ngenmunotid==2) ) )
       {
+        myAccRecoIsoEffs.nevents_exp_id_mus++;
 	(myBaseHistgram.h_exp_mu_id_met)->Fill(met);
 	(myBaseHistgram.h_exp_mu_id_njets)->Fill(njets30);
 	(myBaseHistgram.h_exp_mu_id_mt2)->Fill(MT2);
@@ -490,8 +492,9 @@ int main(int argc, char* argv[])
       }
 
       // exp 1 muon out acc
-      if (nElectrons == 0 && nMuons==0 && ngenmu==1 && ngenmuoutacc==1)
+      if (nElectrons == 0 && nMuons==0 && ( (ngenmu==1 && ngenmuoutacc==1) || ( ngenmu==2 && ngenmuoutacc==2) ) )
       {
+        myAccRecoIsoEffs.nevents_exp_acc_mus++;
 	(myBaseHistgram.h_exp_mu_acc_met)->Fill(met);
 	(myBaseHistgram.h_exp_mu_acc_njets)->Fill(njets30);
 	(myBaseHistgram.h_exp_mu_acc_mt2)->Fill(MT2);
@@ -499,10 +502,11 @@ int main(int argc, char* argv[])
       }
 
       // exp 1 muon tot
-      //if (nElectrons == 0 && nMuons==0 && ngenmu==1 && (ngenmuoutacc==1 || ngenmunotid==1 || ngenmunotiso==1))
-      if (nElectrons == 0 && nMuons==0 && ngenmu==1)
+      if (nElectrons == 0 && nMuons==0 && ngenmu==1 && (ngenmuoutacc==1 || ngenmunotid==1 || ngenmunotiso==1))
+      //if (nElectrons == 0 && nMuons==0 && ngenmu==1)
       {
         myAccRecoIsoEffs.nevents_single_mus++;
+        myAccRecoIsoEffs.nevents_exp_all_mus++;
 	(myBaseHistgram.h_exp_mu_all_met)->Fill(met);
 	(myBaseHistgram.h_exp_mu_all_njets)->Fill(njets30);
 	(myBaseHistgram.h_exp_mu_all_mt2)->Fill(MT2);
@@ -514,10 +518,11 @@ int main(int argc, char* argv[])
         (myBaseHistgram.h_exp_mu1plus2_all_topmass)->Fill(bestTopJetMass);
       }
 
-      //if ( nElectrons == 0 && nMuons==0 && ngenmu==2 && ( ngenmuoutacc==2 || ngenmunotid==2 || ngenmunotiso==2 || ( ngenmuoutacc==1 && ngenmunotid==1 ) || (ngenmuoutacc==1 && ngenmunotiso==1 ) || ( ngenmunotiso==1 && ngenmunotid==1 ) ) )
-      if ( nElectrons == 0 && nMuons==0 && ngenmu==2 )
+      if ( nElectrons == 0 && nMuons==0 && ngenmu==2 && ( ngenmuoutacc==2 || ngenmunotid==2 || ngenmunotiso==2 || ( ngenmuoutacc==1 && ngenmunotid==1 ) || (ngenmuoutacc==1 && ngenmunotiso==1 ) || ( ngenmunotiso==1 && ngenmunotid==1 ) ) )
+      //if ( nElectrons == 0 && nMuons==0 && ngenmu==2 )
       {
         myAccRecoIsoEffs.nevents_di_mus++;
+        myAccRecoIsoEffs.nevents_exp_all_mus++;
         (myBaseHistgram.h_exp_mu1plus2_all_met)->Fill(met);
         (myBaseHistgram.h_exp_mu1plus2_all_njets)->Fill(njets30);
         (myBaseHistgram.h_exp_mu1plus2_all_mt2)->Fill(MT2);
@@ -525,8 +530,9 @@ int main(int argc, char* argv[])
       }
 
       // exp 1 electron not iso
-      if (nElectrons == 0 && nMuons==0 && ngenel==1 && ngenelnotiso==1)
+      if (nElectrons == 0 && nMuons==0 && ( (ngenel==1 && ngenelnotiso==1) || ( ngenel==2 && ngenelnotiso==2) ) )
       {
+        myAccRecoIsoEffs.nevents_exp_iso_els++;
         (myBaseHistgram.h_exp_el_iso_met)->Fill(met);
         (myBaseHistgram.h_exp_el_iso_njets)->Fill(njets30);
         (myBaseHistgram.h_exp_el_iso_mt2)->Fill(MT2);
@@ -534,8 +540,9 @@ int main(int argc, char* argv[])
       }
 
       // exp 1 electron not id
-      if (nElectrons == 0 && nMuons==0 && ngenel==1 && ngenelnotid==1)
+      if (nElectrons == 0 && nMuons==0 && ( (ngenel==1 && ngenelnotid==1) || ( ngenel==2 && ngenelnotid==2) ) )
       {
+        myAccRecoIsoEffs.nevents_exp_id_els++;
         (myBaseHistgram.h_exp_el_id_met)->Fill(met);
         (myBaseHistgram.h_exp_el_id_njets)->Fill(njets30);
         (myBaseHistgram.h_exp_el_id_mt2)->Fill(MT2);
@@ -543,8 +550,9 @@ int main(int argc, char* argv[])
       }
 
       // exp 1 electron not acc
-      if (nElectrons == 0 && nMuons==0 && ngenel==1 && ngeneloutacc==1)
+      if (nElectrons == 0 && nMuons==0 && ( (ngenel==1 && ngeneloutacc==1) || ( ngenel==2 && ngeneloutacc==2) ) )
       {
+        myAccRecoIsoEffs.nevents_exp_acc_els++;
         (myBaseHistgram.h_exp_el_acc_met)->Fill(met);
         (myBaseHistgram.h_exp_el_acc_njets)->Fill(njets30);
         (myBaseHistgram.h_exp_el_acc_mt2)->Fill(MT2);
@@ -552,9 +560,10 @@ int main(int argc, char* argv[])
       }
 
       // exp 1 electron tot
-      //if (nElectrons == 0 && nMuons==0 && ngenel==1 && (ngeneloutacc==1 || ngenelnotid==1 || ngenelnotiso==1))
-      if (nElectrons == 0 && nMuons==0 && ngenel==1)
+      if (nElectrons == 0 && nMuons==0 && ngenel==1 && (ngeneloutacc==1 || ngenelnotid==1 || ngenelnotiso==1))
+      //if (nElectrons == 0 && nMuons==0 && ngenel==1)
       {
+        myAccRecoIsoEffs.nevents_exp_all_els++;
         myAccRecoIsoEffs.nevents_single_els++;
         (myBaseHistgram.h_exp_el_all_met)->Fill(met);
         (myBaseHistgram.h_exp_el_all_njets)->Fill(njets30);
@@ -567,9 +576,10 @@ int main(int argc, char* argv[])
         (myBaseHistgram.h_exp_el1plus2_all_topmass)->Fill(bestTopJetMass);
       }
 
-      //if ( nElectrons == 0 && nMuons==0 && ngenel==2 && ( ngeneloutacc==2 || ngenelnotid==2 || ngenelnotiso==2 || ( ngeneloutacc==1 && ngenelnotid==1 ) || (ngeneloutacc==1 && ngenelnotiso==1 ) || ( ngenelnotiso==1 && ngenelnotid==1 ) ) )
-      if (nElectrons == 0 && nMuons==0 && ngenel==2)
+      if ( nElectrons == 0 && nMuons==0 && ngenel==2 && ( ngeneloutacc==2 || ngenelnotid==2 || ngenelnotiso==2 || ( ngeneloutacc==1 && ngenelnotid==1 ) || (ngeneloutacc==1 && ngenelnotiso==1 ) || ( ngenelnotiso==1 && ngenelnotid==1 ) ) )
+      //if (nElectrons == 0 && nMuons==0 && ngenel==2)
       {
+        myAccRecoIsoEffs.nevents_exp_all_els++;
         myAccRecoIsoEffs.nevents_di_els++;
         (myBaseHistgram.h_exp_el1plus2_all_met)->Fill(met);
         (myBaseHistgram.h_exp_el1plus2_all_njets)->Fill(njets30);
@@ -676,6 +686,17 @@ int main(int argc, char* argv[])
 	  (myBaseHistgram.h_pred_mu_all_njets)->Fill(njets30, EventWeight_all*EventWeight);
 	  (myBaseHistgram.h_pred_mu_all_mt2)->Fill(MT2, EventWeight_all*EventWeight);
 	  (myBaseHistgram.h_pred_mu_all_topmass)->Fill(bestTopJetMass, EventWeight_all*EventWeight);
+
+          myAccRecoIsoEffs.nevents_pred_all_mus += EventWeight_all*EventWeight;
+          myAccRecoIsoEffs.nevents_pred_acc_mus += myAccRecoIsoEffs.mus_EventWeight_acc[ptbin_number]*EventWeight;
+          myAccRecoIsoEffs.nevents_pred_id_mus += myAccRecoIsoEffs.mus_EventWeight_reco[ptbin_number]*EventWeight;
+          myAccRecoIsoEffs.nevents_pred_iso_mus += myAccRecoIsoEffs.mus_EventWeight_iso[ptbin_number]*EventWeight;
+        
+          myAccRecoIsoEffs.nevents_pred_all_mus_err += EventWeight_all*EventWeight*EventWeight_all*EventWeight;
+          myAccRecoIsoEffs.nevents_pred_acc_mus_err += myAccRecoIsoEffs.mus_EventWeight_acc[ptbin_number]*EventWeight*myAccRecoIsoEffs.mus_EventWeight_acc[ptbin_number]*EventWeight;
+          myAccRecoIsoEffs.nevents_pred_id_mus_err += myAccRecoIsoEffs.mus_EventWeight_reco[ptbin_number]*EventWeight*myAccRecoIsoEffs.mus_EventWeight_reco[ptbin_number]*EventWeight;
+          myAccRecoIsoEffs.nevents_pred_iso_mus_err += myAccRecoIsoEffs.mus_EventWeight_iso[ptbin_number]*EventWeight*myAccRecoIsoEffs.mus_EventWeight_iso[ptbin_number]*EventWeight;
+
   	}//mtW5<100.0 (muon CS)
       }//nElectrons == 0 && nMuons == 1
 
@@ -738,10 +759,24 @@ int main(int argc, char* argv[])
           (myBaseHistgram.h_pred_el_all_njets)->Fill(njets30, EventWeight_all*EventWeight);
           (myBaseHistgram.h_pred_el_all_mt2)->Fill(MT2, EventWeight_all*EventWeight);
           (myBaseHistgram.h_pred_el_all_topmass)->Fill(bestTopJetMass, EventWeight_all*EventWeight);
+
+          myAccRecoIsoEffs.nevents_pred_all_els += EventWeight_all*EventWeight;
+          myAccRecoIsoEffs.nevents_pred_acc_els += myAccRecoIsoEffs.els_EventWeight_acc[ptbin_number]*EventWeight;
+          myAccRecoIsoEffs.nevents_pred_id_els += myAccRecoIsoEffs.els_EventWeight_reco[ptbin_number]*EventWeight;
+          myAccRecoIsoEffs.nevents_pred_iso_els += myAccRecoIsoEffs.els_EventWeight_iso[ptbin_number]*EventWeight;
+
+          myAccRecoIsoEffs.nevents_pred_all_els_err += EventWeight_all*EventWeight*EventWeight_all*EventWeight;
+          myAccRecoIsoEffs.nevents_pred_acc_els_err += myAccRecoIsoEffs.els_EventWeight_acc[ptbin_number]*EventWeight*myAccRecoIsoEffs.els_EventWeight_acc[ptbin_number]*EventWeight;
+          myAccRecoIsoEffs.nevents_pred_id_els_err += myAccRecoIsoEffs.els_EventWeight_reco[ptbin_number]*EventWeight*myAccRecoIsoEffs.els_EventWeight_reco[ptbin_number]*EventWeight;
+          myAccRecoIsoEffs.nevents_pred_iso_els_err += myAccRecoIsoEffs.els_EventWeight_iso[ptbin_number]*EventWeight*myAccRecoIsoEffs.els_EventWeight_iso[ptbin_number]*EventWeight;
+
         }//mtW cut for electron
       }//Electron CS sample
     }//baseline_nolepveto
   }
+
+  myAccRecoIsoEffs.NormalizeFlowNumber();
+  myAccRecoIsoEffs.printNormalizeFlowNumber();
 
   //write into histgram
   (myBaseHistgram.oFile)->Write();
@@ -820,6 +855,120 @@ void AccRecoIsoEffs::GetDiLeptonFactor()
 {
   corrfactor_di_mus = ( nevents_single_mus + nevents_di_mus ) / ( nevents_single_mus + 2 * nevents_di_mus );
   corrfactor_di_els = ( nevents_single_els + nevents_di_els ) / ( nevents_single_els + 2 * nevents_di_els );
+
+  double alpha;
+  alpha = 1-0.6827;
+
+  double mus1dev = 0, mus2dev = 0;
+  mus1dev = nevents_di_mus/(nevents_single_mus + 2 * nevents_di_mus)/(nevents_single_mus + 2 * nevents_di_mus);
+  mus2dev = (0-nevents_single_mus)/(nevents_single_mus + 2 * nevents_di_mus)/(nevents_single_mus + 2 * nevents_di_mus);
+
+  corrfactor_di_mus_err = std::sqrt(mus1dev*mus1dev*ROOT::Math::gamma_quantile_c( alpha/2 , nevents_single_mus + 1, 1 ) + mus2dev*mus2dev*ROOT::Math::gamma_quantile_c( alpha/2 , nevents_di_mus + 1 , 1 ));
+
+  double els1dev = 0, els2dev = 0;
+  els1dev = nevents_di_els/(nevents_single_els + 2 * nevents_di_els)/(nevents_single_els + 2 * nevents_di_els);
+  els2dev = (0-nevents_single_els)/(nevents_single_els + 2 * nevents_di_els)/(nevents_single_els + 2 * nevents_di_els);
+
+  corrfactor_di_els_err = std::sqrt(els1dev*els1dev*ROOT::Math::gamma_quantile_c( alpha/2 , nevents_single_els + 1, 1 ) + els2dev*els2dev*ROOT::Math::gamma_quantile_c( alpha
+/2 , nevents_di_els + 1 , 1 ));
+}
+
+void AccRecoIsoEffs::NormalizeFlowNumber()
+{
+  double alpha;
+  alpha = 1-0.6827;
+
+  nevents_exp_all_mus_err = std::sqrt( ROOT::Math::gamma_quantile_c( alpha/2 , nevents_exp_all_mus + 1, 1 ) );
+  nevents_exp_acc_mus_err = std::sqrt( ROOT::Math::gamma_quantile_c( alpha/2 , nevents_exp_acc_mus + 1, 1 ) );
+  nevents_exp_id_mus_err = std::sqrt( ROOT::Math::gamma_quantile_c( alpha/2 , nevents_exp_id_mus + 1, 1 ) );
+  nevents_exp_iso_mus_err = std::sqrt( ROOT::Math::gamma_quantile_c( alpha/2 , nevents_exp_iso_mus + 1, 1 ) );
+
+  nevents_exp_all_els_err = std::sqrt( ROOT::Math::gamma_quantile_c( alpha/2 , nevents_exp_all_els + 1, 1 ) );
+  nevents_exp_acc_els_err = std::sqrt( ROOT::Math::gamma_quantile_c( alpha/2 , nevents_exp_acc_els + 1, 1 ) );
+  nevents_exp_id_els_err = std::sqrt( ROOT::Math::gamma_quantile_c( alpha/2 , nevents_exp_id_els + 1, 1 ) );
+  nevents_exp_iso_els_err = std::sqrt( ROOT::Math::gamma_quantile_c( alpha/2 , nevents_exp_iso_els + 1, 1 ) );
+
+  nevents_pred_all_mus_err = std::sqrt(nevents_pred_all_mus_err);
+  nevents_pred_acc_mus_err = std::sqrt(nevents_pred_acc_mus_err);
+  nevents_pred_id_mus_err = std::sqrt(nevents_pred_id_mus_err);
+  nevents_pred_iso_mus_err = std::sqrt(nevents_pred_iso_mus_err);
+
+  nevents_pred_all_els_err = std::sqrt(nevents_pred_all_els_err);
+  nevents_pred_acc_els_err = std::sqrt(nevents_pred_acc_els_err);
+  nevents_pred_id_els_err = std::sqrt(nevents_pred_id_els_err);
+  nevents_pred_iso_els_err = std::sqrt(nevents_pred_iso_els_err);
+
+
+  double Nevents = 25446993;
+  double XSec = 806.1;
+  double Lumi = 1000;
+  double scale = XSec*Lumi/Nevents;
+
+  nevents_exp_all_mus *= scale;
+  nevents_exp_acc_mus *= scale;
+  nevents_exp_id_mus *= scale;
+  nevents_exp_iso_mus *= scale;
+
+  nevents_exp_all_els *= scale;
+  nevents_exp_acc_els *= scale;
+  nevents_exp_id_els *= scale;
+  nevents_exp_iso_els *= scale;
+
+  nevents_pred_all_mus *= scale;
+  nevents_pred_acc_mus *= scale;
+  nevents_pred_id_mus *= scale;
+  nevents_pred_iso_mus *= scale;
+
+  nevents_pred_all_els *= scale;
+  nevents_pred_acc_els *= scale;
+  nevents_pred_id_els *= scale;
+  nevents_pred_iso_els *= scale;
+
+  nevents_exp_all_mus_err *= scale;
+  nevents_exp_acc_mus_err *= scale;
+  nevents_exp_id_mus_err *= scale;
+  nevents_exp_iso_mus_err *= scale;
+
+  nevents_exp_all_els_err *= scale;
+  nevents_exp_acc_els_err *= scale;
+  nevents_exp_id_els_err *= scale;
+  nevents_exp_iso_els_err *= scale;
+
+  nevents_pred_all_mus_err *= scale;
+  nevents_pred_acc_mus_err *= scale;
+  nevents_pred_id_mus_err *= scale;
+  nevents_pred_iso_mus_err *= scale;
+
+  nevents_pred_all_els_err *= scale;
+  nevents_pred_acc_els_err *= scale;
+  nevents_pred_id_els_err *= scale;
+  nevents_pred_iso_els_err *= scale;
+}
+
+void AccRecoIsoEffs::printNormalizeFlowNumber()
+{
+  std::cout<<"Normalized Flow Number information: "<<std::endl;
+  
+  std::cout<<"mus,exp,all: "<<nevents_exp_all_mus<<"("<<nevents_exp_all_mus_err<<")"<<std::endl;
+  std::cout<<"mus,exp,acc: "<<nevents_exp_acc_mus<<"("<<nevents_exp_acc_mus_err<<")"<<std::endl;
+  std::cout<<"mus,exp,id: "<<nevents_exp_id_mus<<"("<<nevents_exp_id_mus_err<<")"<<std::endl;
+  std::cout<<"mus,exp,iso: "<<nevents_exp_iso_mus<<"("<<nevents_exp_iso_mus_err<<")"<<std::endl;
+
+  std::cout<<"els,exp,all: "<<nevents_exp_all_els<<"("<<nevents_exp_all_els_err<<")"<<std::endl;
+  std::cout<<"els,exp,acc: "<<nevents_exp_acc_els<<"("<<nevents_exp_acc_els_err<<")"<<std::endl;
+  std::cout<<"els,exp,id: "<<nevents_exp_id_els<<"("<<nevents_exp_id_els_err<<")"<<std::endl;
+  std::cout<<"els,exp,iso: "<<nevents_exp_iso_els<<"("<<nevents_exp_iso_els_err<<")"<<std::endl;
+
+  std::cout<<"mus,pred,all: "<<nevents_pred_all_mus<<"("<<nevents_pred_all_mus_err<<")"<<std::endl;
+  std::cout<<"mus,pred,acc: "<<nevents_pred_acc_mus<<"("<<nevents_pred_acc_mus_err<<")"<<std::endl;
+  std::cout<<"mus,pred,id: "<<nevents_pred_id_mus<<"("<<nevents_pred_id_mus_err<<")"<<std::endl;
+  std::cout<<"mus,pred,iso: "<<nevents_pred_iso_mus<<"("<<nevents_pred_iso_mus_err<<")"<<std::endl;
+
+  std::cout<<"els,pred,all: "<<nevents_pred_all_els<<"("<<nevents_pred_all_els_err<<")"<<std::endl;
+  std::cout<<"els,pred,acc: "<<nevents_pred_acc_els<<"("<<nevents_pred_acc_els_err<<")"<<std::endl;
+  std::cout<<"els,pred,id: "<<nevents_pred_id_els<<"("<<nevents_pred_id_els_err<<")"<<std::endl;
+  std::cout<<"els,pred,iso: "<<nevents_pred_iso_els<<"("<<nevents_pred_iso_els_err<<")"<<std::endl;
+
 }
 
 void AccRecoIsoEffs::printAccRecoIsoEffs()
@@ -884,7 +1033,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
     }
   }
 
-  std::cout<<"correction factor from di muons: "<< corrfactor_di_mus <<std::endl;
+  std::cout<<"correction factor from di muons: "<< corrfactor_di_mus << "("<< corrfactor_di_mus_err <<")"<<std::endl;
  
 
   std::cout<<std::endl<<"Electron information: "<<std::endl;
@@ -945,7 +1094,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
     }
   }
 
-  std::cout<<"correction factor from di electrons: "<< corrfactor_di_els <<std::endl;
+  std::cout<<"correction factor from di electrons: "<< corrfactor_di_els <<"("<< corrfactor_di_els_err <<")"<<std::endl;
 
   return ;
 }

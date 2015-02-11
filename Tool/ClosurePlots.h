@@ -19,15 +19,30 @@ class ClosurePlots
  public:
   TFile * fin;
   TList * list;
- 
+
+  double scale;
+
   void Initialization(); 
   void PrintPlotsName();
+  void SetScale(
+               double Nevents,
+               double XSec,
+               double Lumi
+               );
   void ClosureTemplate(
                        TString hist_tag,
                        TString XTitle,
                        double min,
                        double max
                        );
+  void DiLeptonPlots(
+                     TString SLhist,
+                     TString DLhist,
+                     TString XTitle,
+                     double min,
+                     double max
+                    );
+
 };
 
 void ClosurePlots::Initialization()
@@ -44,6 +59,66 @@ void ClosurePlots::PrintPlotsName()
   }
   
   return ;
+}
+
+
+void ClosurePlots::SetScale(
+                            double Nevents,
+                            double XSec,
+                            double Lumi
+                           )
+{
+  scale = XSec*Lumi/Nevents;
+}
+
+
+
+void ClosurePlots::DiLeptonPlots(
+                                 TString SLhist,
+                                 TString DLhist,
+                                 TString XTitle,
+                                 double min,
+                                 double max
+                                )
+{
+  TH1D * h_exp_sl = (TH1D*)fin->Get(SLhist);
+  TH1D * h_exp_dl = (TH1D*)fin->Get(DLhist);
+
+  TCanvas *c = new TCanvas("c","A Simple Graph Example",200,10,700,500);
+  gStyle->SetOptStat(0);
+
+  h_exp_dl->GetXaxis()->SetRangeUser(min,max);
+  h_exp_dl->GetXaxis()->SetTitle(XTitle);
+  h_exp_dl->SetLineColor(1);
+  h_exp_dl->SetLineWidth(3);
+  h_exp_dl->Sumw2();
+  h_exp_dl->Scale(scale);
+
+  h_exp_sl->GetXaxis()->SetRangeUser(min,max);
+  h_exp_sl->SetLineColor(2);
+  h_exp_sl->SetLineWidth(3);
+  h_exp_sl->Sumw2();
+  h_exp_sl->Scale(scale);
+
+  h_exp_dl->Draw();
+  h_exp_sl->Draw("same");
+
+  const std::string titre="CMS Preliminary 2015, 1 fb^{-1}, #sqrt{s} = 13 TeV";
+  TLatex *title = new TLatex(0.09770115,0.9194915,titre.c_str());
+  title->SetNDC();
+  title->SetTextSize(0.045);
+  title->Draw("same");
+
+  TLegend* leg = new TLegend(0.6,0.75,0.85,0.85);
+  leg->SetBorderSize(0);
+  leg->SetTextFont(42);
+  leg->SetFillColor(0);
+  leg->AddEntry(h_exp_dl,"Expectation 1 or 2 lepton","l");
+  leg->AddEntry(h_exp_sl,"Expectation 1 lepton","l");
+  leg->Draw("same");
+
+  c->SaveAs( DLhist + TString("_compare.png") );
+  c->SaveAs( DLhist + TString("_compare.C") );
 }
 
 void ClosurePlots::ClosureTemplate(
@@ -93,14 +168,20 @@ void ClosurePlots::ClosureTemplate(
   h_pred->GetXaxis()->SetRangeUser(min,max);
   h_pred->GetXaxis()->SetTitle(XTitle);
   h_pred->SetLineColor(1);
+  h_pred->SetLineWidth(3);
+  h_pred->Sumw2();
+  h_pred->Scale(scale);
 
   h_exp->GetXaxis()->SetRangeUser(min,max);
   h_exp->SetLineColor(2);
-  
-  h_pred->Draw("E"); 
+  h_exp->SetLineWidth(3);
+  h_exp->Sumw2();
+  h_exp->Scale(scale);
+
+  h_pred->Draw(); 
   h_exp->Draw("same");
 
-  const std::string titre="CMS Preliminary 2015, Simulation #sqrt{s} = 13 TeV";
+  const std::string titre="CMS Preliminary 2015, 1 fb^{-1}, #sqrt{s} = 13 TeV";
   TLatex *title = new TLatex(0.09770115,0.9194915,titre.c_str());
   title->SetNDC();
   title->SetTextSize(0.045);
@@ -147,7 +228,8 @@ void ClosurePlots::ClosureTemplate(
   ratio->SetTitleSize(0.15);
   ratio->SetStats(kFALSE);
   ratio->SetMarkerStyle(kFullDotMedium);
-  ratio->DrawCopy("E");
+  ratio->Sumw2();
+  ratio->DrawCopy();
 
   TH1D *zero = (TH1D*)ratio->Clone(); 
   zero->Reset();
@@ -156,6 +238,7 @@ void ClosurePlots::ClosureTemplate(
   zero->DrawCopy("same");
 
   c->SaveAs( hist_tag + TString(".png") );
+  c->SaveAs( hist_tag + TString(".C") );
 }
 
 
