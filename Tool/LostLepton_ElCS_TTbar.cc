@@ -668,7 +668,7 @@ int main(int argc, char* argv[])
       double metphi = trCS.getVar<double>("metphi");
 
       int njets30 = trCS.getVar<int>("cntNJetsPt30Eta24");
-      int ntopjets = tr.getVar<int>("nTopCandSortedCnt");
+      int ntopjets = trCS.getVar<int>("nTopCandSortedCnt");
       double MT2 = trCS.getVar<double>("MT22");
       double bestTopJetMass = trCS.getVar<double>("bestTopJetMass2");
       double ht = trCS.getVar<double>("ht");
