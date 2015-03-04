@@ -18,17 +18,17 @@
 #define PT_BINS 8
 //#define AC_BINS 1
 
-//############################begin to defin class AccRecoIsoEffs###################
+//############################begin to defin class AccRecoIsoEffs###################//
 
 
 class AccRecoIsoEffs
 {
  public:
+  void GetAccRecoIsoEffs();
+  void GetDiLeptonFactor();
   void printOverview();
   void printAccRecoIsoEffs();
   void printNormalizeFlowNumber();
-
-  void printEffsHeader();
 
   //define the number of Pt bins we need in the calculation
   //static int PT_BINS = 8;
@@ -39,7 +39,7 @@ class AccRecoIsoEffs
   int nevents_sel_mus = 0;
   int nevents_sel_els = 0;
 
-  //define acceptance, reco eff and iso eff to be calculated
+  //define acceptance, reco eff and iso eff to be passed from ttbar result
   double mus_acc = 0, els_acc = 0;
   double mus_acc_err = 0, els_acc_err = 0;
   double mus_recoeff[PT_BINS] = {0}, els_recoeff[PT_BINS] = {0};
@@ -49,9 +49,6 @@ class AccRecoIsoEffs
 
   //here we define the muon/electron number we need to count in the loop
   double nmus = 0, nmus_acc = 0, nels = 0, nels_acc =0;
-  double nmus_acc_bin[PT_BINS] = {0}, nels_acc_bin[PT_BINS] = {0};
-  double nmus_reco[PT_BINS] = {0}, nels_reco[PT_BINS] = {0};
-  double nmus_iso[PT_BINS] = {0}, nels_iso[PT_BINS] = {0};
 
   //here we define the event weight we are going to use in the second loop ( muon/electron CS and prediction plots)
   double mus_EventWeight_iso[PT_BINS] = {0}, mus_EventWeight_reco[PT_BINS] = {0}, mus_EventWeight_acc[PT_BINS] = {0};
@@ -86,9 +83,7 @@ class AccRecoIsoEffs
   double corrfactor_di_mus_err = 0;
   double corrfactor_di_els_err = 0;
 
-  void NumberstoEffs();
   void EffstoWeights();
-  void GetDiLeptonFactor();
   void NormalizeFlowNumber();
 
  private:

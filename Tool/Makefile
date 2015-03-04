@@ -21,7 +21,7 @@ LDFLAGS    =
 
 LIBS       = $(shell root-config --glibs)
 
-PROGRAMS = tupleTest makePlots LostLepton_MuCS_TTbar LostLepton_ElCS_TTbar ClosurePlots
+PROGRAMS = tupleTest makePlots LostLepton_MuCS_TTbar LostLepton_ElCS_TTbar LostLepton_MuCS_SingleTop ClosurePlots
 
 all: $(PROGRAMS)
 
@@ -47,6 +47,9 @@ LostLepton_MuCS_TTbar: $(ODIR)/LostLepton_MuCS_TTbar.o $(ODIR)/NTupleReader.o
 	$(LD) $^ $(LIBS) -L${CMSSW_BASE}/lib/${SCRAM_ARCH}/ -lrecipeAUXOxbridgeMT2 -o $@
 
 LostLepton_ElCS_TTbar: $(ODIR)/LostLepton_ElCS_TTbar.o $(ODIR)/NTupleReader.o
+	$(LD) $^ $(LIBS) -L${CMSSW_BASE}/lib/${SCRAM_ARCH}/ -lrecipeAUXOxbridgeMT2 -o $@
+
+LostLepton_MuCS_SingleTop: $(ODIR)/LostLepton_MuCS_SingleTop.o $(ODIR)/NTupleReader.o
 	$(LD) $^ $(LIBS) -L${CMSSW_BASE}/lib/${SCRAM_ARCH}/ -lrecipeAUXOxbridgeMT2 -o $@
 
 ClosurePlots: $(ODIR)/ClosurePlots.o

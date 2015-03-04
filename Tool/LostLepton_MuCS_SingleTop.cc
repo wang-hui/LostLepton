@@ -19,7 +19,7 @@
 #include "TString.h"
 
 #include "SusyAnaTools/Tools/NTupleReader.h"
-#include "LostLepton_MuCS_TTbar.h"
+#include "LostLepton_MuCS_SingleTop.h"
 #include "TGraph.h"
 #include "TCanvas.h"
 #include "TH1F.h"
@@ -36,6 +36,9 @@
 #include "TLorentzVector.h"
 //#include "TROOT.h"
 //#include "TInterpreter.h"
+
+//include the table of efficiencies in here
+#include "EffsHeader_MuCS.h"
 
 using namespace std;
 
@@ -160,13 +163,11 @@ void passBaselineFunc(NTupleReader &tr)
   //tr.registerDerivedVar("passTagger", passTagger);
   tr.registerDerivedVar("passBaseline", passBaseline);
   tr.registerDerivedVar("passBaseline_nolepveto", passBaseline_nolepveto);
-
   //if( debug ) std::cout<<"nTopCandSortedCnt : "<<nTopCandSortedCnt<<"  MT2 : "<<MT2<<"  mTcomb : "<<mTcomb<<"  passBaseline : "<<passBaseline<<std::endl;
 
   tr.registerDerivedVar("nTopCandSortedCnt", nTopCandSortedCnt);
   tr.registerDerivedVar("MT22", MT2);
   //tr.registerDerivedVar("mTcomb", mTcomb);
-
   //if( debug ) std::cout<<"passBaseline : "<<passBaseline<<"  passBaseline : "<<passBaseline<<std::endl;
 }
 
@@ -185,7 +186,7 @@ int main(int argc, char* argv[])
   const char *inputFileList = argv[1];
   const char *outFileName   = argv[2];
 
-  TChain *fChain = new TChain("AUX");
+  TChain *fChain = new TChain("stopTreeMaker/AUX");
 
   if(!FillChain(fChain, inputFileList))
   {
@@ -202,6 +203,11 @@ int main(int argc, char* argv[])
   tr.registerFunction(&passBaselineFunc);
   //define my AccRecoIsoEffs class to stroe counts and efficiencies
   AccRecoIsoEffs myAccRecoIsoEffs;
+
+  myAccRecoIsoEffs.GetAccRecoIsoEffs();
+  myAccRecoIsoEffs.GetDiLeptonFactor();
+  myAccRecoIsoEffs.printAccRecoIsoEffs();
+  myAccRecoIsoEffs.EffstoWeights();
   //define my histgram class
   BaseHistgram myBaseHistgram;
   myBaseHistgram.BookHistgram(outFileName);
@@ -221,7 +227,7 @@ int main(int argc, char* argv[])
   mtwcorrfactor[7] = 1.83;
 
   //first loop, to generate Acc, reco and Iso effs and also fill expected histgram
-  std::cout<<"First loop begin: "<<std::endl;
+  std::cout << "The loop begin: " << std::endl;
   while(tr.getNextEvent())
   {
     if(tr.getEvtNum()%20000 == 0) std::cout << tr.getEvtNum() << "\t" << ((clock() - t0)/1000000.0) << std::endl;
@@ -292,12 +298,6 @@ int main(int argc, char* argv[])
 
             if((std::abs(gen_mus_eta)) < 2.4 && gen_mus_pt > 5)
             {
-              myAccRecoIsoEffs.nmus_acc++;
-
-              int ptbin_number = Set_ptbin_number(gen_mus_pt);
-
-              myAccRecoIsoEffs.nmus_acc_bin[ptbin_number]++;
-
               //loop over reco lepton information to find out smallest deltaR value
               vector<double> deltar_mus_pool;
               for(int reco_mus_i = 0 ; reco_mus_i < reco_mus_count ; reco_mus_i++)
@@ -327,12 +327,11 @@ int main(int argc, char* argv[])
               bool ismatcheddeltaR;
               ismatcheddeltaR = (deltar < 0.02);
 
-              if(ismatcheddeltaR
-                 //&& 
-                 //isgoodmuonid
+              if( ismatcheddeltaR
+                  //&& 
+                  //isgoodmuonid
                 )
               {
-                myAccRecoIsoEffs.nmus_reco[ptbin_number]++;
 
                 vector<double> muonsRelIso = tr.getVec<double>("muonsRelIso");
 
@@ -340,14 +339,10 @@ int main(int argc, char* argv[])
                 mus_pass_iso = false;               
                 mus_pass_iso = ( muonsRelIso.at(mindeltar_index) < 0.2 );
                 
-                if(mus_pass_iso)
-                {
-                  myAccRecoIsoEffs.nmus_iso[ptbin_number]++;
-                }//if isolated
-                else
+                if( !mus_pass_iso )
                 {
                   ngenmunotiso++;
-                }
+                }//if not isolated
               }//if reconstructed
               else
               {
@@ -394,12 +389,6 @@ int main(int argc, char* argv[])
     
             if((std::abs(gen_els_eta)) < 2.5 && gen_els_pt > 5)
             {
-              myAccRecoIsoEffs.nels_acc++;
-
-              int ptbin_number = Set_ptbin_number(gen_els_pt);
-
-              myAccRecoIsoEffs.nels_acc_bin[ptbin_number]++;
-       
               //loop over reco lepton information to determine the smallest deltar
               vector<double> deltar_els_pool;
               for(int reco_els_i = 0 ; reco_els_i < reco_els_count ; reco_els_i++)
@@ -429,26 +418,20 @@ int main(int argc, char* argv[])
               bool ismatcheddeltaR;
               ismatcheddeltaR = (deltar < 0.02);
     
-              if(ismatcheddeltaR
-                 //&& 
-                 //isgoodmuonid
+              if( ismatcheddeltaR
+                  //&& 
+                  //isgoodmuonid
                 )
               {
-                myAccRecoIsoEffs.nels_reco[ptbin_number]++;
-
                 vector<double> elesRelIso = tr.getVec<double>("elesRelIso");
                 bool els_pass_iso;
                 els_pass_iso = false;
                 els_pass_iso = ( elesRelIso.at(mindeltar_index) < 0.24 );
 
-                if(els_pass_iso)
-                {
-                  myAccRecoIsoEffs.nels_iso[ptbin_number]++;
-                }//if isolated
-                else
+                if( !els_pass_iso )
                 {
                   ngenelnotiso++;
-                }
+                }//if not isolated
               }//if reconstructed
               else
               {
@@ -636,53 +619,17 @@ int main(int argc, char* argv[])
         (myBaseHistgram.h_exp_el_all_mht)->Fill(mht);
         (myBaseHistgram.h_exp_el_all_ntopjets)->Fill(ntopjets);
       }
-    }//baseline, nolepveto
-  }//end of first loop
+      //end of expectation
 
-  //All numbers counted, now calculated effs and print out 
-  myAccRecoIsoEffs.printOverview();
-  myAccRecoIsoEffs.NumberstoEffs();
-  myAccRecoIsoEffs.EffstoWeights();
-  myAccRecoIsoEffs.GetDiLeptonFactor();
-  myAccRecoIsoEffs.printAccRecoIsoEffs();
-  myAccRecoIsoEffs.printEffsHeader();
-
-  NTupleReader trCS(fChain);
-  //initialize the type3Ptr defined in the customize.h
-  AnaFunctions::prepareTopTagger();
-  //The passBaselineFunc is registered here
-  trCS.registerFunction(&passBaselineFunc);
-
-  //second loop, to select CS sample and make prediction
-  std::cout<<"Second loop begin: "<<std::endl;
-  while(trCS.getNextEvent())
-  {
-    if(trCS.getEvtNum()%20000 == 0) std::cout << trCS.getEvtNum() << "\t" << ((clock() - t0)/1000000.0) << std::endl;
-
-    bool passBaseline_nolepveto=trCS.getVar<bool>("passBaseline_nolepveto");
-
-    if(passBaseline_nolepveto)
-    {
-      int nElectrons = trCS.getVar<int>("nElectrons_CUT2");
-      int nMuons = trCS.getVar<int>("nMuons_CUT2");
-
-      double met = trCS.getVar<double>("met");
-      double metphi = trCS.getVar<double>("metphi");
-
-      int njets30 = trCS.getVar<int>("cntNJetsPt30Eta24");
-      int ntopjets = trCS.getVar<int>("nTopCandSortedCnt");
-      double MT2 = trCS.getVar<double>("MT22");
-      double bestTopJetMass = trCS.getVar<double>("bestTopJetMass2");
-      double ht = trCS.getVar<double>("ht");
-      double mht = trCS.getVar<double>("mht");
-
+      //##########################//
+      //begin of prediction
       //muon CS
       //nMuons in flatree means no iso cut muons; CUT2 we add iso
       if (nElectrons == 0 && nMuons == 1)
       {
         //get muon variables
-	vector<TLorentzVector> muonsLVec = trCS.getVec<TLorentzVector>("muonsLVec");
-        vector<double> muonsRelIso = trCS.getVec<double>("muonsRelIso");
+	vector<TLorentzVector> muonsLVec = tr.getVec<TLorentzVector>("muonsLVec");
+        vector<double> muonsRelIso = tr.getVec<double>("muonsRelIso");
 
         double reco_mus_pt = 0, reco_mus_eta = 0, reco_mus_phi = 0;
 
@@ -813,9 +760,11 @@ int main(int argc, char* argv[])
           myAccRecoIsoEffs.nevents_pred_iso_els_err += myAccRecoIsoEffs.els_EventWeight_iso[ptbin_number]*EventWeight_els*myAccRecoIsoEffs.els_EventWeight_iso[ptbin_number]*EventWeight_els;
         }//mtW5_els<100 (muon CS)
       }//nElectrons == 0 && nMuons == 1 (muon CS)
-    }//baseline_nolepveto
-  }
+    }//baseline, nolepveto
+  }//end of the loop
 
+  //All numbers counted, print out 
+  myAccRecoIsoEffs.printOverview();
   myAccRecoIsoEffs.NormalizeFlowNumber();
   myAccRecoIsoEffs.printNormalizeFlowNumber();
 
@@ -846,28 +795,21 @@ void AccRecoIsoEffs::printOverview()
   return ;
 }
 
-void AccRecoIsoEffs::NumberstoEffs()
+void AccRecoIsoEffs::GetAccRecoIsoEffs()
 {
-  mus_acc=nmus_acc/nmus;
-  els_acc=nels_acc/nels;
-
-  mus_acc_err = std::sqrt( get_stat_Error(nmus_acc,nmus)*get_stat_Error(nmus_acc,nmus) + get_sys_Error(mus_acc,0.09)*get_sys_Error(mus_acc,0.09) );
-  els_acc_err = std::sqrt( get_stat_Error(nels_acc,nels)*get_stat_Error(nels_acc,nels) + get_sys_Error(els_acc,0.09)*get_sys_Error(els_acc,0.09) ); 
+  mus_acc = ttbar_mus_acc;
+  els_acc = ttbar_els_acc;
 
   int i_cal;
   for(i_cal = 0 ; i_cal < PT_BINS ; i_cal++)
   {
-    mus_recoeff[i_cal]=nmus_reco[i_cal]/nmus_acc_bin[i_cal];
-    mus_recoeff_err[i_cal]=get_stat_Error(nmus_reco[i_cal],nmus_acc_bin[i_cal]);
-    els_recoeff[i_cal]=nels_reco[i_cal]/nels_acc_bin[i_cal];
-    els_recoeff_err[i_cal]=get_stat_Error(nels_reco[i_cal],nels_acc_bin[i_cal]);
+    mus_recoeff[i_cal] = ttbar_mus_recoeff[i_cal];
+    mus_isoeff[i_cal]  = ttbar_mus_isoeff[i_cal];
+    els_recoeff[i_cal] = ttbar_els_recoeff[i_cal];
+    els_isoeff[i_cal]  = ttbar_els_isoeff[i_cal];
 
-    mus_isoeff[i_cal]=nmus_iso[i_cal]/nmus_reco[i_cal];
-    mus_isoeff_err[i_cal]=get_stat_Error(nmus_iso[i_cal],nmus_reco[i_cal]);
-    els_isoeff[i_cal]=nels_iso[i_cal]/nels_reco[i_cal];
-    els_isoeff_err[i_cal]=get_stat_Error(nels_iso[i_cal],nels_reco[i_cal]);
   }
-  
+  std::cout << "Pass TTbar effs into here!" << std::endl;
   return ;
 }
 
@@ -885,29 +827,16 @@ void AccRecoIsoEffs::EffstoWeights()
     els_EventWeight_acc[i_cal]  = (1.0 - els_isoeff[i_cal])/mus_isoeff[i_cal]*els_recoeff[i_cal]/mus_recoeff[i_cal]*els_acc/mus_acc;
   }
 
+  std::cout << "Convert effs into event weight!" << std::endl;
   return ;
 }
 
 void AccRecoIsoEffs::GetDiLeptonFactor()
 {
-  corrfactor_di_mus = ( nevents_single_mus + nevents_di_mus ) / ( nevents_single_mus + 2 * nevents_di_mus );
-  corrfactor_di_els = ( nevents_single_els + nevents_di_els ) / ( nevents_single_els + 2 * nevents_di_els );
-
-  double alpha;
-  alpha = 1-0.6827;
-
-  double mus1dev = 0, mus2dev = 0;
-  mus1dev = nevents_di_mus/(nevents_single_mus + 2 * nevents_di_mus)/(nevents_single_mus + 2 * nevents_di_mus);
-  mus2dev = (0-nevents_single_mus)/(nevents_single_mus + 2 * nevents_di_mus)/(nevents_single_mus + 2 * nevents_di_mus);
-
-  corrfactor_di_mus_err = std::sqrt(mus1dev*mus1dev*ROOT::Math::gamma_quantile_c( alpha/2 , nevents_single_mus + 1, 1 ) + mus2dev*mus2dev*ROOT::Math::gamma_quantile_c( alpha/2 , nevents_di_mus + 1 , 1 ));
-
-  double els1dev = 0, els2dev = 0;
-  els1dev = nevents_di_els/(nevents_single_els + 2 * nevents_di_els)/(nevents_single_els + 2 * nevents_di_els);
-  els2dev = (0-nevents_single_els)/(nevents_single_els + 2 * nevents_di_els)/(nevents_single_els + 2 * nevents_di_els);
-
-  corrfactor_di_els_err = std::sqrt(els1dev*els1dev*ROOT::Math::gamma_quantile_c( alpha/2 , nevents_single_els + 1, 1 ) + els2dev*els2dev*ROOT::Math::gamma_quantile_c( alpha
-/2 , nevents_di_els + 1 , 1 ));
+  corrfactor_di_mus = ttbar_corrfactor_di_mus;
+  corrfactor_di_els = ttbar_corrfactor_di_els;
+  std::cout << "Pass TTbar dilepton correction into here!" << std::endl;
+  return ;
 }
 
 void AccRecoIsoEffs::NormalizeFlowNumber()
@@ -1014,40 +943,6 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
   
   std::cout<<std::endl<<"Muon information: "<<std::endl;
 
-  std::cout<<"number of muons from top: "<<nmus<<std::endl;
-
-  std::cout<<"number of muons from top, accepted: "<<nmus_acc<<std::endl;
-
-  std::cout<<"number of muons from top, accepted, bins: ";
-  for(i_cal=0;i_cal<PT_BINS;i_cal++)
-  {
-    std::cout<<nmus_acc_bin[i_cal]<<" ";
-    if(i_cal==PT_BINS-1)
-    {
-      std::cout<<std::endl;
-    }
-  }
-
-  std::cout<<"number of muons from top, reconstructed: ";
-  for(i_cal=0;i_cal<PT_BINS;i_cal++)
-  {
-    std::cout<<nmus_reco[i_cal]<<" ";
-    if(i_cal==PT_BINS-1)
-    {
-      std::cout<<std::endl;
-    }
-  }
-
-  std::cout<<"number of muons from top, isolated: ";
-  for(i_cal=0;i_cal<PT_BINS;i_cal++)
-  {
-    std::cout<<nmus_iso[i_cal]<<" ";
-    if(i_cal==PT_BINS-1)
-    {
-      std::cout<<std::endl;
-    }
-  }
-
   std::cout<<"muons from top, acceptance: "<<mus_acc<<"("<<mus_acc_err<<")"<<std::endl;
 
   std::cout<<"muons from top, reconstruction efficiency: ";
@@ -1075,40 +970,6 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
 
   std::cout<<std::endl<<"Electron information: "<<std::endl;
 
-  std::cout<<"number of electrons from top: "<<nels<<std::endl;
-
-  std::cout<<"number of electrons from top, accepted: "<<nels_acc<<std::endl;
-
-  std::cout<<"number of electrons from top, accepted, bins: ";
-  for(i_cal=0;i_cal<PT_BINS;i_cal++)
-  {
-    std::cout<<nels_acc_bin[i_cal]<<" ";
-    if(i_cal==PT_BINS-1)
-    {
-      std::cout<<std::endl;
-    }
-  }
-
-  std::cout<<"number of electrons from top, reconstructed: ";
-  for(i_cal=0;i_cal<PT_BINS;i_cal++)
-  {
-    std::cout<<nels_reco[i_cal]<<" ";
-    if(i_cal==PT_BINS-1)
-    {
-      std::cout<<std::endl;
-    }
-  }
-
-  std::cout<<"number of electrons from top, isolated: ";
-  for(i_cal=0;i_cal<PT_BINS;i_cal++)
-  {
-    std::cout<<nels_iso[i_cal]<<" ";
-    if(i_cal==PT_BINS-1)
-    {
-      std::cout<<std::endl;
-    }
-  }
-
   std::cout<<"electrons from top, acceptance: "<<els_acc<<"("<<els_acc_err<<")"<<std::endl;
 
   std::cout<<"electrons from top, reconstruction efficiency: ";
@@ -1134,72 +995,4 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
   std::cout<<"correction factor from di electrons: "<< corrfactor_di_els <<"("<< corrfactor_di_els_err <<")"<<std::endl;
 
   return ;
-}
-void AccRecoIsoEffs:: printEffsHeader()
-{
-  ofstream EffsHeader;
-  EffsHeader.open ("EffsHeader_MuCS.h");
-
-  int i_cal = 0;
-
-  EffsHeader << "  const double ttbar_mus_acc = " << mus_acc << ";" << std::endl; 
-
-  EffsHeader << "  const double ttbar_mus_recoeff[" << PT_BINS << "] = {";
-  for( i_cal = 0 ; i_cal < PT_BINS ; i_cal++ )
-  {
-    if( i_cal != PT_BINS-1 )
-    {
-      EffsHeader << mus_recoeff[i_cal] << ",";
-    }
-    else
-    {
-      EffsHeader << mus_recoeff[i_cal] << "};" << std::endl;
-    }
-  }
-
-  EffsHeader << "  const double ttbar_mus_isoeff[" << PT_BINS << "] = {";
-  for( i_cal = 0 ; i_cal < PT_BINS ; i_cal++ )
-  {
-    if( i_cal != PT_BINS-1 )
-    {
-      EffsHeader << mus_isoeff[i_cal] << ",";
-    }
-    else
-    {
-      EffsHeader << mus_isoeff[i_cal] << "};" << std::endl;
-    }
-  }
-
-  EffsHeader << "  const double ttbar_els_acc = " << els_acc << ";" << std::endl;
-
-  EffsHeader << "  const double ttbar_els_recoeff[" << PT_BINS << "] = {";
-  for( i_cal = 0 ; i_cal < PT_BINS ; i_cal++ )
-  {
-    if( i_cal != PT_BINS-1 )
-    {
-      EffsHeader << els_recoeff[i_cal] << ",";
-    }
-    else
-    {
-      EffsHeader << els_recoeff[i_cal] << "};" << std::endl;
-    }
-  }
-
-  EffsHeader << "  const double ttbar_els_isoeff[" << PT_BINS << "] = {";
-  for( i_cal = 0 ; i_cal < PT_BINS ; i_cal++ )
-  {
-    if( i_cal != PT_BINS-1 )
-    {
-      EffsHeader << els_isoeff[i_cal] << ",";
-    }
-    else
-    {
-      EffsHeader << els_isoeff[i_cal] << "};" << std::endl;
-    }
-  }
-
-  EffsHeader << "  const double ttbar_corrfactor_di_mus = " << corrfactor_di_mus << ";" << std::endl;
-  EffsHeader << "  const double ttbar_corrfactor_di_els = " << corrfactor_di_els << ";" << std::endl;
-
-  EffsHeader.close();
 }
