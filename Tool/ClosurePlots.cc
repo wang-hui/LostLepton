@@ -23,8 +23,8 @@ int main()
   ClosurePlots myClosurePlots;
   myClosurePlots.Initialization();
   myClosurePlots.SetScale(
-                         1957900, //NEvents
-                         70, //Xsec
+                         25446993, //NEvents
+                         806.1, //Xsec
                          1000 //Lumi in pb
                          );
   //initialize the closure plots parameter we want to investigate

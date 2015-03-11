@@ -155,6 +155,7 @@ class BaseHistgram
   TH1D *h_b_acc_njets, *h_b_acc_nbjetsCSVM, *h_b_acc_bestTopMass, *h_b_acc_MET, *h_b_acc_jetpt2, *h_b_acc_jetpt4, *h_b_acc_jet1_met_phi_diff, *h_b_acc_jet2_met_phi_diff, *h_b_acc_jet3_met_phi_diff;
   TH1D *h_b_reco_nMuons, *h_b_reco_njets, *h_b_reco_nbjetsCSVM, *h_b_reco_bestTopMass, *h_b_reco_MET, *h_b_reco_jetpt2, *h_b_reco_jetpt4, *h_b_reco_jet1_met_phi_diff, *h_b_reco_jet2_met_phi_diff, *h_b_reco_jet3_met_phi_diff;
   TH1D *h_b_deltaR_mus, *h_b_deltaR_els;
+  TH1D *h_b_activity_mus, *h_b_activity_els;
 
   //closure plots definition
   TH1D *h_pred_mu_iso_met, *h_pred_mu_iso_njets, *h_pred_mu_iso_mt2, *h_pred_mu_iso_topmass, *h_pred_mu_iso_ht, *h_pred_mu_iso_mht, *h_pred_mu_iso_ntopjets;
@@ -223,6 +224,9 @@ void BaseHistgram::BookHistgram(const char *outFileName)
 
   h_b_deltaR_mus = new TH1D("h_b_deltaR_mus","",1000,0,0.5);
   h_b_deltaR_els = new TH1D("h_b_deltaR_els","",1000,0,0.5);
+
+  h_b_activity_mus = new TH1D("h_b_activity_mus","",1000,0,200);
+  h_b_activity_els = new TH1D("h_b_activity_els","",1000,0,200);
 
   //start closure plots
   h_pred_mu_iso_met = new TH1D("h_pred_mu_iso_met","",100,0,1000);
@@ -494,77 +498,3 @@ bool isGoodMuonID(double id_GlobalMuonPromptTight,
   return true;
 }
 */
-/*
-bool isGoodElectronID(double isEB,
-                      double isEE,
-                      double dEtaIn,
-                      double dPhiIn,
-                      double full5x5_sigmaIetaIeta,
-                      double hadOverEm
-                      )
-{ 
-  if(( (int)isEB==1 && (int)isEE==1 )||( (int)isEB==0 && (int)isEE==0 ) )
-    return false;
-
-  if((int)isEB==1)
-  {
-    if(dEtaIn > 0.021)
-      return false;
-    if(dPhiIn > 0.25)
-      return false;
-    if(full5x5_sigmaIetaIeta > 0.012)
-      return false;
-    if(hadOverEm > 0.24)
-      return false;
-  }
-  
-  if((int)isEE==1)
-  {
-    if(dEtaIn > 0.028)
-      return false;
-    if(dPhiIn > 0.23)
-      return false;
-    if(full5x5_sigmaIetaIeta > 0.035)
-      return false;
-    if(hadOverEm > 0.19)
-      return false;
-  }
-
-  return true;
-}
-*/
-/*
-bool isMatchedDeltaR(double eta1, double phi1, double eta2, double phi2)
-{
-  double deltaR;
-  deltaR = DeltaR(eta1,phi1,eta2,phi2);
-
-  if(deltaR<0.01)
-    return true;
-  else
-    return false;
-}
-*/
-
-/*
-bool isPassMuonIso(double mus_pfIsoR04_sumNeutralHadronEt,
-                   double mus_pfIsoR04_sumPhotonEt,
-                   double mus_pfIsoR04_sumPUPt,
-                   double mus_pfIsoR04_sumChargedHadronPt,
-                   double reco_mus_pt
-                   )
-{
-  double isoNeutral = mus_pfIsoR04_sumNeutralHadronEt + mus_pfIsoR04_sumPhotonEt - 0.5*mus_pfIsoR04_sumPUPt;
-  isoNeutral = ( isoNeutral > 0) ? isoNeutral : 0;
-
-  double  muRelIso = (mus_pfIsoR04_sumChargedHadronPt + isoNeutral) / reco_mus_pt;
-  if( muRelIso < 0.2 )
-  {
-    return true;
-  }
-  else
-    return false;
-}
-*/
-
-

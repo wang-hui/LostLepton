@@ -36,6 +36,7 @@
 #include "TLorentzVector.h"
 //#include "TROOT.h"
 //#include "TInterpreter.h"
+#include "Activity.h"
 
 using namespace std;
 
@@ -185,7 +186,8 @@ int main(int argc, char* argv[])
   const char *inputFileList = argv[1];
   const char *outFileName   = argv[2];
 
-  TChain *fChain = new TChain("AUX");
+  TChain *fChain = new TChain("stopTreeMaker/AUX");
+  //TChain *fChain = new TChain("AUX");
 
   if(!FillChain(fChain, inputFileList))
   {
@@ -200,6 +202,8 @@ int main(int argc, char* argv[])
   AnaFunctions::prepareTopTagger();
   //The passBaselineFunc is registered here
   tr.registerFunction(&passBaselineFunc);
+  //define activity variables
+  Activity myActivity;
   //define my AccRecoIsoEffs class to stroe counts and efficiencies
   AccRecoIsoEffs myAccRecoIsoEffs;
   //define my histgram class
@@ -263,10 +267,14 @@ int main(int argc, char* argv[])
       if(nElectrons == 0)
       {
         myAccRecoIsoEffs.nevents_sel_mus++;
-       
+    
         //get reco level information of muons
         vector<TLorentzVector> muonsLVec = tr.getVec<TLorentzVector>("muonsLVec");
         int reco_mus_count = muonsLVec.size();
+
+        vector<TLorentzVector> jetsLVec = tr.getVec<TLorentzVector>("jetsLVec");
+        vector<double> recoJetschargedHadronEnergyFraction = tr.getVec<double>("recoJetschargedHadronEnergyFraction");
+        vector<double> recoJetschargedEmEnergyFraction = tr.getVec<double>("recoJetschargedEmEnergyFraction");
 
         for(int gen_emus_i = 0 ; gen_emus_i < gen_emus_count ; gen_emus_i++)
         {
@@ -289,6 +297,18 @@ int main(int argc, char* argv[])
             gen_mus_eta = ( genDecayLVec.at ( genId ) ).Eta();
             gen_mus_phi = ( genDecayLVec.at ( genId ) ).Phi();
             gen_mus_pt  = ( genDecayLVec.at ( genId ) ).Pt();
+
+            myActivity.getVariables(
+                                    gen_mus_eta,
+                                    gen_mus_phi,
+                                    jetsLVec,
+                                    recoJetschargedHadronEnergyFraction,
+                                    recoJetschargedEmEnergyFraction
+                                   );
+            double activity = myActivity.getActivity();
+            myActivity.reset();
+            (myBaseHistgram.h_b_activity_mus)->Fill(activity);
+            //std::cout << activity  << std::endl;
 
             if((std::abs(gen_mus_eta)) < 2.4 && gen_mus_pt > 5)
             {
@@ -1135,7 +1155,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
 
   return ;
 }
-void AccRecoIsoEffs:: printEffsHeader()
+void AccRecoIsoEffs::printEffsHeader()
 {
   ofstream EffsHeader;
   EffsHeader.open ("EffsHeader_MuCS.h");
