@@ -49,7 +49,7 @@ double Activity::getActivity()
   double activity = 0;
   for( unsigned int i = 0 ; i < jetLVec_in.size() ; i++ )
   {
-    if( DeltaR( eta_lepton_in , phi_lepton_in , (jetLVec_in.at(i)).Eta() , (jetLVec_in.at(i)).Phi() ) < 0.5 )
+    if( DeltaR( eta_lepton_in , phi_lepton_in , (jetLVec_in.at(i)).Eta() , (jetLVec_in.at(i)).Phi() ) < 1.0 )
     {
       activity+= (jetLVec_in.at(i)).Pt() * (recoJetschargedEmEnergyFraction_in[i] + recoJetschargedHadronEnergyFraction_in[i]);
     }

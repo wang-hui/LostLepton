@@ -38,6 +38,7 @@ class AccRecoIsoEffs
   int nevents_sel_base = 0;
   int nevents_sel_mus = 0;
   int nevents_sel_els = 0;
+  int nevents_cs_mus = 0;
 
   //define acceptance, reco eff and iso eff to be calculated
   double mus_acc = 0, els_acc = 0;
@@ -156,6 +157,7 @@ class BaseHistgram
   TH1D *h_b_reco_nMuons, *h_b_reco_njets, *h_b_reco_nbjetsCSVM, *h_b_reco_bestTopMass, *h_b_reco_MET, *h_b_reco_jetpt2, *h_b_reco_jetpt4, *h_b_reco_jet1_met_phi_diff, *h_b_reco_jet2_met_phi_diff, *h_b_reco_jet3_met_phi_diff;
   TH1D *h_b_deltaR_mus, *h_b_deltaR_els;
   TH1D *h_b_activity_mus, *h_b_activity_els;
+  TH1D *h_b_jet_pt;
 
   //closure plots definition
   TH1D *h_pred_mu_iso_met, *h_pred_mu_iso_njets, *h_pred_mu_iso_mt2, *h_pred_mu_iso_topmass, *h_pred_mu_iso_ht, *h_pred_mu_iso_mht, *h_pred_mu_iso_ntopjets;
@@ -227,6 +229,8 @@ void BaseHistgram::BookHistgram(const char *outFileName)
 
   h_b_activity_mus = new TH1D("h_b_activity_mus","",1000,0,200);
   h_b_activity_els = new TH1D("h_b_activity_els","",1000,0,200);
+
+  h_b_jet_pt = new TH1D("h_b_jet_pt","",1000,0,200);
 
   //start closure plots
   h_pred_mu_iso_met = new TH1D("h_pred_mu_iso_met","",100,0,1000);

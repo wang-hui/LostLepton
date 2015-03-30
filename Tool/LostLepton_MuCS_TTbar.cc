@@ -51,8 +51,12 @@ void passBaselineFunc(NTupleReader &tr)
   TLorentzVector metLVec; metLVec.SetPtEtaPhiM(tr.getVar<double>("met"), 0, tr.getVar<double>("metphi"), 0);
 
   //Calculate number of leptons
-  int nMuons = AnaFunctions::countMuons(tr.getVec<TLorentzVector>("muonsLVec"), tr.getVec<double>("muonsRelIso"), tr.getVec<double>("muonsMtw"), AnaConsts::muonsArr);
-  int nElectrons = AnaFunctions::countElectrons(tr.getVec<TLorentzVector>("elesLVec"), tr.getVec<double>("elesRelIso"), tr.getVec<double>("elesMtw"), AnaConsts::elesArr);
+  //int nMuons = AnaFunctions::countMuons(tr.getVec<TLorentzVector>("muonsLVec"), tr.getVec<double>("muonsRelIso"), tr.getVec<double>("muonsMtw"), AnaConsts::muonsArr);
+  int nMuons = AnaFunctions::countMuons(tr.getVec<TLorentzVector>("muonsLVec"), tr.getVec<double>("muonsMiniIso"), tr.getVec<double>("muonsMtw"), AnaConsts::muonsArr);
+
+  //int nElectrons = AnaFunctions::countElectrons(tr.getVec<TLorentzVector>("elesLVec"), tr.getVec<double>("elesRelIso"), tr.getVec<double>("elesMtw"), AnaConsts::elesArr);
+  int nElectrons = AnaFunctions::countElectrons(tr.getVec<TLorentzVector>("elesLVec"), tr.getVec<double>("elesMiniIso"), tr.getVec<double>("elesMtw"), AnaConsts::elesArr);
+
   int nIsoTrks = AnaFunctions::countIsoTrks(tr.getVec<TLorentzVector>("loose_isoTrksLVec"), tr.getVec<double>("loose_isoTrks_iso"), tr.getVec<double>("loose_isoTrks_mtw"), AnaConsts::isoTrksArr);
 
   //Calculate number of jets and b-tagged jets
@@ -186,8 +190,8 @@ int main(int argc, char* argv[])
   const char *inputFileList = argv[1];
   const char *outFileName   = argv[2];
 
-  TChain *fChain = new TChain("stopTreeMaker/AUX");
-  //TChain *fChain = new TChain("AUX");
+  //TChain *fChain = new TChain("stopTreeMaker/AUX");
+  TChain *fChain = new TChain("AUX");
 
   if(!FillChain(fChain, inputFileList))
   {
@@ -276,6 +280,11 @@ int main(int argc, char* argv[])
         vector<double> recoJetschargedHadronEnergyFraction = tr.getVec<double>("recoJetschargedHadronEnergyFraction");
         vector<double> recoJetschargedEmEnergyFraction = tr.getVec<double>("recoJetschargedEmEnergyFraction");
 
+        //for( unsigned int i = 0 ; i < jetsLVec.size() ; i++ )
+        //{
+          //(myBaseHistgram.h_b_jet_pt)->Fill( ( jetsLVec.at(i) ).Pt() );
+        //}
+
         for(int gen_emus_i = 0 ; gen_emus_i < gen_emus_count ; gen_emus_i++)
         {
           //determine if this gen particle is Muon;
@@ -354,11 +363,12 @@ int main(int argc, char* argv[])
               {
                 myAccRecoIsoEffs.nmus_reco[ptbin_number]++;
 
-                vector<double> muonsRelIso = tr.getVec<double>("muonsRelIso");
+                //vector<double> muonsRelIso = tr.getVec<double>("muonsRelIso");
+                vector<double> muonsMiniIso = tr.getVec<double>("muonsMiniIso");
 
                 bool mus_pass_iso;
                 mus_pass_iso = false;               
-                mus_pass_iso = ( muonsRelIso.at(mindeltar_index) < 0.2 );
+                mus_pass_iso = ( muonsMiniIso.at(mindeltar_index) < 0.2 );
                 
                 if(mus_pass_iso)
                 {
@@ -456,10 +466,12 @@ int main(int argc, char* argv[])
               {
                 myAccRecoIsoEffs.nels_reco[ptbin_number]++;
 
-                vector<double> elesRelIso = tr.getVec<double>("elesRelIso");
+                //vector<double> elesRelIso = tr.getVec<double>("elesRelIso");
+                vector<double> elesMiniIso = tr.getVec<double>("elesMiniIso");
+
                 bool els_pass_iso;
                 els_pass_iso = false;
-                els_pass_iso = ( elesRelIso.at(mindeltar_index) < 0.24 );
+                els_pass_iso = ( elesMiniIso.at(mindeltar_index) < 0.2 );
 
                 if(els_pass_iso)
                 {
@@ -660,7 +672,6 @@ int main(int argc, char* argv[])
   }//end of first loop
 
   //All numbers counted, now calculated effs and print out 
-  myAccRecoIsoEffs.printOverview();
   myAccRecoIsoEffs.NumberstoEffs();
   myAccRecoIsoEffs.EffstoWeights();
   myAccRecoIsoEffs.GetDiLeptonFactor();
@@ -700,15 +711,18 @@ int main(int argc, char* argv[])
       //nMuons in flatree means no iso cut muons; CUT2 we add iso
       if (nElectrons == 0 && nMuons == 1)
       {
+        //counting the events for muon control sample
+        myAccRecoIsoEffs.nevents_cs_mus++;
         //get muon variables
 	vector<TLorentzVector> muonsLVec = trCS.getVec<TLorentzVector>("muonsLVec");
-        vector<double> muonsRelIso = trCS.getVec<double>("muonsRelIso");
+        //vector<double> muonsRelIso = trCS.getVec<double>("muonsRelIso");
+        vector<double> muonsMiniIso = trCS.getVec<double>("muonsMiniIso");
 
         double reco_mus_pt = 0, reco_mus_eta = 0, reco_mus_phi = 0;
 
         for(unsigned int im = 0 ; im < muonsLVec.size() ; im++)
         {
-          if( fabs(muonsLVec[im].Eta()) < 2.4 && muonsRelIso[im] < 0.2 )
+          if( fabs(muonsLVec[im].Eta()) < 2.4 && muonsMiniIso[im] < 0.2 )
 	  {
             reco_mus_pt  = ( muonsLVec.at(im) ).Pt();
             reco_mus_eta = ( muonsLVec.at(im) ).Eta();
@@ -836,6 +850,7 @@ int main(int argc, char* argv[])
     }//baseline_nolepveto
   }
 
+  myAccRecoIsoEffs.printOverview();
   myAccRecoIsoEffs.NormalizeFlowNumber();
   myAccRecoIsoEffs.printNormalizeFlowNumber();
 
@@ -862,6 +877,8 @@ void AccRecoIsoEffs::printOverview()
 
   std::cout << "nevents_sel_mus = " << nevents_sel_mus << std::endl;
   std::cout << "nevents_sel_els = " << nevents_sel_els << std::endl;
+
+  std::cout << "nevents_cs_mus = "<< nevents_cs_mus << std::endl;
 
   return ;
 }
