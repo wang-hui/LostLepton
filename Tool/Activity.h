@@ -12,7 +12,9 @@ class Activity
                     const std::vector<double>& recoJetschargedHadronEnergyFraction,
                     const std::vector<double>& recoJetschargedEmEnergyFraction
                    );
-  double getActivity();
+  double getElActivity();
+  double getMuActivity();
+
   void reset();
 
  private:
@@ -44,12 +46,30 @@ void Activity::getVariables(
   std::copy ( recoJetschargedEmEnergyFraction.begin() , recoJetschargedEmEnergyFraction.end() , recoJetschargedEmEnergyFraction_in.begin() );
 }
 
-double Activity::getActivity()
+double Activity::getElActivity()
 {
   double activity = 0;
   for( unsigned int i = 0 ; i < jetLVec_in.size() ; i++ )
   {
-    if( DeltaR( eta_lepton_in , phi_lepton_in , (jetLVec_in.at(i)).Eta() , (jetLVec_in.at(i)).Phi() ) < 1.0 )
+    if( DeltaR( eta_lepton_in , phi_lepton_in , (jetLVec_in.at(i)).Eta() , (jetLVec_in.at(i)).Phi() ) < 1.0 && (jetLVec_in.at(i)).Pt() > 10 )
+    //for now, we study the activity integral over jetpt > 10, we will lower the pt cut later
+    {
+      activity+= (jetLVec_in.at(i)).Pt() * recoJetschargedHadronEnergyFraction_in[i];
+    }
+    else
+      continue;
+  }
+
+  return activity;
+}
+
+double Activity::getMuActivity()
+{
+  double activity = 0;
+  for( unsigned int i = 0 ; i < jetLVec_in.size() ; i++ )
+  {
+    if( DeltaR( eta_lepton_in , phi_lepton_in , (jetLVec_in.at(i)).Eta() , (jetLVec_in.at(i)).Phi() ) < 1.0 && (jetLVec_in.at(i)).Pt() > 10 )
+    //for now, we study the activity integral over jetpt > 10, we will lower the pt cut later
     {
       activity+= (jetLVec_in.at(i)).Pt() * (recoJetschargedEmEnergyFraction_in[i] + recoJetschargedHadronEnergyFraction_in[i]);
     }
@@ -59,6 +79,7 @@ double Activity::getActivity()
 
   return activity;
 }
+
 
 void Activity::reset()
 {

@@ -16,7 +16,7 @@
 #include "SusyAnaTools/Tools/NTupleReader.h"
 
 #define PT_BINS 8
-//#define AC_BINS 1
+#define AC_BINS 8
 
 //############################begin to defin class AccRecoIsoEffs###################
 
@@ -30,9 +30,6 @@ class AccRecoIsoEffs
 
   void printEffsHeader();
 
-  //define the number of Pt bins we need in the calculation
-  //static int PT_BINS = 8;
-
   //here we define the overall information for ttbar sample
   int nevents_tot = 0;
   int nevents_sel_base = 0;
@@ -43,20 +40,20 @@ class AccRecoIsoEffs
   //define acceptance, reco eff and iso eff to be calculated
   double mus_acc = 0, els_acc = 0;
   double mus_acc_err = 0, els_acc_err = 0;
-  double mus_recoeff[PT_BINS] = {0}, els_recoeff[PT_BINS] = {0};
-  double mus_isoeff[PT_BINS] = {0}, els_isoeff[PT_BINS] = {0};
-  double mus_recoeff_err[PT_BINS] = {0}, els_recoeff_err[PT_BINS] = {0};
-  double mus_isoeff_err[PT_BINS] = {0}, els_isoeff_err[PT_BINS] = {0};
+  double mus_recoeff[PT_BINS][AC_BINS] = {{0}}, els_recoeff[PT_BINS][AC_BINS] = {{0}};
+  double mus_isoeff[PT_BINS][AC_BINS] = {{0}}, els_isoeff[PT_BINS][AC_BINS] = {{0}};
+  double mus_recoeff_err[PT_BINS][AC_BINS] = {{0}}, els_recoeff_err[PT_BINS][AC_BINS] = {{0}};
+  double mus_isoeff_err[PT_BINS][AC_BINS] = {{0}}, els_isoeff_err[PT_BINS][AC_BINS] = {{0}};
 
   //here we define the muon/electron number we need to count in the loop
   double nmus = 0, nmus_acc = 0, nels = 0, nels_acc =0;
-  double nmus_acc_bin[PT_BINS] = {0}, nels_acc_bin[PT_BINS] = {0};
-  double nmus_reco[PT_BINS] = {0}, nels_reco[PT_BINS] = {0};
-  double nmus_iso[PT_BINS] = {0}, nels_iso[PT_BINS] = {0};
+  double nmus_acc_bin[PT_BINS][AC_BINS] = {{0}}, nels_acc_bin[PT_BINS][AC_BINS] = {{0}};
+  double nmus_reco[PT_BINS][AC_BINS] = {{0}}, nels_reco[PT_BINS][AC_BINS] = {{0}};
+  double nmus_iso[PT_BINS][AC_BINS] = {{0}}, nels_iso[PT_BINS][AC_BINS] = {{0}};
 
   //here we define the event weight we are going to use in the second loop ( muon/electron CS and prediction plots)
-  double mus_EventWeight_iso[PT_BINS] = {0}, mus_EventWeight_reco[PT_BINS] = {0}, mus_EventWeight_acc[PT_BINS] = {0};
-  double els_EventWeight_iso[PT_BINS] = {0}, els_EventWeight_reco[PT_BINS] = {0}, els_EventWeight_acc[PT_BINS] = {0};
+  double mus_EventWeight_iso[PT_BINS][AC_BINS] = {{0}}, mus_EventWeight_reco[PT_BINS][AC_BINS] = {{0}}, mus_EventWeight_acc[PT_BINS][AC_BINS] = {{0}};
+  double els_EventWeight_iso[PT_BINS][AC_BINS] = {{0}}, els_EventWeight_reco[PT_BINS][AC_BINS] = {{0}}, els_EventWeight_acc[PT_BINS][AC_BINS] = {{0}};
 
   //di-lepton correction
   double nevents_single_mus = 0, nevents_di_mus = 0;
@@ -87,7 +84,14 @@ class AccRecoIsoEffs
   double corrfactor_di_mus_err = 0;
   double corrfactor_di_els_err = 0;
 
+  TFile *Effs2dPlots = new TFile("Effs2dPlots.root", "recreate");
+  TH2D *mus_recoeffs2d  = new TH2D("mus_recoeffs","Muon RecoEffs",8,0,8,8,0,8);
+  TH2D *mus_isoeffs2d  = new TH2D("mus_isoeffs","Muon IsoEffs",8,0,8,8,0,8);
+  TH2D *els_recoeffs2d  = new TH2D("els_recoeffs","Electron RecoEffs",8,0,8,8,0,8);
+  TH2D *els_isoeffs2d  = new TH2D("els_isoeffs","Electron IsoEffs",8,0,8,8,0,8);
+
   void NumberstoEffs();
+  void EffsPlotsGen();
   void EffstoWeights();
   void GetDiLeptonFactor();
   void NormalizeFlowNumber();
@@ -403,7 +407,7 @@ bool FillChain(TChain *chain, const TString &inputFileList)
 }
 
 
-//############determine the pt bin number from generation level pt############
+//############determine the pt bin number############
 int Set_ptbin_number(
                      double gen_pt
                     )
@@ -444,6 +448,50 @@ int Set_ptbin_number(
   }
   
   return ptbin_num;
+}
+
+//############determine the activity bin number############
+
+int Set_acbin_number(
+                     double activity
+                    )
+{
+  int acbin_num;
+
+  if(activity < 5)
+  {
+    acbin_num = 0;
+  }
+  else if(activity >= 5 && activity < 10)
+  {
+    acbin_num = 1;
+  }
+  else if(activity >= 10 && activity < 20)
+  {
+    acbin_num = 2;
+  }
+  else if(activity >= 20 && activity < 40)
+  {
+    acbin_num = 3;
+  }
+  else if(activity >= 40 && activity < 60)
+  {
+    acbin_num = 4;
+  }
+  else if(activity >= 60 && activity < 80)
+  {
+    acbin_num = 5;
+  }
+  else if(activity >= 80 && activity < 100)
+  {
+    acbin_num = 6;
+  }
+  else if(activity >= 100 )
+  {
+    acbin_num = 7;
+  }
+
+  return acbin_num;
 }
 
 

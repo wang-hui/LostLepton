@@ -45,10 +45,6 @@ And it will be involved into make command automatically and we do not have error
 
 ./LostLepton_MuCS_TTbar runList_inputfile.txt outputfile.root
 
-./LostLepton_ElCS_TTbar runList_ttbarfile.txt outputfile.root
-
-./LostLepton_ElCS_SingleTop runList_singletopfile.txt outputfile.root
-
 5.Make Closure Plots:
 
 ./ClosurePlots

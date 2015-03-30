@@ -1,1 +1,1 @@
-/uscms/home/hwei/work/stop/CMSSW_7_2_0/src/flattrees/stop_ttbar_skimmed_tree_v1.root
+/uscms/home/hwei/work/stop/CMSSW_7_2_0/src/flattrees/stop_ttbar_skimmed_tree_v2.root

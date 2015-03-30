@@ -1,1 +1,0 @@
-/uscms/home/hwei/work/stop/CMSSW_7_2_0/src/flattrees/stop_ttbar_a_test_tree.root
