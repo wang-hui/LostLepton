@@ -961,14 +961,14 @@ void AccRecoIsoEffs::EffsPlotsGen()
       els_recoeffs2d->Fill( i_cal , j_cal, els_recoeff[i_cal][j_cal] );
       els_isoeffs2d->Fill( i_cal , j_cal, els_isoeff[i_cal][j_cal] );
            
-      mus_recoeffs2d->GetXaxis()->SetTitle("Muon_Pt Bin");
-      mus_recoeffs2d->GetYaxis()->SetTitle("Activity Bin");
-      mus_isoeffs2d->GetXaxis()->SetTitle("Muon_Pt Bin");
-      mus_isoeffs2d->GetYaxis()->SetTitle("Activity Bin");
-      els_recoeffs2d->GetXaxis()->SetTitle("Electron_Pt Bin");
-      els_recoeffs2d->GetYaxis()->SetTitle("Activity Bin");
-      els_isoeffs2d->GetXaxis()->SetTitle("Electron_Pt Bin");
-      els_isoeffs2d->GetYaxis()->SetTitle("Activity Bin");
+      mus_recoeffs2d->GetXaxis()->SetTitle("Muon_Pt");
+      mus_recoeffs2d->GetYaxis()->SetTitle("Activity");
+      mus_isoeffs2d->GetXaxis()->SetTitle("Muon_Pt");
+      mus_isoeffs2d->GetYaxis()->SetTitle("Activity");
+      els_recoeffs2d->GetXaxis()->SetTitle("Electron_Pt");
+      els_recoeffs2d->GetYaxis()->SetTitle("Activity");
+      els_isoeffs2d->GetXaxis()->SetTitle("Electron_Pt");
+      els_isoeffs2d->GetYaxis()->SetTitle("Activity");
     }
   }
 
@@ -985,12 +985,12 @@ void AccRecoIsoEffs::EffstoWeights()
     for(j_cal = 0 ; j_cal < AC_BINS ; j_cal++)
     {
       mus_EventWeight_iso[i_cal][j_cal]  = (1.0 - mus_isoeff[i_cal][j_cal])/mus_isoeff[i_cal][j_cal];
-      mus_EventWeight_reco[i_cal][j_cal] = (1.0 - mus_recoeff[i_cal][j_cal])/mus_recoeff[i_cal][j_cal]/mus_isoeff[i_cal][j_cal]; 
-      mus_EventWeight_acc[i_cal][j_cal]  = 1.0/mus_isoeff[i_cal][j_cal]/mus_recoeff[i_cal][j_cal]*(1.0 - mus_acc)/mus_acc;
+      mus_EventWeight_reco[i_cal][j_cal] = (1.0/mus_isoeff[i_cal][j_cal]) * ( (1.0 - mus_recoeff[i_cal][j_cal])/mus_recoeff[i_cal][j_cal] ); 
+      mus_EventWeight_acc[i_cal][j_cal]  = (1.0/mus_isoeff[i_cal][j_cal]) * (1.0/mus_recoeff[i_cal][j_cal]) * ( (1.0 - mus_acc)/mus_acc );
     
-      els_EventWeight_iso[i_cal][j_cal]  = 1.0/mus_isoeff[i_cal][j_cal]/mus_recoeff[i_cal][j_cal]*(1.0 - els_acc)/mus_acc;;
-      els_EventWeight_reco[i_cal][j_cal] = 1.0/mus_isoeff[i_cal][j_cal]*(1 - els_recoeff[i_cal][j_cal])/mus_recoeff[i_cal][j_cal]*els_acc/mus_acc; 
-      els_EventWeight_acc[i_cal][j_cal]  = (1.0 - els_isoeff[i_cal][j_cal])/mus_isoeff[i_cal][j_cal]*els_recoeff[i_cal][j_cal]/mus_recoeff[i_cal][j_cal]*els_acc/mus_acc;
+      els_EventWeight_acc[i_cal][j_cal]  = (1.0/mus_isoeff[i_cal][j_cal]) * (1.0/mus_recoeff[i_cal][j_cal]) * ( (1.0 - els_acc)/mus_acc );
+      els_EventWeight_reco[i_cal][j_cal] = (1.0/mus_isoeff[i_cal][j_cal]) * ( (1 - els_recoeff[i_cal][j_cal])/mus_recoeff[i_cal][j_cal] )* (els_acc/mus_acc); 
+      els_EventWeight_iso[i_cal][j_cal]  = ( (1.0 - els_isoeff[i_cal][j_cal])/mus_isoeff[i_cal][j_cal] ) * (els_recoeff[i_cal][j_cal]/mus_recoeff[i_cal][j_cal])* (els_acc/mus_acc);
     }
   }
 
