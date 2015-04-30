@@ -19,7 +19,7 @@
     }
   }
 
-
+  gStyle->SetPaintTextFormat("1.2g");
   h_mu_iso_eff->Draw("colztext");
 
 
