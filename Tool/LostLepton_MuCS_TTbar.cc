@@ -292,7 +292,7 @@ int main(int argc, char* argv[])
           vector<int> genDecayPdgIdVec = tr.getVec<int>("genDecayPdgIdVec");
           bool isMuon;
           isMuon = false;
-          isMuon = ( ( genDecayPdgIdVec.at ( emuVec_merge.at ( gen_emus_i ) ) == 13 )||( genDecayPdgIdVec.at ( emuVec_merge.at ( gen_emus_i ) ) == -13 ) );
+          isMuon = ( ( genDecayPdgIdVec.at ( emuVec_merge.at ( gen_emus_i ) ) == 13 ) || ( genDecayPdgIdVec.at ( emuVec_merge.at ( gen_emus_i ) ) == -13 ) );
 
           if( isMuon )
           {
@@ -322,6 +322,8 @@ int main(int argc, char* argv[])
             (myBaseHistgram.h_b_activity_mus)->Fill(activity);
             (myBaseHistgram.h_b_njets_mus)->Fill(njets30);
             //std::cout << activity  << std::endl;
+            (myBaseHistgram.h_b_njets30_pt_mus)->Fill( njets30 , gen_mus_pt );
+            (myBaseHistgram.h_b_njets30_eta_mus)->Fill( njets30 , gen_mus_eta );
 
             if((std::abs(gen_mus_eta)) < 2.4 && gen_mus_pt > 5)
             {
@@ -331,6 +333,24 @@ int main(int argc, char* argv[])
               int acbin_number = Set_acbin_number(activity);
 
               myAccRecoIsoEffs.nmus_acc_bin[ptbin_number][acbin_number]++;
+
+              for( int i = 0 ; i < genDecayPdgIdVec.size() ; i++ )
+              {
+                int genindice = genDecayPdgIdVec.at(i);
+                if( ( genindice == 13 || genindice  == -13 ) && i != genId )
+                {
+                  double deltar_study;
+                  deltar_study = DeltaR(
+                                        gen_mus_eta,
+                                        gen_mus_phi,
+                                        ( genDecayLVec.at ( i ) ).Eta(),
+                                        ( genDecayLVec.at ( i ) ).Phi()
+                                       );
+                  (myBaseHistgram.h_b_deltaR_genup_mus)->Fill(deltar_study);
+                }
+                else
+                  continue;
+              }
 
               //loop over reco lepton information to find out smallest deltaR value
               vector<double> deltar_mus_pool;
@@ -355,11 +375,13 @@ int main(int argc, char* argv[])
                 deltar = *(std::min_element(deltar_mus_pool.begin(), deltar_mus_pool.end()));
                 mindeltar_index = std::min_element(deltar_mus_pool.begin(), deltar_mus_pool.end()) - deltar_mus_pool.begin();
               }
-              //h_b_deltaR_mus->Fill(deltar);
+              (myBaseHistgram.h_b_deltaR_mus)->Fill(deltar);
+              (myBaseHistgram.h_b_deltaR_pt_mus)->Fill( deltar , gen_mus_pt );
+
               deltar_mus_pool.clear();
 
               bool ismatcheddeltaR;
-              ismatcheddeltaR = (deltar < 0.2);
+              ismatcheddeltaR = (deltar < 0.1);
 
               if(ismatcheddeltaR
                  //&& 
@@ -445,6 +467,9 @@ int main(int argc, char* argv[])
             (myBaseHistgram.h_b_activity_els)->Fill(activity);
             (myBaseHistgram.h_b_njets_els)->Fill(njets30);
 
+            (myBaseHistgram.h_b_njets30_pt_els)->Fill( njets30 , gen_els_pt );
+            (myBaseHistgram.h_b_njets30_eta_els)->Fill( njets30 , gen_els_eta );
+
             if((std::abs(gen_els_eta)) < 2.5 && gen_els_pt > 5)
             {
               myAccRecoIsoEffs.nels_acc[njetsbin_number]++;
@@ -454,6 +479,24 @@ int main(int argc, char* argv[])
 
               myAccRecoIsoEffs.nels_acc_bin[ptbin_number][acbin_number]++;
        
+              for( int i = 0 ; i < genDecayPdgIdVec.size() ; i++ )
+              {
+                int genindice = genDecayPdgIdVec.at(i);
+                if( ( genindice == 11 || genindice  == -11 ) && i != genId )
+                {
+                  double deltar_study;
+                  deltar_study = DeltaR(
+                                        gen_els_eta,
+                                        gen_els_phi,
+                                        ( genDecayLVec.at ( i ) ).Eta(),
+                                        ( genDecayLVec.at ( i ) ).Phi()
+                                       );
+                  (myBaseHistgram.h_b_deltaR_genup_els)->Fill(deltar_study);
+                }
+                else
+                  continue;
+              }
+
               //loop over reco lepton information to determine the smallest deltar
               vector<double> deltar_els_pool;
               for(int reco_els_i = 0 ; reco_els_i < reco_els_count ; reco_els_i++)
@@ -478,11 +521,13 @@ int main(int argc, char* argv[])
                 deltar = *(std::min_element(deltar_els_pool.begin(), deltar_els_pool.end()));
                 mindeltar_index = std::min_element(deltar_els_pool.begin(), deltar_els_pool.end()) - deltar_els_pool.begin();
               }
-              //h_b_deltaR_els->Fill(deltar);  
+              (myBaseHistgram.h_b_deltaR_els)->Fill(deltar);
+              (myBaseHistgram.h_b_deltaR_pt_els)->Fill( deltar , gen_els_pt );
+
               deltar_els_pool.clear();
 
               bool ismatcheddeltaR;
-              ismatcheddeltaR = (deltar < 0.2);
+              ismatcheddeltaR = (deltar < 0.1);
     
               if(ismatcheddeltaR
                  //&& 
@@ -935,10 +980,10 @@ void AccRecoIsoEffs::NumberstoEffs()
   for(i_cal = 0 ; i_cal < NJETS_BINS ; i_cal++)
   {
     mus_acc[i_cal] = nmus_acc[i_cal]/nmus[i_cal];
-    mus_acc_err[i_cal] = get_stat_Error(nmus_acc[i_cal],nmus[i_cal])*get_stat_Error(nmus_acc[i_cal],nmus[i_cal]);
+    mus_acc_err[i_cal] = std::sqrt( get_stat_Error(nmus_acc[i_cal],nmus[i_cal])*get_stat_Error(nmus_acc[i_cal],nmus[i_cal]) + get_sys_Error(mus_acc[i_cal],0.09)*get_sys_Error(mus_acc[i_cal],0.09) );
 
     els_acc[i_cal] = nels_acc[i_cal]/nels[i_cal];
-    els_acc_err[i_cal] = get_stat_Error(nels_acc[i_cal],nels[i_cal])*get_stat_Error(nels_acc[i_cal],nels[i_cal]);
+    els_acc_err[i_cal] = std::sqrt( get_stat_Error(nels_acc[i_cal],nels[i_cal])*get_stat_Error(nels_acc[i_cal],nels[i_cal]) + get_sys_Error(els_acc[i_cal],0.09)*get_sys_Error(els_acc[i_cal],0.09) );
   }
 
   for(i_cal = 0 ; i_cal < PT_BINS ; i_cal++)
@@ -973,17 +1018,22 @@ void AccRecoIsoEffs::EffsPlotsGen()
       mus_isoeffs2d->Fill( i_cal , j_cal, mus_isoeff[i_cal][j_cal] );
       els_recoeffs2d->Fill( i_cal , j_cal, els_recoeff[i_cal][j_cal] );
       els_isoeffs2d->Fill( i_cal , j_cal, els_isoeff[i_cal][j_cal] );
-           
-      mus_recoeffs2d->GetXaxis()->SetTitle("Muon_Pt");
-      mus_recoeffs2d->GetYaxis()->SetTitle("Activity");
-      mus_isoeffs2d->GetXaxis()->SetTitle("Muon_Pt");
-      mus_isoeffs2d->GetYaxis()->SetTitle("Activity");
-      els_recoeffs2d->GetXaxis()->SetTitle("Electron_Pt");
-      els_recoeffs2d->GetYaxis()->SetTitle("Activity");
-      els_isoeffs2d->GetXaxis()->SetTitle("Electron_Pt");
-      els_isoeffs2d->GetYaxis()->SetTitle("Activity");
-    }
+
+      mus_recoeffs2d->SetBinError( i_cal , j_cal, mus_recoeff_err[i_cal][j_cal] );
+      mus_isoeffs2d->SetBinError( i_cal , j_cal, mus_isoeff_err[i_cal][j_cal] );
+      els_recoeffs2d->SetBinError( i_cal , j_cal, els_recoeff_err[i_cal][j_cal] );
+      els_isoeffs2d->SetBinError( i_cal , j_cal, els_isoeff_err[i_cal][j_cal] );
+    }       
   }
+
+  mus_recoeffs2d->GetXaxis()->SetTitle("Muon Pt [GeV]");
+  mus_recoeffs2d->GetYaxis()->SetTitle("Activity");
+  mus_isoeffs2d->GetXaxis()->SetTitle("Muon Pt [GeV]");
+  mus_isoeffs2d->GetYaxis()->SetTitle("Activity");
+  els_recoeffs2d->GetXaxis()->SetTitle("Electron Pt [GeV]");
+  els_recoeffs2d->GetYaxis()->SetTitle("Activity");
+  els_isoeffs2d->GetXaxis()->SetTitle("Electron Pt [GeV]");
+  els_isoeffs2d->GetYaxis()->SetTitle("Activity");
 
   Effs2dPlots->Write();
 }

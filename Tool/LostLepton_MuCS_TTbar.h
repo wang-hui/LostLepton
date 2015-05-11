@@ -17,7 +17,7 @@
 
 #define PT_BINS 8
 #define AC_BINS 8
-#define NJETS_BINS 8
+#define NJETS_BINS 6
 
 //############################begin to defin class AccRecoIsoEffs###################
 
@@ -86,6 +86,13 @@ class AccRecoIsoEffs
   double corrfactor_di_els_err = 0;
 
   TFile *Effs2dPlots = new TFile("Effs2dPlots.root", "recreate");
+  //double ptbins[9]={5.0,10.0,20.0,30.0,40.0,50.0,70.0,100.0,120.0};
+  //double acbins[9]={0.0,5.0,10.0,20.0,40.0,60.0,80.0,100.0,120.0};
+  //TH2D *mus_recoeffs2d  = new TH2D("mus_recoeffs","Muon RecoEffs",8,ptbins,8,acbins);
+  //TH2D *mus_isoeffs2d  = new TH2D("mus_isoeffs","Muon IsoEffs",8,ptbins,8,acbins);
+  //TH2D *els_recoeffs2d  = new TH2D("els_recoeffs","Electron RecoEffs",8,ptbins,8,acbins);
+  //TH2D *els_isoeffs2d  = new TH2D("els_isoeffs","Electron IsoEffs",8,ptbins,8,acbins);
+
   TH2D *mus_recoeffs2d  = new TH2D("mus_recoeffs","Muon RecoEffs",8,0,8,8,0,8);
   TH2D *mus_isoeffs2d  = new TH2D("mus_isoeffs","Muon IsoEffs",8,0,8,8,0,8);
   TH2D *els_recoeffs2d  = new TH2D("els_recoeffs","Electron RecoEffs",8,0,8,8,0,8);
@@ -165,6 +172,10 @@ class BaseHistgram
   TH1D *h_b_njets_mus, *h_b_njets_els;
   TH1D *h_b_jet_pt;
 
+  TH1D *h_b_deltaR_genup_mus, *h_b_deltaR_genup_els;
+  TH2D *h_b_deltaR_pt_mus, *h_b_deltaR_pt_els;
+  TH2D *h_b_njets30_pt_mus, *h_b_njets30_pt_els, *h_b_njets30_eta_mus, *h_b_njets30_eta_els;
+
   //closure plots definition
   TH1D *h_pred_mu_iso_met, *h_pred_mu_iso_njets, *h_pred_mu_iso_mt2, *h_pred_mu_iso_topmass, *h_pred_mu_iso_ht, *h_pred_mu_iso_mht, *h_pred_mu_iso_ntopjets;
   TH1D *h_pred_mu_id_met, *h_pred_mu_id_njets, *h_pred_mu_id_mt2, *h_pred_mu_id_topmass, *h_pred_mu_id_ht, *h_pred_mu_id_mht, *h_pred_mu_id_ntopjets;
@@ -189,11 +200,11 @@ class BaseHistgram
   TH1D *h_exp_el_all_met, *h_exp_el_all_njets, *h_exp_el_all_mt2, *h_exp_el_all_topmass, *h_exp_el_all_ht, *h_exp_el_all_mht, *h_exp_el_all_ntopjets;
 
   TH1D *h_exp_elsingle_all_met, *h_exp_elsingle_all_njets, *h_exp_elsingle_all_mt2, *h_exp_elsingle_all_topmass, *h_exp_elsingle_all_ht, *h_exp_elsingle_all_mht, *h_exp_elsingle_all_ntopjets;
+
 };
 
 void BaseHistgram::BookHistgram(const char *outFileName)
 {
-
   oFile = new TFile(outFileName, "recreate");
 
   h_b_all_MET = new TH1D("h_b_all_MET","",1000,0,1000);
@@ -232,6 +243,17 @@ void BaseHistgram::BookHistgram(const char *outFileName)
 
   h_b_deltaR_mus = new TH1D("h_b_deltaR_mus","",1000,0,0.5);
   h_b_deltaR_els = new TH1D("h_b_deltaR_els","",1000,0,0.5);
+  
+  h_b_deltaR_genup_mus = new TH1D("h_b_deltaR_genup_mus","",50,0,5);
+  h_b_deltaR_genup_els = new TH1D("h_b_deltaR_genup_els","",50,0,5);
+
+  h_b_deltaR_pt_mus = new TH2D("h_b_deltaR_pt_mus","",100,0,1,100,0,500);
+  h_b_deltaR_pt_els = new TH2D("h_b_deltaR_pt_els","",100,0,1,100,0,500);
+
+  h_b_njets30_pt_mus = new TH2D("h_b_njets30_pt_mus","",15,0,15,20,0,200);
+  h_b_njets30_pt_els = new TH2D("h_b_njets30_pt_els","",15,0,15,20,0,200);
+  h_b_njets30_eta_mus = new TH2D("h_b_njets30_eta_mus","",15,0,15,12,-3,3);
+  h_b_njets30_eta_els = new TH2D("h_b_njets30_eta_els","",15,0,15,12,-3,3);
 
   h_b_activity_mus = new TH1D("h_b_activity_mus","",1000,0,200);
   h_b_activity_els = new TH1D("h_b_activity_els","",1000,0,200);
@@ -525,17 +547,9 @@ int Set_njetsbin_number(
   {
     njetsbin_num = 4;
   }
-  else if(njets == 9)
+  else if(njets >= 9)
   {
     njetsbin_num = 5;
-  }
-  else if(njets == 10)
-  {
-    njetsbin_num = 6;
-  }
-  else if(njets > 10)
-  {
-    njetsbin_num = 7;
   }
 
   return njetsbin_num;
