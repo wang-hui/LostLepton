@@ -41,16 +41,25 @@ class AccRecoIsoEffs
   //define acceptance, reco eff and iso eff to be calculated
   double mus_acc[NJETS_BINS] = {0}, els_acc[NJETS_BINS] = {0};
   double mus_acc_err[NJETS_BINS] = {0}, els_acc_err[NJETS_BINS] = {0};
+
   double mus_recoeff[PT_BINS][AC_BINS] = {{0}}, els_recoeff[PT_BINS][AC_BINS] = {{0}};
   double mus_isoeff[PT_BINS][AC_BINS] = {{0}}, els_isoeff[PT_BINS][AC_BINS] = {{0}};
+
+  double mus_isoeff_allreco[PT_BINS][AC_BINS] = {{0}}, els_isoeff_allreco[PT_BINS][AC_BINS] = {{0}};
+ 
   double mus_recoeff_err[PT_BINS][AC_BINS] = {{0}}, els_recoeff_err[PT_BINS][AC_BINS] = {{0}};
   double mus_isoeff_err[PT_BINS][AC_BINS] = {{0}}, els_isoeff_err[PT_BINS][AC_BINS] = {{0}};
+
+  double mus_isoeff_err_allreco[PT_BINS][AC_BINS] = {{0}}, els_isoeff_err_allreco[PT_BINS][AC_BINS] = {{0}};
 
   //here we define the muon/electron number we need to count in the loop
   double nmus[NJETS_BINS] = {0}, nmus_acc[NJETS_BINS] = {0}, nels[NJETS_BINS] = {0}, nels_acc[NJETS_BINS] = {0};
   double nmus_acc_bin[PT_BINS][AC_BINS] = {{0}}, nels_acc_bin[PT_BINS][AC_BINS] = {{0}};
   double nmus_reco[PT_BINS][AC_BINS] = {{0}}, nels_reco[PT_BINS][AC_BINS] = {{0}};
   double nmus_iso[PT_BINS][AC_BINS] = {{0}}, nels_iso[PT_BINS][AC_BINS] = {{0}};
+
+  double nmus_reco_allreco[PT_BINS][AC_BINS] = {{0}}, nels_reco_allreco[PT_BINS][AC_BINS] = {{0}};
+  double nmus_iso_allreco[PT_BINS][AC_BINS] = {{0}}, nels_iso_allreco[PT_BINS][AC_BINS] = {{0}};
 
   //here we define the event weight we are going to use in the second loop ( muon/electron CS and prediction plots)
   double mus_EventWeight_iso[NJETS_BINS][PT_BINS][AC_BINS] = {{{0}}}, mus_EventWeight_reco[NJETS_BINS][PT_BINS][AC_BINS] = {{{0}}}, mus_EventWeight_acc[NJETS_BINS][PT_BINS][AC_BINS] = {{{0}}};
@@ -175,6 +184,10 @@ class BaseHistgram
   TH1D *h_b_deltaR_genup_mus, *h_b_deltaR_genup_els;
   TH2D *h_b_deltaR_pt_mus, *h_b_deltaR_pt_els;
   TH2D *h_b_njets30_pt_mus, *h_b_njets30_pt_els, *h_b_njets30_eta_mus, *h_b_njets30_eta_els;
+  TH1D *h_b_njets30_4_pt_mus, *h_b_njets30_5_pt_mus, *h_b_njets30_6_pt_mus, *h_b_njets30_7_pt_mus, *h_b_njets30_8_pt_mus, *h_b_njets30_9_pt_mus;
+  TH1D *h_b_njets30_4_eta_mus, *h_b_njets30_5_eta_mus, *h_b_njets30_6_eta_mus, *h_b_njets30_7_eta_mus, *h_b_njets30_8_eta_mus, *h_b_njets30_9_eta_mus;
+  TH1D *h_b_njets30_4_pt_els, *h_b_njets30_5_pt_els, *h_b_njets30_6_pt_els, *h_b_njets30_7_pt_els, *h_b_njets30_8_pt_els, *h_b_njets30_9_pt_els;
+  TH1D *h_b_njets30_4_eta_els, *h_b_njets30_5_eta_els, *h_b_njets30_6_eta_els, *h_b_njets30_7_eta_els, *h_b_njets30_8_eta_els, *h_b_njets30_9_eta_els;
 
   //closure plots definition
   TH1D *h_pred_mu_iso_met, *h_pred_mu_iso_njets, *h_pred_mu_iso_mt2, *h_pred_mu_iso_topmass, *h_pred_mu_iso_ht, *h_pred_mu_iso_mht, *h_pred_mu_iso_ntopjets;
@@ -254,6 +267,34 @@ void BaseHistgram::BookHistgram(const char *outFileName)
   h_b_njets30_pt_els = new TH2D("h_b_njets30_pt_els","",15,0,15,20,0,200);
   h_b_njets30_eta_mus = new TH2D("h_b_njets30_eta_mus","",15,0,15,12,-3,3);
   h_b_njets30_eta_els = new TH2D("h_b_njets30_eta_els","",15,0,15,12,-3,3);
+
+  h_b_njets30_4_pt_mus = new TH1D("h_b_njets30_4_pt_mus","",200,0,200);
+  h_b_njets30_5_pt_mus = new TH1D("h_b_njets30_5_pt_mus","",200,0,200);
+  h_b_njets30_6_pt_mus = new TH1D("h_b_njets30_6_pt_mus","",200,0,200);
+  h_b_njets30_7_pt_mus = new TH1D("h_b_njets30_7_pt_mus","",200,0,200);
+  h_b_njets30_8_pt_mus = new TH1D("h_b_njets30_8_pt_mus","",200,0,200);
+  h_b_njets30_9_pt_mus = new TH1D("h_b_njets30_9_pt_mus","",200,0,200);
+
+  h_b_njets30_4_eta_mus = new TH1D("h_b_njets30_4_eta_mus","",60,-3,3);
+  h_b_njets30_5_eta_mus = new TH1D("h_b_njets30_5_eta_mus","",60,-3,3);
+  h_b_njets30_6_eta_mus = new TH1D("h_b_njets30_6_eta_mus","",60,-3,3);
+  h_b_njets30_7_eta_mus = new TH1D("h_b_njets30_7_eta_mus","",60,-3,3);
+  h_b_njets30_8_eta_mus = new TH1D("h_b_njets30_8_eta_mus","",60,-3,3);
+  h_b_njets30_9_eta_mus = new TH1D("h_b_njets30_9_eta_mus","",60,-3,3);
+
+  h_b_njets30_4_pt_els = new TH1D("h_b_njets30_4_pt_els","",200,0,200);
+  h_b_njets30_5_pt_els = new TH1D("h_b_njets30_5_pt_els","",200,0,200);
+  h_b_njets30_6_pt_els = new TH1D("h_b_njets30_6_pt_els","",200,0,200);
+  h_b_njets30_7_pt_els = new TH1D("h_b_njets30_7_pt_els","",200,0,200);
+  h_b_njets30_8_pt_els = new TH1D("h_b_njets30_8_pt_els","",200,0,200);
+  h_b_njets30_9_pt_els = new TH1D("h_b_njets30_9_pt_els","",200,0,200);
+
+  h_b_njets30_4_eta_els = new TH1D("h_b_njets30_4_eta_els","",60,-3,3);
+  h_b_njets30_5_eta_els = new TH1D("h_b_njets30_5_eta_els","",60,-3,3);
+  h_b_njets30_6_eta_els = new TH1D("h_b_njets30_6_eta_els","",60,-3,3);
+  h_b_njets30_7_eta_els = new TH1D("h_b_njets30_7_eta_els","",60,-3,3);
+  h_b_njets30_8_eta_els = new TH1D("h_b_njets30_8_eta_els","",60,-3,3);
+  h_b_njets30_9_eta_els = new TH1D("h_b_njets30_9_eta_els","",60,-3,3);
 
   h_b_activity_mus = new TH1D("h_b_activity_mus","",1000,0,200);
   h_b_activity_els = new TH1D("h_b_activity_els","",1000,0,200);
