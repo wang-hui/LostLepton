@@ -254,6 +254,7 @@ int main(int argc, char* argv[])
       double met = tr.getVar<double>("met");
       double metphi = tr.getVar<double>("metphi");
       int njets30 = tr.getVar<int>("cntNJetsPt30Eta24");
+      const double ht = tr.getVar<double>("ht");
 
       vector<int> W_emuVec = tr.getVec<int>("W_emuVec");
       vector<int> W_tau_emuVec = tr.getVec<int>("W_tau_emuVec");
@@ -329,31 +330,37 @@ int main(int argc, char* argv[])
             {
               (myBaseHistgram.h_b_njets30_4_pt_mus)->Fill( gen_mus_pt );
               (myBaseHistgram.h_b_njets30_4_eta_mus)->Fill( gen_mus_eta );
+	      (myBaseHistgram.h_b_njets30_4_ht_mus)->Fill(ht);
             }
             else if( njets30 == 5 )
             {
               (myBaseHistgram.h_b_njets30_5_pt_mus)->Fill( gen_mus_pt );
               (myBaseHistgram.h_b_njets30_5_eta_mus)->Fill( gen_mus_eta );
+	      (myBaseHistgram.h_b_njets30_5_ht_mus)->Fill(ht);
             }
             else if( njets30 == 6 )
             {
               (myBaseHistgram.h_b_njets30_6_pt_mus)->Fill( gen_mus_pt );
               (myBaseHistgram.h_b_njets30_6_eta_mus)->Fill( gen_mus_eta );
+	      (myBaseHistgram.h_b_njets30_6_ht_mus)->Fill(ht);
             }
             else if( njets30 == 7 )
             {
               (myBaseHistgram.h_b_njets30_7_pt_mus)->Fill( gen_mus_pt );
               (myBaseHistgram.h_b_njets30_7_eta_mus)->Fill( gen_mus_eta );
+	      (myBaseHistgram.h_b_njets30_7_ht_mus)->Fill(ht);
             }
             else if( njets30 == 8 )
             {
               (myBaseHistgram.h_b_njets30_8_pt_mus)->Fill( gen_mus_pt );
               (myBaseHistgram.h_b_njets30_8_eta_mus)->Fill( gen_mus_eta );
+	      (myBaseHistgram.h_b_njets30_8_ht_mus)->Fill(ht);
             }
             else if( njets30 == 9 )
             {
               (myBaseHistgram.h_b_njets30_9_pt_mus)->Fill( gen_mus_pt );
               (myBaseHistgram.h_b_njets30_9_eta_mus)->Fill( gen_mus_eta );
+	      (myBaseHistgram.h_b_njets30_9_ht_mus)->Fill(ht);
             }
 
             if((std::abs(gen_mus_eta)) < 2.4 && gen_mus_pt > 5)
@@ -668,7 +675,6 @@ int main(int argc, char* argv[])
       int ntopjets = tr.getVar<int>("nTopCandSortedCnt");
       double MT2 = tr.getVar<double>("MT22");
       double bestTopJetMass = tr.getVar<double>("bestTopJetMass2");
-      double ht = tr.getVar<double>("ht");
       double mht = tr.getVar<double>("mht");
 
       ///////////////////////////
@@ -1118,15 +1124,15 @@ void AccRecoIsoEffs::EffsPlotsGen()
   {
     for(j_cal = 0 ; j_cal < AC_BINS ; j_cal++)
     {
-      mus_recoeffs2d->Fill( i_cal , j_cal, mus_recoeff[i_cal][j_cal] );
-      mus_isoeffs2d->Fill( i_cal , j_cal, mus_isoeff_allreco[i_cal][j_cal] );
-      els_recoeffs2d->Fill( i_cal , j_cal, els_recoeff[i_cal][j_cal] );
-      els_isoeffs2d->Fill( i_cal , j_cal, els_isoeff_allreco[i_cal][j_cal] );
+      mus_recoeffs2d->SetBinContent( i_cal+1 , j_cal+1, mus_recoeff[i_cal][j_cal] );
+      mus_isoeffs2d->SetBinContent( i_cal+1 , j_cal+1, mus_isoeff_allreco[i_cal][j_cal] );
+      els_recoeffs2d->SetBinContent( i_cal+1 , j_cal+1, els_recoeff[i_cal][j_cal] );
+      els_isoeffs2d->SetBinContent( i_cal+1 , j_cal+1, els_isoeff_allreco[i_cal][j_cal] );
 
-      mus_recoeffs2d->SetBinError( i_cal , j_cal, mus_recoeff_err[i_cal][j_cal] );
-      mus_isoeffs2d->SetBinError( i_cal , j_cal, mus_isoeff_err_allreco[i_cal][j_cal] );
-      els_recoeffs2d->SetBinError( i_cal , j_cal, els_recoeff_err[i_cal][j_cal] );
-      els_isoeffs2d->SetBinError( i_cal , j_cal, els_isoeff_err_allreco[i_cal][j_cal] );
+      mus_recoeffs2d->SetBinError( i_cal+1 , j_cal+1, mus_recoeff_err[i_cal][j_cal] );
+      mus_isoeffs2d->SetBinError( i_cal+1 , j_cal+1, mus_isoeff_err_allreco[i_cal][j_cal] );
+      els_recoeffs2d->SetBinError( i_cal+1 , j_cal+1, els_recoeff_err[i_cal][j_cal] );
+      els_isoeffs2d->SetBinError( i_cal+1 , j_cal+1, els_isoeff_err_allreco[i_cal][j_cal] );
     }       
   }
 
@@ -1311,7 +1317,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
 {
   int i_cal = 0;
   int j_cal = 0;
-  
+  std::cout.precision(3);
   std::cout << std::endl << "Muon information: " << std::endl;
 
   std::cout << "number of muons from top: " << std::endl;
