@@ -188,6 +188,7 @@ class BaseHistgram
   TH1D *h_b_njets30_4_eta_mus, *h_b_njets30_5_eta_mus, *h_b_njets30_6_eta_mus, *h_b_njets30_7_eta_mus, *h_b_njets30_8_eta_mus, *h_b_njets30_9_eta_mus;
   TH1D *h_b_njets30_4_pt_els, *h_b_njets30_5_pt_els, *h_b_njets30_6_pt_els, *h_b_njets30_7_pt_els, *h_b_njets30_8_pt_els, *h_b_njets30_9_pt_els;
   TH1D *h_b_njets30_4_eta_els, *h_b_njets30_5_eta_els, *h_b_njets30_6_eta_els, *h_b_njets30_7_eta_els, *h_b_njets30_8_eta_els, *h_b_njets30_9_eta_els;
+  TH1D *h_b_njets30_4_ht_mus, *h_b_njets30_5_ht_mus, *h_b_njets30_6_ht_mus, *h_b_njets30_7_ht_mus, *h_b_njets30_8_ht_mus, *h_b_njets30_9_ht_mus;
 
   //closure plots definition
   TH1D *h_pred_mu_iso_met, *h_pred_mu_iso_njets, *h_pred_mu_iso_mt2, *h_pred_mu_iso_topmass, *h_pred_mu_iso_ht, *h_pred_mu_iso_mht, *h_pred_mu_iso_ntopjets;
@@ -274,6 +275,13 @@ void BaseHistgram::BookHistgram(const char *outFileName)
   h_b_njets30_7_pt_mus = new TH1D("h_b_njets30_7_pt_mus","",200,0,200);
   h_b_njets30_8_pt_mus = new TH1D("h_b_njets30_8_pt_mus","",200,0,200);
   h_b_njets30_9_pt_mus = new TH1D("h_b_njets30_9_pt_mus","",200,0,200);
+
+  h_b_njets30_4_ht_mus = new TH1D("h_b_njets30_4_ht_mus","",200,0,2000);
+  h_b_njets30_5_ht_mus = new TH1D("h_b_njets30_5_ht_mus","",200,0,2000);
+  h_b_njets30_6_ht_mus = new TH1D("h_b_njets30_6_ht_mus","",200,0,2000);
+  h_b_njets30_7_ht_mus = new TH1D("h_b_njets30_7_ht_mus","",200,0,2000);
+  h_b_njets30_8_ht_mus = new TH1D("h_b_njets30_8_ht_mus","",200,0,2000);
+  h_b_njets30_9_ht_mus = new TH1D("h_b_njets30_9_ht_mus","",200,0,2000);
 
   h_b_njets30_4_eta_mus = new TH1D("h_b_njets30_4_eta_mus","",60,-3,3);
   h_b_njets30_5_eta_mus = new TH1D("h_b_njets30_5_eta_mus","",60,-3,3);
