@@ -363,7 +363,7 @@ int main(int argc, char* argv[])
 	      (myBaseHistgram.h_b_njets30_9_ht_mus)->Fill(ht);
             }
 
-            if((std::abs(gen_mus_eta)) < 2.4 && gen_mus_pt > 5)
+            if((std::abs(gen_mus_eta)) < AnaConsts::muonsArr[1] && gen_mus_pt > AnaConsts::muonsArr[2])
             {
               myAccRecoIsoEffs.nmus_acc[njetsbin_number]++;
 
@@ -557,7 +557,7 @@ int main(int argc, char* argv[])
               (myBaseHistgram.h_b_njets30_9_eta_els)->Fill( gen_els_eta );
             }
 
-            if((std::abs(gen_els_eta)) < 2.5 && gen_els_pt > 5)
+            if( (std::abs(gen_els_eta)) < AnaConsts::elesArr[1] && gen_els_pt > AnaConsts::elesArr[2] )
             {
               myAccRecoIsoEffs.nels_acc[njetsbin_number]++;
 
