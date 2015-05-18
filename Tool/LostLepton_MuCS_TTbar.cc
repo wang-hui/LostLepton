@@ -450,7 +450,7 @@ int main(int argc, char* argv[])
 
                 bool mus_pass_iso;
                 mus_pass_iso = false;               
-                mus_pass_iso = ( muonsMiniIso.at(mindeltar_index) < 0.2 );
+                mus_pass_iso = ( muonsMiniIso.at(mindeltar_index) < AnaConsts::muonsArr[4] );
                 
                 if(mus_pass_iso)
                 {
@@ -646,7 +646,7 @@ int main(int argc, char* argv[])
 
                 bool els_pass_iso;
                 els_pass_iso = false;
-                els_pass_iso = ( elesMiniIso.at(mindeltar_index) < 0.2 );
+                els_pass_iso = ( elesMiniIso.at(mindeltar_index) < AnaConsts::elesArr[4] );
 
                 if(els_pass_iso)
                 {
