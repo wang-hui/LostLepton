@@ -363,7 +363,8 @@ int main(int argc, char* argv[])
 	      (myBaseHistgram.h_b_njets30_9_ht_mus)->Fill(ht);
             }
 
-            if((std::abs(gen_mus_eta)) < 2.4 && gen_mus_pt > 5)
+            if((std::abs(gen_mus_eta)) < 2.4 && gen_mus_pt > 5) //fsl520
+	      //if((std::abs(gen_mus_eta)) < 2.4 && gen_mus_pt > 20.0) //fsl520
             {
               myAccRecoIsoEffs.nmus_acc[njetsbin_number]++;
 
@@ -450,7 +451,7 @@ int main(int argc, char* argv[])
 
                 bool mus_pass_iso;
                 mus_pass_iso = false;               
-                mus_pass_iso = ( muonsMiniIso.at(mindeltar_index) < 0.2 );
+                mus_pass_iso = ( muonsMiniIso.at(mindeltar_index) < AnaConsts::muonsArr[4] );
                 
                 if(mus_pass_iso)
                 {
@@ -646,7 +647,8 @@ int main(int argc, char* argv[])
 
                 bool els_pass_iso;
                 els_pass_iso = false;
-                els_pass_iso = ( elesMiniIso.at(mindeltar_index) < 0.2 );
+		//std::cout << "FL: elesArr[4] = " << AnaConsts::elesArr[4] << std::endl;
+                els_pass_iso = ( elesMiniIso.at(mindeltar_index) < AnaConsts::elesArr[4] );
 
                 if(els_pass_iso)
                 {
@@ -901,7 +903,7 @@ int main(int argc, char* argv[])
 
         for(unsigned int im = 0 ; im < muonsLVec.size() ; im++)
         {
-          if( fabs(muonsLVec[im].Eta()) < 2.4 && muonsMiniIso[im] < 0.2 )
+          if( fabs(muonsLVec[im].Eta()) < 2.4 && muonsMiniIso[im] < AnaConsts::muonsArr[4] )
 	  {
             reco_mus_pt  = ( muonsLVec.at(im) ).Pt();
             reco_mus_eta = ( muonsLVec.at(im) ).Eta();
