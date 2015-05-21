@@ -52,6 +52,8 @@ class AccRecoIsoEffs
 
   double mus_isoeff_err_allreco[PT_BINS][AC_BINS] = {{0}}, els_isoeff_err_allreco[PT_BINS][AC_BINS] = {{0}};
 
+  double mtwcorrfactor[PT_BINS] = {0}, mtwcorrfactor_err[PT_BINS] = {0};
+
   //here we define the muon/electron number we need to count in the loop
   double nmus[NJETS_BINS] = {0}, nmus_acc[NJETS_BINS] = {0}, nels[NJETS_BINS] = {0}, nels_acc[NJETS_BINS] = {0};
   double nmus_acc_bin[PT_BINS][AC_BINS] = {{0}}, nels_acc_bin[PT_BINS][AC_BINS] = {{0}};
@@ -60,6 +62,8 @@ class AccRecoIsoEffs
 
   double nmus_reco_allreco[PT_BINS][AC_BINS] = {{0}}, nels_reco_allreco[PT_BINS][AC_BINS] = {{0}};
   double nmus_iso_allreco[PT_BINS][AC_BINS] = {{0}}, nels_iso_allreco[PT_BINS][AC_BINS] = {{0}};
+
+  double mtwall[PT_BINS] = {0}, mtw100[PT_BINS] = {0};
 
   //here we define the event weight we are going to use in the second loop ( muon/electron CS and prediction plots)
   double mus_EventWeight_iso[NJETS_BINS][PT_BINS][AC_BINS] = {{{0}}}, mus_EventWeight_reco[NJETS_BINS][PT_BINS][AC_BINS] = {{{0}}}, mus_EventWeight_acc[NJETS_BINS][PT_BINS][AC_BINS] = {{{0}}};
@@ -190,6 +194,8 @@ class BaseHistgram
   TH1D *h_b_njets30_4_eta_els, *h_b_njets30_5_eta_els, *h_b_njets30_6_eta_els, *h_b_njets30_7_eta_els, *h_b_njets30_8_eta_els, *h_b_njets30_9_eta_els;
   TH1D *h_b_njets30_4_ht_mus, *h_b_njets30_5_ht_mus, *h_b_njets30_6_ht_mus, *h_b_njets30_7_ht_mus, *h_b_njets30_8_ht_mus, *h_b_njets30_9_ht_mus;
 
+  TH1D *h_mtw_mus;
+
   //closure plots definition
   TH1D *h_pred_mu_iso_met, *h_pred_mu_iso_njets, *h_pred_mu_iso_mt2, *h_pred_mu_iso_topmass, *h_pred_mu_iso_ht, *h_pred_mu_iso_mht, *h_pred_mu_iso_ntopjets;
   TH1D *h_pred_mu_id_met, *h_pred_mu_id_njets, *h_pred_mu_id_mt2, *h_pred_mu_id_topmass, *h_pred_mu_id_ht, *h_pred_mu_id_mht, *h_pred_mu_id_ntopjets;
@@ -303,6 +309,8 @@ void BaseHistgram::BookHistgram(const char *outFileName)
   h_b_njets30_7_eta_els = new TH1D("h_b_njets30_7_eta_els","",60,-3,3);
   h_b_njets30_8_eta_els = new TH1D("h_b_njets30_8_eta_els","",60,-3,3);
   h_b_njets30_9_eta_els = new TH1D("h_b_njets30_9_eta_els","",60,-3,3);
+
+  h_mtw_mus = new TH1D("h_mtw_mus","",200,0,200);
 
   h_b_activity_mus = new TH1D("h_b_activity_mus","",1000,0,200);
   h_b_activity_els = new TH1D("h_b_activity_els","",1000,0,200);

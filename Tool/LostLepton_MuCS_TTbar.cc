@@ -218,15 +218,15 @@ int main(int argc, char* argv[])
   int nevents_baseline= 0;
   //int nevents_baseline_ref= 0;
 
-  double mtwcorrfactor[8];
-  mtwcorrfactor[0] = 1.01;
-  mtwcorrfactor[1] = 1.04;
-  mtwcorrfactor[2] = 1.07;
-  mtwcorrfactor[3] = 1.20;
-  mtwcorrfactor[4] = 1.15;
-  mtwcorrfactor[5] = 1.20;
-  mtwcorrfactor[6] = 1.28;
-  mtwcorrfactor[7] = 1.83;
+  //double mtwcorrfactor[8];
+  //mtwcorrfactor[0] = 1.01;
+  //mtwcorrfactor[1] = 1.04;
+  //mtwcorrfactor[2] = 1.07;
+  //mtwcorrfactor[3] = 1.20;
+  //mtwcorrfactor[4] = 1.15;
+  //mtwcorrfactor[5] = 1.20;
+  //mtwcorrfactor[6] = 1.28;
+  //mtwcorrfactor[7] = 1.83;
 
   //first loop, to generate Acc, reco and Iso effs and also fill expected histgram
   std::cout<<"First loop begin: "<<std::endl;
@@ -671,6 +671,37 @@ int main(int argc, char* argv[])
         }//loop gen electrons/muons
       }//if no muons
       
+      //mtW correction factor calculation
+      if (nElectrons == 0 && nMuons == 1)
+      {
+        vector<TLorentzVector> muonsLVec = tr.getVec<TLorentzVector>("muonsLVec");
+        vector<double> muonsMiniIso = tr.getVec<double>("muonsMiniIso");
+
+        double reco_mus_pt = 0, reco_mus_eta = 0, reco_mus_phi = 0;
+
+        for(unsigned int im = 0 ; im < muonsLVec.size() ; im++)
+        {
+          if( fabs(muonsLVec[im].Eta()) < 2.4 && muonsMiniIso[im] < 0.2 )
+          {
+            reco_mus_pt  = ( muonsLVec.at(im) ).Pt();
+            reco_mus_eta = ( muonsLVec.at(im) ).Eta();
+            reco_mus_phi = ( muonsLVec.at(im) ).Phi();
+          }
+        }
+
+        double deltaphi_mus = DeltaPhi( reco_mus_phi , metphi );
+        double mtW_mus = std::sqrt( 2.0 * reco_mus_pt * met * ( 1.0 - cos(deltaphi_mus) ) );
+        (myBaseHistgram.h_mtw_mus)->Fill(mtW_mus);
+
+        int ptbin_number_allreco = Set_ptbin_number(reco_mus_pt);
+
+        myAccRecoIsoEffs.mtwall[ptbin_number_allreco]++;        
+        if( mtW_mus < 100 )
+        {
+          myAccRecoIsoEffs.mtw100[ptbin_number_allreco]++;
+        }
+      }
+
       //book the variable we need to check
       int ntopjets = tr.getVar<int>("nTopCandSortedCnt");
       double MT2 = tr.getVar<double>("MT22");
@@ -933,7 +964,7 @@ int main(int argc, char* argv[])
           int acbin_number = Set_acbin_number(activity);
 
 	  //mtwcorrfactor
-	  EventWeight_mus = EventWeight_mus * mtwcorrfactor[ptbin_number];
+	  EventWeight_mus = EventWeight_mus * myAccRecoIsoEffs.mtwcorrfactor[ptbin_number];
 	  //dimuon correction factor
           EventWeight_mus = EventWeight_mus * myAccRecoIsoEffs.corrfactor_di_mus;
 
@@ -987,7 +1018,7 @@ int main(int argc, char* argv[])
           //begin to predict lost electrons from muon CS
           double EventWeight_els = 1.0;
           //mtwcorrfactor
-          EventWeight_els = EventWeight_els * mtwcorrfactor[ptbin_number];
+          EventWeight_els = EventWeight_els * myAccRecoIsoEffs.mtwcorrfactor[ptbin_number];
           //dielectron correction factor
           EventWeight_els = EventWeight_els * myAccRecoIsoEffs.corrfactor_di_els;
   
@@ -1112,6 +1143,12 @@ void AccRecoIsoEffs::NumberstoEffs()
     }
   }
   
+  for(i_cal = 0 ; i_cal < PT_BINS ; i_cal++)
+  {
+    mtwcorrfactor[i_cal] = mtwall[i_cal]/mtw100[i_cal];
+    mtwcorrfactor_err[i_cal] = get_stat_Error(mtw100[i_cal],mtwall[i_cal]);
+  }
+
   return ;
 }
 
@@ -1318,6 +1355,18 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
   int i_cal = 0;
   int j_cal = 0;
   std::cout.precision(3);
+
+  std::cout << "mtW correction factor: " << std::endl;
+  for( i_cal=0 ; i_cal < PT_BINS ; i_cal++ )
+  {
+    std::cout << mtwcorrfactor[i_cal] << "(" << mtwcorrfactor_err[i_cal] << ")"<< " ";;
+    if( i_cal == PT_BINS-1 )
+    {
+      std::cout << std::endl;
+    }
+  }
+
+
   std::cout << std::endl << "Muon information: " << std::endl;
 
   std::cout << "number of muons from top: " << std::endl;
@@ -1674,6 +1723,15 @@ void AccRecoIsoEffs::printEffsHeader()
 
   int i_cal = 0;
   int j_cal = 0;
+
+  EffsHeader << "  const double ttbar_mtwcorrfactor[" << PT_BINS << "] = ";
+  for( i_cal = 0 ; i_cal < PT_BINS ; i_cal++ )
+  {
+    if( i_cal == 0 ) { EffsHeader << "{"; }
+    EffsHeader << mtwcorrfactor[i_cal];
+    if( i_cal != PT_BINS-1 ) { EffsHeader << ","; }
+    if( i_cal == PT_BINS-1 ) { EffsHeader << "};" << std::endl; }
+  }
 
   EffsHeader << "  const double ttbar_mus_acc[" << NJETS_BINS << "] = "; 
   for( i_cal = 0 ; i_cal < NJETS_BINS ; i_cal++ )
