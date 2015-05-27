@@ -56,8 +56,6 @@ double Activity::getElActivity()
     {
       activity+= (jetLVec_in.at(i)).Pt() * recoJetschargedHadronEnergyFraction_in[i];
     }
-    else
-      continue;
   }
 
   return activity;
@@ -73,8 +71,6 @@ double Activity::getMuActivity()
     {
       activity+= (jetLVec_in.at(i)).Pt() * (recoJetschargedEmEnergyFraction_in[i] + recoJetschargedHadronEnergyFraction_in[i]);
     }
-    else
-      continue;
   }
 
   return activity;
