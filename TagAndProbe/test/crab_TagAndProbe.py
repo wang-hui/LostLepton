@@ -1,6 +1,5 @@
 from WMCore.Configuration import Configuration
 config = Configuration()
-
 config.section_("General")
 config.General.requestName = 'TagAndProbe_DY'
 
