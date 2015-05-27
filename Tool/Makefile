@@ -21,7 +21,7 @@ LDFLAGS    =
 
 LIBS       = $(shell root-config --glibs)
 
-PROGRAMS = tupleTest LostLepton_MuCS_TTbar ClosurePlots SignalScan
+PROGRAMS = tupleTest LostLepton_MuCS_TTbar ClosurePlots SignalScan TagAndProbeAnalysis
 
 all: $(PROGRAMS)
 
@@ -56,6 +56,9 @@ ClosurePlots: $(ODIR)/ClosurePlots.o
 	$(LD) $^ $(LIBS)  -o $@
 
 SignalScan:$(ODIR)/SignalScan.o $(ODIR)/NTupleReader.o
+	$(LD) $^ $(LIBS) -L${CMSSW_BASE}/lib/${SCRAM_ARCH}/ -lrecipeAUXOxbridgeMT2 -o $@
+
+TagAndProbeAnalysis:$(ODIR)/TagAndProbeAnalysis.o $(ODIR)/NTupleReader.o
 	$(LD) $^ $(LIBS) -L${CMSSW_BASE}/lib/${SCRAM_ARCH}/ -lrecipeAUXOxbridgeMT2 -o $@
 
 clean:

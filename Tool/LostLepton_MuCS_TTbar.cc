@@ -48,7 +48,6 @@ int main(int argc, char* argv[])
     std::cerr <<"Please give 2 arguments " << "runList " << " " << "outputFileName" << std::endl;
     std::cerr <<" Valid configurations are " << std::endl;
     std::cerr <<" ./LostLepton_MuCS_TTbar runlist_ttjets.txt isoplots.root" << std::endl;
-    std::cerr <<" ./LostLepton runlist_ttjets.txt isoplots.root" << std::endl;
     return -1;
   }
   const char *inputFileList = argv[1];
@@ -81,16 +80,6 @@ int main(int argc, char* argv[])
   int nevents_muonCS= 0;
   int nevents_baseline= 0;
   //int nevents_baseline_ref= 0;
-
-  //double mtwcorrfactor[8];
-  //mtwcorrfactor[0] = 1.01;
-  //mtwcorrfactor[1] = 1.04;
-  //mtwcorrfactor[2] = 1.07;
-  //mtwcorrfactor[3] = 1.20;
-  //mtwcorrfactor[4] = 1.15;
-  //mtwcorrfactor[5] = 1.20;
-  //mtwcorrfactor[6] = 1.28;
-  //mtwcorrfactor[7] = 1.83;
 
   //first loop, to generate Acc, reco and Iso effs and also fill expected histgram
   std::cout<<"First loop begin: "<<std::endl;
