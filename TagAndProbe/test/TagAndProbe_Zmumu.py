@@ -12,8 +12,8 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 ## Source
 process.source = cms.Source("PoolSource",
-          #fileNames = cms.untracked.vstring ("root://cmsxrootd.fnal.gov//store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/06C61714-7E6C-E411-9205-002590DB92A8.root")
-          fileNames = cms.untracked.vstring ("file:06C61714-7E6C-E411-9205-002590DB92A8.root")
+          fileNames = cms.untracked.vstring ("root://cmsxrootd.fnal.gov//store/mc/Phys14DR/DYJetsToLL_M-50_13TeV-madgraph-pythia8/MINIAODSIM/PU20bx25_PHYS14_25_V1-v1/00000/06C61714-7E6C-E411-9205-002590DB92A8.root")
+          #fileNames = cms.untracked.vstring ("file:06C61714-7E6C-E411-9205-002590DB92A8.root")
 )
 
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(500) )    
