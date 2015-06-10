@@ -21,7 +21,6 @@
 
 //############################begin to defin class AccRecoIsoEffs###################
 
-
 class AccRecoIsoEffs
 {
  public:
@@ -118,17 +117,20 @@ class AccRecoIsoEffs
   void NormalizeFlowNumber();
 
  private:
-  double get_stat_Error(double a,
+  double get_stat_Error(
+                        double a,
                         double an
                        );
   
-  double get_sys_Error(double r,
+  double get_sys_Error(
+                       double r,
                        double p
                       );
 };
 
 
-double AccRecoIsoEffs::get_stat_Error(double a,
+double AccRecoIsoEffs::get_stat_Error(
+                                      double a,
                                       double an
                                      )
 {
@@ -152,7 +154,8 @@ double AccRecoIsoEffs::get_stat_Error(double a,
   }
 }
 
-double AccRecoIsoEffs::get_sys_Error(double r,
+double AccRecoIsoEffs::get_sys_Error(
+                                     double r,
                                      double p
                                     )
 {

@@ -216,7 +216,7 @@ int main(int argc, char* argv[])
 	      (myBaseHistgram.h_b_njets30_9_ht_mus)->Fill(ht);
             }
 
-            if((std::abs(gen_mus_eta)) < AnaConsts::muonsArr[1] && gen_mus_pt > AnaConsts::muonsArr[2])
+            if( (std::abs(gen_mus_eta)) < (AnaConsts::muonsMiniIsoArr).maxAbsEta && gen_mus_pt > (AnaConsts::muonsMiniIsoArr).minPt )
             {
               myAccRecoIsoEffs.nmus_acc[njetsbin_number]++;
 
@@ -303,7 +303,7 @@ int main(int argc, char* argv[])
 
                 bool mus_pass_iso;
                 mus_pass_iso = false;               
-                mus_pass_iso = ( muonsMiniIso.at(mindeltar_index) < AnaConsts::muonsArr[4] );
+                mus_pass_iso = ( muonsMiniIso.at(mindeltar_index) < (AnaConsts::muonsMiniIsoArr).maxIso );
                 
                 if(mus_pass_iso)
                 {
@@ -410,7 +410,7 @@ int main(int argc, char* argv[])
               (myBaseHistgram.h_b_njets30_9_eta_els)->Fill( gen_els_eta );
             }
 
-            if( (std::abs(gen_els_eta)) < AnaConsts::elesArr[1] && gen_els_pt > AnaConsts::elesArr[2] )
+            if( (std::abs(gen_els_eta)) < (AnaConsts::elesMiniIsoArr).maxAbsEta && gen_els_pt > (AnaConsts::elesMiniIsoArr).minPt )
             {
               myAccRecoIsoEffs.nels_acc[njetsbin_number]++;
 
@@ -499,7 +499,7 @@ int main(int argc, char* argv[])
 
                 bool els_pass_iso;
                 els_pass_iso = false;
-                els_pass_iso = ( elesMiniIso.at(mindeltar_index) < AnaConsts::elesArr[4] );
+                els_pass_iso = ( elesMiniIso.at(mindeltar_index) < (AnaConsts::elesMiniIsoArr).maxIsoEB );
 
                 if(els_pass_iso)
                 {

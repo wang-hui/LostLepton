@@ -21,7 +21,7 @@ LDFLAGS    =
 
 LIBS       = $(shell root-config --glibs)
 
-PROGRAMS = tupleTest LostLepton_MuCS_TTbar ClosurePlots SignalScan TagAndProbeAnalysis
+PROGRAMS = tupleTest LostLepton_MuCS_TTbar ClosurePlots TagAndProbeAnalysis
 
 all: $(PROGRAMS)
 
@@ -46,17 +46,8 @@ tupleTest: $(ODIR)/NTupleReader.o $(ODIR)/tupleReadTest.o
 LostLepton_MuCS_TTbar: $(ODIR)/LostLepton_MuCS_TTbar.o $(ODIR)/NTupleReader.o
 	$(LD) $^ $(LIBS) -L${CMSSW_BASE}/lib/${SCRAM_ARCH}/ -lrecipeAUXOxbridgeMT2 -o $@
 
-#LostLepton_ElCS_TTbar: $(ODIR)/LostLepton_ElCS_TTbar.o $(ODIR)/NTupleReader.o
-#	$(LD) $^ $(LIBS) -L${CMSSW_BASE}/lib/${SCRAM_ARCH}/ -lrecipeAUXOxbridgeMT2 -o $@
-
-#LostLepton_MuCS_SingleTop: $(ODIR)/LostLepton_MuCS_SingleTop.o $(ODIR)/NTupleReader.o
-#	$(LD) $^ $(LIBS) -L${CMSSW_BASE}/lib/${SCRAM_ARCH}/ -lrecipeAUXOxbridgeMT2 -o $@
-
 ClosurePlots: $(ODIR)/ClosurePlots.o
 	$(LD) $^ $(LIBS)  -o $@
-
-SignalScan:$(ODIR)/SignalScan.o $(ODIR)/NTupleReader.o
-	$(LD) $^ $(LIBS) -L${CMSSW_BASE}/lib/${SCRAM_ARCH}/ -lrecipeAUXOxbridgeMT2 -o $@
 
 TagAndProbeAnalysis:$(ODIR)/TagAndProbeAnalysis.o $(ODIR)/NTupleReader.o
 	$(LD) $^ $(LIBS) -L${CMSSW_BASE}/lib/${SCRAM_ARCH}/ -lrecipeAUXOxbridgeMT2 -o $@

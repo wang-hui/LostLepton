@@ -66,7 +66,7 @@
   c3->SetFillColor(0);
   c3->cd();
 
-  TH2F *h_mus_reco_eff_ori = (TH2F*)f_eff.Get("mus_recoeffs");
+  TH2F *h_mus_reco_eff_ori = (TH2F*)f_eff.Get("mus_niso_tagandprobe");
   //h_mus_reco_eff_ori->Draw("colztext");
 
   TH2F *h_mus_reco_eff;
