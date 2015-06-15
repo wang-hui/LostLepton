@@ -19,6 +19,7 @@
 #define AC_BINS 8
 #define NJETS_BINS 6
 
+#define NSEARCH_BINS 48
 //############################begin to defin class AccRecoIsoEffs###################
 
 class AccRecoIsoEffs
@@ -27,7 +28,6 @@ class AccRecoIsoEffs
   void printOverview();
   void printAccRecoIsoEffs();
   void printNormalizeFlowNumber();
-
   void printEffsHeader();
 
   //here we define the overall information for ttbar sample
@@ -52,7 +52,6 @@ class AccRecoIsoEffs
   double mus_isoeff_err_allreco[PT_BINS][AC_BINS] = {{0}}, els_isoeff_err_allreco[PT_BINS][AC_BINS] = {{0}};
 
   double mtwcorrfactor[PT_BINS] = {0}, mtwcorrfactor_err[PT_BINS] = {0};
-
   //here we define the muon/electron number we need to count in the loop
   double nmus[NJETS_BINS] = {0}, nmus_acc[NJETS_BINS] = {0}, nels[NJETS_BINS] = {0}, nels_acc[NJETS_BINS] = {0};
   double nmus_acc_bin[PT_BINS][AC_BINS] = {{0}}, nels_acc_bin[PT_BINS][AC_BINS] = {{0}};
@@ -67,6 +66,9 @@ class AccRecoIsoEffs
   //here we define the event weight we are going to use in the second loop ( muon/electron CS and prediction plots)
   double mus_EventWeight_iso[NJETS_BINS][PT_BINS][AC_BINS] = {{{0}}}, mus_EventWeight_reco[NJETS_BINS][PT_BINS][AC_BINS] = {{{0}}}, mus_EventWeight_acc[NJETS_BINS][PT_BINS][AC_BINS] = {{{0}}};
   double els_EventWeight_iso[NJETS_BINS][PT_BINS][AC_BINS] = {{{0}}}, els_EventWeight_reco[NJETS_BINS][PT_BINS][AC_BINS] = {{{0}}}, els_EventWeight_acc[NJETS_BINS][PT_BINS][AC_BINS] = {{{0}}};
+
+  //here we define the search bin variables
+  double nevents_mus_CS_SB_MC[NSEARCH_BINS] = {0}, nevents_mus_CS_SB_Normalized[NSEARCH_BINS] = {0};
 
   //di-lepton correction
   double nevents_single_mus = 0, nevents_di_mus = 0;
@@ -115,8 +117,15 @@ class AccRecoIsoEffs
   void EffstoWeights();
   void GetDiLeptonFactor();
   void NormalizeFlowNumber();
+  void printSearchBin();
 
  private:
+  //define the variables we needed for normalization
+  double Nevents = 25446993;
+  double XSec = 806.1;
+  double Lumi = 1000;
+  double scale = XSec*Lumi/Nevents;
+
   double get_stat_Error(
                         double a,
                         double an

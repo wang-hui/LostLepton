@@ -90,11 +90,12 @@ void passBaselineFunc(NTupleReader &tr)
   }
 
   //Pass top tagger requirement?
-  bool passTagger = true;
   //bestTopJetIdx != -1 means at least 1 top candidate!
-  if( bestTopJetIdx == -1 ){ passBaseline = false; passBaseline_nolepveto = false; passTagger = false; }
-  if( ! remainPassCSVS ){ passBaseline = false; passBaseline_nolepveto = false; passTagger = false; }
-  if( pickedRemainingCombfatJetIdx == -1 && jetsLVec_forTagger->size()>=6 ){ passBaseline = false; passBaseline_nolepveto = false; passTagger = false; }
+  bool passTagger = type3Ptr->passNewTaggerReq();
+  if( !passTagger ) { passBaseline = false; passBaseline_nolepveto = false; }
+  //if( bestTopJetIdx == -1 ){ passBaseline = false; passBaseline_nolepveto = false; passTagger = false; }
+  //if( ! remainPassCSVS ){ passBaseline = false; passBaseline_nolepveto = false; passTagger = false; }
+  //if( pickedRemainingCombfatJetIdx == -1 && jetsLVec_forTagger->size()>=6 ){ passBaseline = false; passBaseline_nolepveto = false; passTagger = false; }
   //if( ! (bestTopJetMass > AnaConsts::lowTopCut_ && bestTopJetMass < AnaConsts::highTopCut_ ) ){ passBaseline = false; passBaseline_nolepveto = false; passTagger = false; }
   //if( debug ) std::cout<<"bestTopJetidx : "<<bestTopJetIdx<<"  remainPassCSVS : "<<remainPassCSVS<<"  pickedRemainingCombfatJetIdx : "<<pickedRemainingCombfatJetIdx<<"  bestTopJetMass : "<<bestTopJetMass<<"  passBaseline : "<<passBaseline<<std::endl;
 
@@ -105,7 +106,7 @@ void passBaselineFunc(NTupleReader &tr)
   //tr.registerDerivedVar("cntNJetsPt50Eta24", cntNJetsPt50Eta24);
   tr.registerDerivedVar("cntNJetsPt30Eta24", cntNJetsPt30Eta24);
   //tr.registerDerivedVec("dPhiVec", dPhiVec);
-  //tr.registerDerivedVar("cntCSVS", cntCSVS);
+  tr.registerDerivedVar("cntCSVS", cntCSVS);
   //tr.registerDerivedVec("jetsLVec_forTagger", jetsLVec_forTagger);
   //tr.registerDerivedVec("recoJetsBtag_forTagger", recoJetsBtag_forTagger);
   //tr.registerDerivedVar("cntNJetsPt30", cntNJetsPt30);
@@ -123,11 +124,12 @@ void passBaselineFunc(NTupleReader &tr)
   //tr.registerDerivedVar("passTagger", passTagger);
   tr.registerDerivedVar("passBaseline", passBaseline);
   tr.registerDerivedVar("passBaseline_nolepveto", passBaseline_nolepveto);
+  tr.registerDerivedVar("best_had_brJet_MT2", type3Ptr->best_had_brJet_MT2);
 
   //if( debug ) std::cout<<"nTopCandSortedCnt : "<<nTopCandSortedCnt<<"  MT2 : "<<MT2<<"  mTcomb : "<<mTcomb<<"  passBaseline : "<<passBaseline<<std::endl;
 
   tr.registerDerivedVar("nTopCandSortedCnt", nTopCandSortedCnt);
-  tr.registerDerivedVar("MT22", MT2);
+  //tr.registerDerivedVar("MT22", MT2);
   //tr.registerDerivedVar("mTcomb", mTcomb);
 
   //if( debug ) std::cout<<"passBaseline : "<<passBaseline<<"  passBaseline : "<<passBaseline<<std::endl;

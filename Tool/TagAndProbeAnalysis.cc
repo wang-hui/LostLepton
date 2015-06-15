@@ -131,12 +131,6 @@ void TagAndProbeEffs::NumberstoEffs()
   int i_cal;
   int j_cal;
   
-  double XSec = 4746;
-  double Lumi = 1000.0;
-  double Nevents = 2829164;
-
-  double scale = XSec*Lumi/Nevents;
-
   for(i_cal = 0 ; i_cal < PT_BINS ; i_cal++)
   {
     for(j_cal = 0 ; j_cal < AC_BINS ; j_cal++)

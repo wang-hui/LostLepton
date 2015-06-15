@@ -25,8 +25,6 @@
 class TagAndProbeEffs
 {
  public:
-  //define acceptance, reco eff and iso eff to be calculated
-
   double mus_recoeff[PT_BINS][AC_BINS] = {{0}};
   double mus_isoeff[PT_BINS][AC_BINS] = {{0}};
 
@@ -54,6 +52,12 @@ class TagAndProbeEffs
   void TagAndProbe2dPlotsGen();
 
  private:
+  //here we define the variables we needed for normalization
+  double XSec = 4746;
+  double Lumi = 1000.0;
+  double Nevents = 2829164;
+  double scale = XSec*Lumi/Nevents;
+
   double get_stat_Error(double a,
                         double an
                        );

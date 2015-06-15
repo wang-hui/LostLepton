@@ -9,11 +9,11 @@
 #include <ctime>
 #include <sstream>
 #include <fstream>
-
 #include <vector>
 
 #include "SusyAnaTools/Tools/samples.h"
 #include "SusyAnaTools/Tools/customize.h"
+#include "SusyAnaTools/Tools/searchBins.h"
 
 #include "TStopwatch.h"
 #include "TString.h"
@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
   int nevents_muonCS= 0;
   int nevents_baseline= 0;
   //int nevents_baseline_ref= 0;
-
+  
   //first loop, to generate Acc, reco and Iso effs and also fill expected histgram
   std::cout<<"First loop begin: "<<std::endl;
   while(tr.getNextEvent())
@@ -108,6 +108,11 @@ int main(int argc, char* argv[])
       double metphi = tr.getVar<double>("metphi");
       int njets30 = tr.getVar<int>("cntNJetsPt30Eta24");
       const double ht = tr.getVar<double>("ht");
+      int ntopjets = tr.getVar<int>("nTopCandSortedCnt");
+      int nbottomjets = tr.getVar<int>("cntCSVS");
+      double MT2 = tr.getVar<double>("best_had_brJet_MT2");
+      double bestTopJetMass = tr.getVar<double>("bestTopJetMass2");
+      double mht = tr.getVar<double>("mht");
 
       vector<int> W_emuVec = tr.getVec<int>("W_emuVec");
       vector<int> W_tau_emuVec = tr.getVec<int>("W_tau_emuVec");
@@ -524,9 +529,10 @@ int main(int argc, char* argv[])
         }//loop gen electrons/muons
       }//if no muons
       
-      //mtW correction factor calculation
+      //loop over muon CS, mtW correction factor calculation and other calculations
       if (nElectrons == 0 && nMuons == 1)
       {
+        //mtw correction factor calculation
         vector<TLorentzVector> muonsLVec = tr.getVec<TLorentzVector>("muonsLVec");
         vector<double> muonsMiniIso = tr.getVec<double>("muonsMiniIso");
 
@@ -553,13 +559,17 @@ int main(int argc, char* argv[])
         {
           myAccRecoIsoEffs.mtw100[ptbin_number_allreco]++;
         }
-      }
 
-      //book the variable we need to check
-      int ntopjets = tr.getVar<int>("nTopCandSortedCnt");
-      double MT2 = tr.getVar<double>("MT22");
-      double bestTopJetMass = tr.getVar<double>("bestTopJetMass2");
-      double mht = tr.getVar<double>("mht");
+        //muon CS statistics
+        int searchbin_id = find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+        //std::cout << nbottomjets << " " << ntopjets << " " << MT2 << " " << met << std::endl;
+        //std::cout << searchbin_id << std::endl;
+        if( searchbin_id >= 0 )
+        {
+          myAccRecoIsoEffs.nevents_mus_CS_SB_MC[searchbin_id]++;
+        }
+        //}
+      }
 
       ///////////////////////////
       // expectation computation
@@ -736,6 +746,7 @@ int main(int argc, char* argv[])
   myAccRecoIsoEffs.GetDiLeptonFactor();
   myAccRecoIsoEffs.printAccRecoIsoEffs();
   myAccRecoIsoEffs.printEffsHeader();
+  myAccRecoIsoEffs.printSearchBin();
 
   NTupleReader trCS(fChain);
   //initialize the type3Ptr defined in the customize.h
@@ -761,7 +772,7 @@ int main(int argc, char* argv[])
 
       int njets30 = trCS.getVar<int>("cntNJetsPt30Eta24");
       int ntopjets = trCS.getVar<int>("nTopCandSortedCnt");
-      double MT2 = trCS.getVar<double>("MT22");
+      double MT2 = trCS.getVar<double>("best_had_brJet_MT2");
       double bestTopJetMass = trCS.getVar<double>("bestTopJetMass2");
       double ht = trCS.getVar<double>("ht");
       double mht = trCS.getVar<double>("mht");
@@ -1119,12 +1130,6 @@ void AccRecoIsoEffs::NormalizeFlowNumber()
   nevents_pred_id_els_err = std::sqrt(nevents_pred_id_els_err);
   nevents_pred_iso_els_err = std::sqrt(nevents_pred_iso_els_err);
 
-
-  double Nevents = 25446993;
-  double XSec = 806.1;
-  double Lumi = 1000;
-  double scale = XSec*Lumi/Nevents;
-
   nevents_exp_all_mus *= scale;
   nevents_exp_acc_mus *= scale;
   nevents_exp_id_mus *= scale;
@@ -1203,6 +1208,17 @@ void AccRecoIsoEffs::printNormalizeFlowNumber()
 
 }
 
+void AccRecoIsoEffs::printSearchBin()
+{
+  std::cout << "Muon CS # in Search Bins: " << std::endl;  
+  for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
+  {
+    std::cout << "idx: " << i_cal << "; MC Numbers: " << nevents_mus_CS_SB_MC[i_cal] << std::endl;
+    nevents_mus_CS_SB_Normalized[i_cal] = nevents_mus_CS_SB_MC[i_cal]*scale;
+    std::cout << "idx: " << i_cal << "; Normalized Numbers: " << nevents_mus_CS_SB_Normalized[i_cal] << std::endl;
+  }
+}
+
 void AccRecoIsoEffs::printAccRecoIsoEffs()
 {
   int i_cal = 0;
@@ -1212,13 +1228,12 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
   std::cout << "mtW correction factor: " << std::endl;
   for( i_cal=0 ; i_cal < PT_BINS ; i_cal++ )
   {
-    std::cout << mtwcorrfactor[i_cal] << "(" << mtwcorrfactor_err[i_cal] << ")"<< " ";;
+    std::cout << mtwcorrfactor[i_cal] << "(" << mtwcorrfactor_err[i_cal] << ")"<< " ";
     if( i_cal == PT_BINS-1 )
     {
       std::cout << std::endl;
     }
   }
-
 
   std::cout << std::endl << "Muon information: " << std::endl;
 
