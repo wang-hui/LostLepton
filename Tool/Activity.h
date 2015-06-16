@@ -51,7 +51,7 @@ double Activity::getElActivity()
   double activity = 0;
   for( unsigned int i = 0 ; i < jetLVec_in.size() ; i++ )
   {
-    if( DeltaR( eta_lepton_in , phi_lepton_in , (jetLVec_in.at(i)).Eta() , (jetLVec_in.at(i)).Phi() ) < 1.0 && (jetLVec_in.at(i)).Pt() > 10 )
+    if( DeltaR( eta_lepton_in , phi_lepton_in , (jetLVec_in.at(i)).Eta() , (jetLVec_in.at(i)).Phi() ) < 1.0 && (jetLVec_in.at(i)).Pt() > 30 )
     //for now, we study the activity integral over jetpt > 10, we will lower the pt cut later
     {
       activity+= (jetLVec_in.at(i)).Pt() * recoJetschargedHadronEnergyFraction_in[i];
@@ -66,7 +66,7 @@ double Activity::getMuActivity()
   double activity = 0;
   for( unsigned int i = 0 ; i < jetLVec_in.size() ; i++ )
   {
-    if( DeltaR( eta_lepton_in , phi_lepton_in , (jetLVec_in.at(i)).Eta() , (jetLVec_in.at(i)).Phi() ) < 1.0 && (jetLVec_in.at(i)).Pt() > 10 )
+    if( DeltaR( eta_lepton_in , phi_lepton_in , (jetLVec_in.at(i)).Eta() , (jetLVec_in.at(i)).Phi() ) < 1.0 && (jetLVec_in.at(i)).Pt() > 30 )
     //for now, we study the activity integral over jetpt > 10, we will lower the pt cut later
     {
       activity+= (jetLVec_in.at(i)).Pt() * (recoJetschargedEmEnergyFraction_in[i] + recoJetschargedHadronEnergyFraction_in[i]);

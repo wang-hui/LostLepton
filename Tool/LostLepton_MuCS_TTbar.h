@@ -123,7 +123,7 @@ class AccRecoIsoEffs
   //define the variables we needed for normalization
   double Nevents = 25446993;
   double XSec = 806.1;
-  double Lumi = 1000;
+  double Lumi = 10000;
   double scale = XSec*Lumi/Nevents;
 
   double get_stat_Error(

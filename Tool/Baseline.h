@@ -98,6 +98,8 @@ void passBaselineFunc(NTupleReader &tr)
   //if( pickedRemainingCombfatJetIdx == -1 && jetsLVec_forTagger->size()>=6 ){ passBaseline = false; passBaseline_nolepveto = false; passTagger = false; }
   //if( ! (bestTopJetMass > AnaConsts::lowTopCut_ && bestTopJetMass < AnaConsts::highTopCut_ ) ){ passBaseline = false; passBaseline_nolepveto = false; passTagger = false; }
   //if( debug ) std::cout<<"bestTopJetidx : "<<bestTopJetIdx<<"  remainPassCSVS : "<<remainPassCSVS<<"  pickedRemainingCombfatJetIdx : "<<pickedRemainingCombfatJetIdx<<"  bestTopJetMass : "<<bestTopJetMass<<"  passBaseline : "<<passBaseline<<std::endl;
+  //special cut for ttbar background rejection
+  bool passNewCuts = type3Ptr->passNewCuts();
 
   //Register all the calculated variables
   tr.registerDerivedVar("nMuons_CUT2", nMuons);
@@ -131,7 +133,7 @@ void passBaselineFunc(NTupleReader &tr)
   tr.registerDerivedVar("nTopCandSortedCnt", nTopCandSortedCnt);
   //tr.registerDerivedVar("MT22", MT2);
   //tr.registerDerivedVar("mTcomb", mTcomb);
-
+  tr.registerDerivedVar("passNewCuts", passNewCuts);
   //if( debug ) std::cout<<"passBaseline : "<<passBaseline<<"  passBaseline : "<<passBaseline<<std::endl;
 }
 

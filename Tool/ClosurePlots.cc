@@ -25,7 +25,7 @@ int main()
   myClosurePlots.SetScale(
                          25446993, //NEvents
                          806.1, //Xsec
-                         1000 //Lumi in pb
+                         10000 //Lumi in pb-1
                          );
   //initialize the closure plots parameter we want to investigate
   vector<Plotting_Parameter> myPlotting_Paramete = 

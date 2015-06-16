@@ -95,8 +95,15 @@ int main(int argc, char* argv[])
       //++nevents_baseline_ref;
     //}
 
-    bool passBaseline_nolepveto=tr.getVar<bool>("passBaseline_nolepveto");
-    if (passBaseline_nolepveto)
+    //baseline cut without lepton veto
+    bool passBaseline_nolepveto = tr.getVar<bool>("passBaseline_nolepveto");
+    //special cut for ttbar background
+    bool passNewCuts = tr.getVar<bool>("passNewCuts");
+
+    if ( 
+           passBaseline_nolepveto 
+        && passNewCuts 
+       )
     {
       myAccRecoIsoEffs.nevents_sel_base++;
 
@@ -555,7 +562,7 @@ int main(int argc, char* argv[])
         int ptbin_number_allreco = Set_ptbin_number(reco_mus_pt);
 
         myAccRecoIsoEffs.mtwall[ptbin_number_allreco]++;        
-        if( mtW_mus < 100 )
+        if( mtW_mus < 125 )
         {
           myAccRecoIsoEffs.mtw100[ptbin_number_allreco]++;
         }
@@ -761,8 +768,13 @@ int main(int argc, char* argv[])
     if(trCS.getEvtNum()%20000 == 0) std::cout << trCS.getEvtNum() << "\t" << ((clock() - t0)/1000000.0) << std::endl;
 
     bool passBaseline_nolepveto=trCS.getVar<bool>("passBaseline_nolepveto");
-
-    if(passBaseline_nolepveto)
+    //special cut for ttbar background
+    bool passNewCuts = trCS.getVar<bool>("passNewCuts");
+ 
+    if(
+          passBaseline_nolepveto
+       && passNewCuts
+      )
     {
       int nElectrons = trCS.getVar<int>("nElectrons_CUT2");
       int nMuons = trCS.getVar<int>("nMuons_CUT2");
@@ -817,7 +829,7 @@ int main(int argc, char* argv[])
         double activity = myActivity.getMuActivity();
         myActivity.reset();
 
-        if ( mtW_mus < 100.0 )
+        if ( mtW_mus < 125.0 )
         {
 	  //////////////////////////
 	  // prediction computation
@@ -931,7 +943,7 @@ int main(int argc, char* argv[])
           myAccRecoIsoEffs.nevents_pred_acc_els_err += myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els*myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els;
           myAccRecoIsoEffs.nevents_pred_id_els_err += myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els*myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els;
           myAccRecoIsoEffs.nevents_pred_iso_els_err += myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els*myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els;
-        }//mtW5_els<100 (muon CS)
+        }//mtW5_els<125 (muon CS)
       }//nElectrons == 0 && nMuons == 1 (muon CS)
     }//baseline_nolepveto
   }
