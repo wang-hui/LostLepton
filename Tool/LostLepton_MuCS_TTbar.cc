@@ -15,9 +15,6 @@
 #include "SusyAnaTools/Tools/customize.h"
 #include "SusyAnaTools/Tools/searchBins.h"
 
-#include "TStopwatch.h"
-#include "TString.h"
-
 #include "Baseline.h"
 #include "LostLepton_MuCS_TTbar.h"
 #include "TGraph.h"
@@ -30,6 +27,11 @@
 #include "TFile.h"
 #include "TTree.h"
 #include "TChain.h"
+#include "TList.h"
+#include "TPad.h"
+#include "TStyle.h"
+#include "TStopwatch.h"
+#include "TString.h"
 
 #include "Math/QuantFuncMathCore.h"
 #include "TMath.h"
@@ -569,13 +571,10 @@ int main(int argc, char* argv[])
 
         //muon CS statistics
         int searchbin_id = find_Binning_Index( nbottomjets , ntopjets , MT2, met );
-        //std::cout << nbottomjets << " " << ntopjets << " " << MT2 << " " << met << std::endl;
-        //std::cout << searchbin_id << std::endl;
         if( searchbin_id >= 0 )
         {
           myAccRecoIsoEffs.nevents_mus_CS_SB_MC[searchbin_id]++;
         }
-        //}
       }
 
       ///////////////////////////
@@ -630,6 +629,12 @@ int main(int argc, char* argv[])
       {
         myAccRecoIsoEffs.nevents_exp_all_mus++;
         myAccRecoIsoEffs.nevents_single_mus++;
+
+        int searchbin_id = find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+        if( searchbin_id >= 0 )
+        {
+          myAccRecoIsoEffs.nevents_mus_exp_SB_MC[searchbin_id]++;
+        }
 	
         (myBaseHistgram.h_exp_musingle_all_met)->Fill(met);
 	(myBaseHistgram.h_exp_musingle_all_njets)->Fill(njets30);
@@ -653,6 +658,12 @@ int main(int argc, char* argv[])
       {
         myAccRecoIsoEffs.nevents_di_mus++;
         myAccRecoIsoEffs.nevents_exp_all_mus++;
+
+        int searchbin_id = find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+        if( searchbin_id >= 0 )
+        {
+          myAccRecoIsoEffs.nevents_mus_exp_SB_MC[searchbin_id]++;
+        }
 
         (myBaseHistgram.h_exp_mu_all_met)->Fill(met);
         (myBaseHistgram.h_exp_mu_all_njets)->Fill(njets30);
@@ -712,6 +723,12 @@ int main(int argc, char* argv[])
         myAccRecoIsoEffs.nevents_exp_all_els++;
         myAccRecoIsoEffs.nevents_single_els++;
 
+        int searchbin_id = find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+        if( searchbin_id >= 0 )
+        {
+          myAccRecoIsoEffs.nevents_els_exp_SB_MC[searchbin_id]++;
+        }
+
         (myBaseHistgram.h_exp_elsingle_all_met)->Fill(met);
         (myBaseHistgram.h_exp_elsingle_all_njets)->Fill(njets30);
         (myBaseHistgram.h_exp_elsingle_all_mt2)->Fill(MT2);
@@ -735,6 +752,12 @@ int main(int argc, char* argv[])
         myAccRecoIsoEffs.nevents_exp_all_els++;
         myAccRecoIsoEffs.nevents_di_els++;
 
+        int searchbin_id = find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+        if( searchbin_id >= 0 )
+        {
+          myAccRecoIsoEffs.nevents_els_exp_SB_MC[searchbin_id]++;
+        }
+
         (myBaseHistgram.h_exp_el_all_met)->Fill(met);
         (myBaseHistgram.h_exp_el_all_njets)->Fill(njets30);
         (myBaseHistgram.h_exp_el_all_mt2)->Fill(MT2);
@@ -753,7 +776,6 @@ int main(int argc, char* argv[])
   myAccRecoIsoEffs.GetDiLeptonFactor();
   myAccRecoIsoEffs.printAccRecoIsoEffs();
   myAccRecoIsoEffs.printEffsHeader();
-  myAccRecoIsoEffs.printSearchBin();
 
   NTupleReader trCS(fChain);
   //initialize the type3Ptr defined in the customize.h
@@ -784,6 +806,7 @@ int main(int argc, char* argv[])
 
       int njets30 = trCS.getVar<int>("cntNJetsPt30Eta24");
       int ntopjets = trCS.getVar<int>("nTopCandSortedCnt");
+      int nbottomjets = trCS.getVar<int>("cntCSVS");
       double MT2 = trCS.getVar<double>("best_had_brJet_MT2");
       double bestTopJetMass = trCS.getVar<double>("bestTopJetMass2");
       double ht = trCS.getVar<double>("ht");
@@ -838,6 +861,7 @@ int main(int argc, char* argv[])
           int njetsbin_number = Set_njetsbin_number(njets30);
           int ptbin_number = Set_ptbin_number(reco_mus_pt);
           int acbin_number = Set_acbin_number(activity);
+          int searchbin_id = find_Binning_Index( nbottomjets , ntopjets , MT2, met );
 
 	  //mtwcorrfactor
 	  EventWeight_mus = EventWeight_mus * myAccRecoIsoEffs.mtwcorrfactor[ptbin_number];
@@ -885,7 +909,12 @@ int main(int argc, char* argv[])
           myAccRecoIsoEffs.nevents_pred_acc_mus += myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus;
           myAccRecoIsoEffs.nevents_pred_id_mus += myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus;
           myAccRecoIsoEffs.nevents_pred_iso_mus += myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus;
-        
+
+          if( searchbin_id >= 0 )
+          {
+            myAccRecoIsoEffs.nevents_mus_pred_SB_MC[searchbin_id] += EventWeight_all_mus*EventWeight_mus;
+          }
+
           myAccRecoIsoEffs.nevents_pred_all_mus_err += EventWeight_all_mus*EventWeight_mus*EventWeight_all_mus*EventWeight_mus;
           myAccRecoIsoEffs.nevents_pred_acc_mus_err += myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus*myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus;
           myAccRecoIsoEffs.nevents_pred_id_mus_err += myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus*myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus;
@@ -939,6 +968,11 @@ int main(int argc, char* argv[])
           myAccRecoIsoEffs.nevents_pred_id_els += myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els;
           myAccRecoIsoEffs.nevents_pred_iso_els += myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els;
 
+          if( searchbin_id >= 0 )
+          {
+            myAccRecoIsoEffs.nevents_els_pred_SB_MC[searchbin_id] += EventWeight_all_els*EventWeight_els;
+          }
+
           myAccRecoIsoEffs.nevents_pred_all_els_err += EventWeight_all_els*EventWeight_els*EventWeight_all_els*EventWeight_els;
           myAccRecoIsoEffs.nevents_pred_acc_els_err += myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els*myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els;
           myAccRecoIsoEffs.nevents_pred_id_els_err += myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els*myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els;
@@ -951,6 +985,7 @@ int main(int argc, char* argv[])
   myAccRecoIsoEffs.printOverview();
   myAccRecoIsoEffs.NormalizeFlowNumber();
   myAccRecoIsoEffs.printNormalizeFlowNumber();
+  myAccRecoIsoEffs.printSearchBin();
 
   //write into histgram
   (myBaseHistgram.oFile)->Write();
@@ -959,10 +994,10 @@ int main(int argc, char* argv[])
   //const double lumi=1000.0;
   //const double ntoteventsttbar=25446993.0;
   //std::cout << "nevents_muonCS = " << nevents_muonCS << std::endl;
-  //std::cout << "nevents_muonCS_norm (1fb-1) = " << nevents_muonCS*ttbarCrossSection*lumi/ntoteventsttbar << std::endl;
+  //std::cout << "nevents_muonCS_norm (10fb-1) = " << nevents_muonCS*ttbarCrossSection*lumi/ntoteventsttbar << std::endl;
   //std::cout << "nevents_baseline = " << nevents_baseline << std::endl;
   //std::cout << "nevents_baseline_ref = " << nevents_baseline_ref << std::endl;
-  //std::cout << "nevents_baseline_norm (1fb-1) = " << nevents_baseline*ttbarCrossSection*lumi/ntoteventsttbar << std::endl;
+  //std::cout << "nevents_baseline_norm (10fb-1) = " << nevents_baseline*ttbarCrossSection*lumi/ntoteventsttbar << std::endl;
   return 0;
 }
 
@@ -1181,6 +1216,9 @@ void AccRecoIsoEffs::NormalizeFlowNumber()
   nevents_pred_acc_els_err *= scale;
   nevents_pred_id_els_err *= scale;
   nevents_pred_iso_els_err *= scale;
+
+  
+
 }
 
 void AccRecoIsoEffs::printNormalizeFlowNumber()
@@ -1225,10 +1263,115 @@ void AccRecoIsoEffs::printSearchBin()
   std::cout << "Muon CS # in Search Bins: " << std::endl;  
   for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
   {
-    std::cout << "idx: " << i_cal << "; MC Numbers: " << nevents_mus_CS_SB_MC[i_cal] << std::endl;
     nevents_mus_CS_SB_Normalized[i_cal] = nevents_mus_CS_SB_MC[i_cal]*scale;
-    std::cout << "idx: " << i_cal << "; Normalized Numbers: " << nevents_mus_CS_SB_Normalized[i_cal] << std::endl;
+    nevents_mus_exp_SB_Normalized[i_cal] = nevents_mus_exp_SB_MC[i_cal]*scale;
+    nevents_mus_pred_SB_Normalized[i_cal] = nevents_mus_pred_SB_MC[i_cal]*scale;
+    nevents_els_exp_SB_Normalized[i_cal] = nevents_els_exp_SB_MC[i_cal]*scale;
+    nevents_els_pred_SB_Normalized[i_cal] = nevents_els_pred_SB_MC[i_cal]*scale;
+
+    std::cout << "idx: " << i_cal << "; MC Numbers: " << nevents_mus_CS_SB_MC[i_cal] << "; Normalized Numbers: " << nevents_mus_CS_SB_Normalized[i_cal] << std::endl;
+    std::cout << "Mus Exp MC Numbers: " << nevents_mus_exp_SB_MC[i_cal] << "; Mus Exp Normalized Numbers: " << nevents_mus_exp_SB_Normalized[i_cal] << std::endl;
+    std::cout << "Mus Pred MC Numbers: " << nevents_mus_pred_SB_MC[i_cal] << "; Mus Pred Normalized Numbers: " << nevents_mus_pred_SB_Normalized[i_cal] << std::endl;
+    std::cout << "Els Exp MC Numbers: " << nevents_els_exp_SB_MC[i_cal] << "; Els Exp Normalized Numbers: " << nevents_els_exp_SB_Normalized[i_cal] << std::endl;
+    std::cout << "Els Pred MC Numbers: " << nevents_els_pred_SB_MC[i_cal] << "; Els Pred Normalized Numbers: " << nevents_els_pred_SB_Normalized[i_cal] << std::endl;
   }
+  
+  TH1D * h_cs_mus_sb = new TH1D("h_cs_mus_sb","",50,0,50);
+  TH1D * h_exp_mus_sb = new TH1D("h_exp_mus_sb","",50,0,50);
+  TH1D * h_pred_mus_sb = new TH1D("h_pred_mus_sb","",50,0,50);
+  TH1D * h_exp_els_sb = new TH1D("h_exp_els_sb","",50,0,50);
+  TH1D * h_pred_els_sb = new TH1D("h_pred_els_sb","",50,0,50);
+
+  for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
+  {
+    h_cs_mus_sb->SetBinContent( i_cal+1 , nevents_mus_CS_SB_Normalized[i_cal] );
+    h_exp_mus_sb->SetBinContent( i_cal+1 , nevents_mus_exp_SB_Normalized[i_cal] );
+    h_pred_mus_sb->SetBinContent( i_cal+1 , nevents_mus_pred_SB_Normalized[i_cal] );
+    h_exp_els_sb->SetBinContent( i_cal+1 , nevents_mus_exp_SB_Normalized[i_cal] );
+    h_pred_els_sb->SetBinContent( i_cal+1 , nevents_mus_pred_SB_Normalized[i_cal] );
+  }
+
+  TCanvas *cmusCS = new TCanvas("cmusCS","A Simple Graph Example",200,10,700,500);
+  gStyle->SetOptStat(0);
+
+  h_cs_mus_sb->SetLineColor(1);
+  h_cs_mus_sb->SetLineWidth(3);
+
+  h_cs_mus_sb->Draw();
+
+  const std::string titre_musCS="CMS Preliminary 2015, 10 fb^{-1}, #sqrt{s} = 13 TeV; Muon CS in Search Bins";
+  TLatex *title_musCS = new TLatex(0.09770115,0.9194915,titre_musCS.c_str());
+  title_musCS->SetNDC();
+  title_musCS->SetTextSize(0.045);
+  title_musCS->Draw("same");
+
+  TLegend* leg_musCS = new TLegend(0.6,0.75,0.85,0.85);
+  leg_musCS->SetBorderSize(0);
+  leg_musCS->SetTextFont(42);
+  leg_musCS->SetFillColor(0);
+  leg_musCS->AddEntry(h_cs_mus_sb,"Number of Muon CS","l");
+  leg_musCS->Draw("same");
+
+  cmusCS->SaveAs( "mus_searchbin_CS.png" );
+  cmusCS->SaveAs( "mus_searchbin_CS.C" );
+
+  TCanvas *cmus = new TCanvas("cmus","A Simple Graph Example",200,10,700,500);
+  gStyle->SetOptStat(0);
+
+  h_exp_mus_sb->SetLineColor(1);
+  h_exp_mus_sb->SetLineWidth(3);
+
+  h_pred_mus_sb->SetLineColor(2);
+  h_pred_mus_sb->SetLineWidth(3);
+
+  h_exp_mus_sb->Draw();
+  h_pred_mus_sb->Draw("same");
+
+  const std::string titre_mus="CMS Preliminary 2015, 10 fb^{-1}, #sqrt{s} = 13 TeV; Muon Search Bin Closure";
+  TLatex *title_mus = new TLatex(0.09770115,0.9194915,titre_mus.c_str());
+  title_mus->SetNDC();
+  title_mus->SetTextSize(0.045);
+  title_mus->Draw("same");
+
+  TLegend* leg_mus = new TLegend(0.6,0.75,0.85,0.85);
+  leg_mus->SetBorderSize(0);
+  leg_mus->SetTextFont(42);
+  leg_mus->SetFillColor(0);
+  leg_mus->AddEntry(h_exp_mus_sb,"Expectation","l");
+  leg_mus->AddEntry(h_pred_mus_sb,"Prediction","l");
+  leg_mus->Draw("same");
+
+  cmus->SaveAs( "mus_searchbin_closure.png" );
+  cmus->SaveAs( "mus_searchbin_closure.C" );
+
+  TCanvas *cels = new TCanvas("cels","A Simple Graph Example",200,10,700,500);
+  gStyle->SetOptStat(0);
+
+  h_exp_els_sb->SetLineColor(1);
+  h_exp_els_sb->SetLineWidth(3);
+
+  h_pred_els_sb->SetLineColor(2);
+  h_pred_els_sb->SetLineWidth(3);
+
+  h_exp_els_sb->Draw();
+  h_pred_els_sb->Draw("same");
+
+  const std::string titre_els="CMS Preliminary 2015, 10 fb^{-1}, #sqrt{s} = 13 TeV; Electron Search Bin Closure";
+  TLatex *title_els = new TLatex(0.09770115,0.9194915,titre_els.c_str());
+  title_els->SetNDC();
+  title_els->SetTextSize(0.045);
+  title_els->Draw("same");
+
+  TLegend* leg_els = new TLegend(0.6,0.75,0.85,0.85);
+  leg_els->SetBorderSize(0);
+  leg_els->SetTextFont(42);
+  leg_els->SetFillColor(0);
+  leg_els->AddEntry(h_exp_els_sb,"Expectation","l");
+  leg_els->AddEntry(h_pred_els_sb,"Prediction","l");
+  leg_els->Draw("same");
+
+  cels->SaveAs( "els_searchbin_closure.png" );
+  cels->SaveAs( "els_searchbin_closure.C" );
 }
 
 void AccRecoIsoEffs::printAccRecoIsoEffs()

@@ -69,6 +69,10 @@ class AccRecoIsoEffs
 
   //here we define the search bin variables
   double nevents_mus_CS_SB_MC[NSEARCH_BINS] = {0}, nevents_mus_CS_SB_Normalized[NSEARCH_BINS] = {0};
+  double nevents_mus_pred_SB_MC[NSEARCH_BINS] = {0}, nevents_mus_pred_SB_Normalized[NSEARCH_BINS] = {0};
+  double nevents_mus_exp_SB_MC[NSEARCH_BINS] = {0}, nevents_mus_exp_SB_Normalized[NSEARCH_BINS] = {0};
+  double nevents_els_pred_SB_MC[NSEARCH_BINS] = {0}, nevents_els_pred_SB_Normalized[NSEARCH_BINS] = {0};
+  double nevents_els_exp_SB_MC[NSEARCH_BINS] = {0}, nevents_els_exp_SB_Normalized[NSEARCH_BINS] = {0};
 
   //di-lepton correction
   double nevents_single_mus = 0, nevents_di_mus = 0;
