@@ -5,7 +5,7 @@ const std::string spec = "lostlept";
 void passBaselineFunc(NTupleReader &tr)
 {
   bool debug = false;
-  bool doIsoTrksVeto = false;
+  bool doIsoTrksVeto = true;
   bool doMuonVeto = true;
   bool doElectronVeto = true;  
 
@@ -35,6 +35,7 @@ void passBaselineFunc(NTupleReader &tr)
   {
      doMuonVeto = false;
      doElectronVeto = false;
+     doIsoTrksVeto = false;
   }
   if(spec.compare("Zinv") == 0) 
   {

@@ -27,8 +27,6 @@
   gStyle->SetPaintTextFormat("1.2f");
   h_mu_iso_eff->Draw("colztexte");
 
-  c1->SaveAs( "_mu_2d_iso_eff.png" );
-  c1->SaveAs( "_mu_2d_iso_eff.C" );
 
   ///////////////////
   //     c2
@@ -60,9 +58,6 @@
   gStyle->SetPaintTextFormat("1.2f");
   h_els_iso_eff->Draw("colztexte");
 
-  c2->SaveAs( "_el_2d_iso_eff.png" );
-  c2->SaveAs( "_el_2d_iso_eff.C" );
-
   ///////////////////
   //     c3
   ///////////////////
@@ -92,9 +87,6 @@
   }
   gStyle->SetPaintTextFormat("1.2f");
   h_mus_reco_eff->Draw("colztexte");
-
-  c3->SaveAs( "_mu_2d_reco_eff.png" );
-  c3->SaveAs( "_mu_2d_reco_eff.C" );
 
   ///////////////////
   //     c4
@@ -126,6 +118,4 @@
   gStyle->SetPaintTextFormat("1.2f");
   h_els_reco_eff->Draw("colztexte");
 
-  c4->SaveAs( "_el_2d_reco_eff.png" );
-  c4->SaveAs( "_el_2d_reco_eff.C" );
 }
