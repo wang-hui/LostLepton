@@ -1,6 +1,8 @@
 {
   TFile f_eff("Effs2dPlots.root");
 
+  const std::string titre="CMS Simulation 2015, #sqrt{s} = 13 TeV";
+
   TCanvas *c1 = new TCanvas("c1", "c1",0,51,1920,1004);
   c1->SetFillColor(0);
   c1->cd();
@@ -9,23 +11,29 @@
   //h_mu_iso_eff_ori->Draw("colztext");
 
   TH2F *h_mu_iso_eff;
-  Float_t xbins[9]={5.0,10.0,20.0,30.0,40.0,50.0,70.0,100.0,120.0};
+  Float_t xbins[8]={10.0,20.0,30.0,40.0,50.0,70.0,100.0,120.0};
   Float_t ybins[9]={0.0,5.0,10.0,20.0,40.0,60.0,80.0,100.0,120.0};
-  h_mu_iso_eff = new TH2F("h_mu_iso_eff", "h_mu_iso_eff", 8, xbins, 8, ybins);
+  h_mu_iso_eff = new TH2F("h_mu_iso_eff", "h_mu_iso_eff", 7, xbins, 8, ybins);
   h_mu_iso_eff->SetTitle("");
   h_mu_iso_eff->SetXTitle("muon pT [GeV]");
   h_mu_iso_eff->SetYTitle("activity [GeV]");
   h_mu_iso_eff->SetStats(0);
 
-  for (Int_t muonptc=1;muonptc<9;++muonptc) {
+  for (Int_t muonptc=1;muonptc<8;++muonptc) {
     for (int activityc=1;activityc<9;++activityc)
     {
       h_mu_iso_eff->SetBinContent(muonptc,activityc,h_mu_iso_eff_ori->GetBinContent(muonptc,activityc));
       h_mu_iso_eff->SetBinError(muonptc,activityc,h_mu_iso_eff_ori->GetBinError(muonptc,activityc));
     }
   }
+
   gStyle->SetPaintTextFormat("1.2f");
   h_mu_iso_eff->Draw("colztexte");
+
+  TLatex *title = new TLatex(0.09770115,0.9194915,titre.c_str());
+  title->SetNDC();
+  title->SetTextSize(0.045);
+  title->Draw("same");
 
   c1->SaveAs( "_mu_2d_iso_eff.png" );
   c1->SaveAs( "_mu_2d_iso_eff.C" );
@@ -44,7 +52,7 @@
   TH2F *h_els_iso_eff;
   //Float_t xbins[9]={5.0,10.0,20.0,30.0,40.0,50.0,70.0,100.0,120.0};
   //Float_t ybins[9]={0.0,5.0,10.0,20.0,40.0,60.0,80.0,100.0,120.0};
-  h_els_iso_eff = new TH2F("h_els_iso_eff", "h_els_iso_eff", 8, xbins, 8, ybins);
+  h_els_iso_eff = new TH2F("h_els_iso_eff", "h_els_iso_eff", 7, xbins, 8, ybins);
   h_els_iso_eff->SetTitle("");
   h_els_iso_eff->SetXTitle("electron pT [GeV]");
   h_els_iso_eff->SetYTitle("activity [GeV]");
@@ -57,8 +65,14 @@
       h_els_iso_eff->SetBinError(elsonptc,activityc,h_els_iso_eff_ori->GetBinError(elsonptc,activityc));
     }
   }
+
   gStyle->SetPaintTextFormat("1.2f");
   h_els_iso_eff->Draw("colztexte");
+
+  TLatex *title = new TLatex(0.09770115,0.9194915,titre.c_str());
+  title->SetNDC();
+  title->SetTextSize(0.045);
+  title->Draw("same");
 
   c2->SaveAs( "_el_2d_iso_eff.png" );
   c2->SaveAs( "_el_2d_iso_eff.C" );
@@ -77,7 +91,7 @@
   TH2F *h_mus_reco_eff;
   //Float_t xbins[9]={5.0,10.0,20.0,30.0,40.0,50.0,70.0,100.0,120.0};
   //Float_t ybins[9]={0.0,5.0,10.0,20.0,40.0,60.0,80.0,100.0,120.0};
-  h_mus_reco_eff = new TH2F("h_mus_reco_eff", "h_mus_reco_eff", 8, xbins, 8, ybins);
+  h_mus_reco_eff = new TH2F("h_mus_reco_eff", "h_mus_reco_eff", 7, xbins, 8, ybins);
   h_mus_reco_eff->SetTitle("");
   h_mus_reco_eff->SetXTitle("muon pT [GeV]");
   h_mus_reco_eff->SetYTitle("activity [GeV]");
@@ -90,8 +104,14 @@
       h_mus_reco_eff->SetBinError(musonptc,activityc,h_mus_reco_eff_ori->GetBinError(musonptc,activityc));
     }
   }
+
   gStyle->SetPaintTextFormat("1.2f");
   h_mus_reco_eff->Draw("colztexte");
+
+  TLatex *title = new TLatex(0.09770115,0.9194915,titre.c_str());
+  title->SetNDC();
+  title->SetTextSize(0.045);
+  title->Draw("same");
 
   c3->SaveAs( "_mu_2d_reco_eff.png" );
   c3->SaveAs( "_mu_2d_reco_eff.C" );
@@ -110,7 +130,7 @@
   TH2F *h_els_reco_eff;
   //Float_t xbins[9]={5.0,10.0,20.0,30.0,40.0,50.0,70.0,100.0,120.0};
   //Float_t ybins[9]={0.0,5.0,10.0,20.0,40.0,60.0,80.0,100.0,120.0};
-  h_els_reco_eff = new TH2F("h_els_reco_eff", "h_els_reco_eff", 8, xbins, 8, ybins);
+  h_els_reco_eff = new TH2F("h_els_reco_eff", "h_els_reco_eff", 7, xbins, 8, ybins);
   h_els_reco_eff->SetTitle("");
   h_els_reco_eff->SetXTitle("electron pT [GeV]");
   h_els_reco_eff->SetYTitle("activity [GeV]");
@@ -123,8 +143,14 @@
       h_els_reco_eff->SetBinError(elsonptc,activityc,h_els_reco_eff_ori->GetBinError(elsonptc,activityc));
     }
   }
+
   gStyle->SetPaintTextFormat("1.2f");
   h_els_reco_eff->Draw("colztexte");
+
+  TLatex *title = new TLatex(0.09770115,0.9194915,titre.c_str());
+  title->SetNDC();
+  title->SetTextSize(0.045);
+  title->Draw("same");
 
   c4->SaveAs( "_el_2d_reco_eff.png" );
   c4->SaveAs( "_el_2d_reco_eff.C" );
