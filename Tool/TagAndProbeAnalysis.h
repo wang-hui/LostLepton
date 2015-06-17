@@ -12,16 +12,10 @@
 
 #include "Math/QuantFuncMathCore.h"
 #include "TMath.h"
-
 #include "SusyAnaTools/Tools/NTupleReader.h"
 
-#define PT_BINS 8
-#define AC_BINS 8
-#define NJETS_BINS 6
-
+#include "LLBinFunction.h"
 //############################begin to defin class AccRecoIsoEffs###################
-
-
 class TagAndProbeEffs
 {
  public:
@@ -146,129 +140,6 @@ bool FillChain(TChain *chain, const TString &inputFileList)
   std::cout << "No. of Entries in this tree : " << chain->GetEntries() << std::endl;
   return true;
 }
-
-
-//############determine the pt bin number############
-int Set_ptbin_number(
-                     double gen_pt
-                    )
-{
-  int ptbin_num;
-
-  if(gen_pt < 10)
-  {
-    ptbin_num = 0;
-  }
-  else if(gen_pt >= 10 && gen_pt < 20)
-  {
-    ptbin_num = 1;
-  }
-  else if(gen_pt >= 20 && gen_pt < 30)
-  {
-    ptbin_num = 2;
-  }
-  else if(gen_pt >= 30 && gen_pt < 40)
-  {
-    ptbin_num = 3;
-  }
-  else if(gen_pt >= 40 && gen_pt < 50)
-  {
-    ptbin_num = 4;
-  }
-  else if(gen_pt >= 50 && gen_pt < 70)
-  {
-    ptbin_num = 5;
-  }
-  else if(gen_pt >= 70 && gen_pt < 100)
-  {
-    ptbin_num = 6;
-  }
-  else if(gen_pt >= 100 )
-  {
-    ptbin_num = 7;
-  }
-  
-  return ptbin_num;
-}
-
-//############determine the activity bin number############
-
-int Set_acbin_number(
-                     double activity
-                    )
-{
-  int acbin_num;
-
-  if(activity < 5)
-  {
-    acbin_num = 0;
-  }
-  else if(activity >= 5 && activity < 10)
-  {
-    acbin_num = 1;
-  }
-  else if(activity >= 10 && activity < 20)
-  {
-    acbin_num = 2;
-  }
-  else if(activity >= 20 && activity < 40)
-  {
-    acbin_num = 3;
-  }
-  else if(activity >= 40 && activity < 60)
-  {
-    acbin_num = 4;
-  }
-  else if(activity >= 60 && activity < 80)
-  {
-    acbin_num = 5;
-  }
-  else if(activity >= 80 && activity < 100)
-  {
-    acbin_num = 6;
-  }
-  else if(activity >= 100 )
-  {
-    acbin_num = 7;
-  }
-
-  return acbin_num;
-}
-
-int Set_njetsbin_number(
-                        int njets
-                       )
-{
-  int njetsbin_num;
-
-  if(njets == 4)
-  {
-    njetsbin_num = 0;
-  }
-  else if(njets == 5)
-  {
-    njetsbin_num = 1;
-  }
-  else if(njets == 6)
-  {
-    njetsbin_num = 2;
-  }
-  else if(njets == 7)
-  {
-    njetsbin_num = 3;
-  }
-  else if(njets ==8)
-  {
-    njetsbin_num = 4;
-  }
-  else if(njets >= 9)
-  {
-    njetsbin_num = 5;
-  }
-
-  return njetsbin_num;
-}
-
 
 //##########functions to calculate Delta_R and Delta Phi###############
 double DeltaPhi(double phi1, double phi2) 

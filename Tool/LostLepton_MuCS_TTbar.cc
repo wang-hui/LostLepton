@@ -15,8 +15,6 @@
 #include "SusyAnaTools/Tools/customize.h"
 #include "SusyAnaTools/Tools/searchBins.h"
 
-#include "Baseline.h"
-#include "LostLepton_MuCS_TTbar.h"
 #include "TGraph.h"
 #include "TCanvas.h"
 #include "TH1F.h"
@@ -38,6 +36,9 @@
 #include "TLorentzVector.h"
 //#include "TROOT.h"
 //#include "TInterpreter.h"
+
+#include "Baseline.h"
+#include "LostLepton_MuCS_TTbar.h"
 #include "Activity.h"
 
 using namespace std;
@@ -91,36 +92,27 @@ int main(int argc, char* argv[])
     
     myAccRecoIsoEffs.nevents_tot++;
 
-    //bool passBaseline=tr.getVar<bool>("passBaseline");
-    //if (passBaseline)
-    //{
-      //++nevents_baseline_ref;
-    //}
-
     //baseline cut without lepton veto
-    bool passBaseline_nolepveto = tr.getVar<bool>("passBaseline_nolepveto");
-    //special cut for ttbar background
-    bool passNewCuts = tr.getVar<bool>("passNewCuts");
+    bool passBaselinelostlept = tr.getVar<bool>("passBaselinelostlept");
 
     if ( 
-           passBaseline_nolepveto 
-        && passNewCuts 
+        passBaselinelostlept 
        )
     {
       myAccRecoIsoEffs.nevents_sel_base++;
 
-      //nMuons in flatree means no iso cut muons; CUT2 we add iso
-      int nElectrons = tr.getVar<int>("nElectrons_CUT2");
-      int nMuons = tr.getVar<int>("nMuons_CUT2");
+      //nMuons in flatree means no iso cut muons; CUT we add iso
+      int nElectrons = tr.getVar<int>("nElectrons_CUTlostlept");
+      int nMuons = tr.getVar<int>("nMuons_CUTlostlept");
 
       double met = tr.getVar<double>("met");
       double metphi = tr.getVar<double>("metphi");
-      int njets30 = tr.getVar<int>("cntNJetsPt30Eta24");
+      int njets30 = tr.getVar<int>("cntNJetsPt30Eta24lostlept");
       const double ht = tr.getVar<double>("ht");
-      int ntopjets = tr.getVar<int>("nTopCandSortedCnt");
-      int nbottomjets = tr.getVar<int>("cntCSVS");
-      double MT2 = tr.getVar<double>("best_had_brJet_MT2");
-      double bestTopJetMass = tr.getVar<double>("bestTopJetMass2");
+      int ntopjets = tr.getVar<int>("nTopCandSortedCntlostlept");
+      int nbottomjets = tr.getVar<int>("cntCSVSlostlept");
+      double MT2 = tr.getVar<double>("best_had_brJet_MT2lostlept");
+      double bestTopJetMass = tr.getVar<double>("bestTopJetMasslostlept");
       double mht = tr.getVar<double>("mht");
 
       vector<int> W_emuVec = tr.getVec<int>("W_emuVec");
@@ -789,31 +781,27 @@ int main(int argc, char* argv[])
   {
     if(trCS.getEvtNum()%20000 == 0) std::cout << trCS.getEvtNum() << "\t" << ((clock() - t0)/1000000.0) << std::endl;
 
-    bool passBaseline_nolepveto=trCS.getVar<bool>("passBaseline_nolepveto");
-    //special cut for ttbar background
-    bool passNewCuts = trCS.getVar<bool>("passNewCuts");
+    bool passBaselinelostlept = trCS.getVar<bool>("passBaselinelostlept");
  
     if(
-          passBaseline_nolepveto
-       && passNewCuts
+       passBaselinelostlept
       )
     {
-      int nElectrons = trCS.getVar<int>("nElectrons_CUT2");
-      int nMuons = trCS.getVar<int>("nMuons_CUT2");
+      int nElectrons = trCS.getVar<int>("nElectrons_CUTlostlept");
+      int nMuons = trCS.getVar<int>("nMuons_CUTlostlept");
 
       double met = trCS.getVar<double>("met");
       double metphi = trCS.getVar<double>("metphi");
 
-      int njets30 = trCS.getVar<int>("cntNJetsPt30Eta24");
-      int ntopjets = trCS.getVar<int>("nTopCandSortedCnt");
-      int nbottomjets = trCS.getVar<int>("cntCSVS");
-      double MT2 = trCS.getVar<double>("best_had_brJet_MT2");
-      double bestTopJetMass = trCS.getVar<double>("bestTopJetMass2");
+      int njets30 = trCS.getVar<int>("cntNJetsPt30Eta24lostlept");
+      int ntopjets = trCS.getVar<int>("nTopCandSortedCntlostlept");
+      int nbottomjets = trCS.getVar<int>("cntCSVSlostlept");
+      double MT2 = trCS.getVar<double>("best_had_brJet_MT2lostlept");
+      double bestTopJetMass = trCS.getVar<double>("bestTopJetMasslostlept");
       double ht = trCS.getVar<double>("ht");
       double mht = trCS.getVar<double>("mht");
 
       //muon CS
-      //nMuons in flatree means no iso cut muons; CUT2 we add iso
       if (nElectrons == 0 && nMuons == 1)
       {
         //counting the events for muon control sample
@@ -827,17 +815,18 @@ int main(int argc, char* argv[])
         vector<double> recoJetschargedHadronEnergyFraction = trCS.getVec<double>("recoJetschargedHadronEnergyFraction");
         vector<double> recoJetschargedEmEnergyFraction = trCS.getVec<double>("recoJetschargedEmEnergyFraction");
 
-        double reco_mus_pt = 0, reco_mus_eta = 0, reco_mus_phi = 0;
+        double reco_mus_pt = -1, reco_mus_eta = 0, reco_mus_phi = 0;
 
         for(unsigned int im = 0 ; im < muonsLVec.size() ; im++)
         {
-          if( fabs(muonsLVec[im].Eta()) < 2.4 && muonsMiniIso[im] < 0.2 )
+          if( fabs(muonsLVec[im].Eta()) < (AnaConsts::muonsMiniIsoArr).maxAbsEta && muonsMiniIso[im] < (AnaConsts::muonsMiniIsoArr).maxIso )
 	  {
             reco_mus_pt  = ( muonsLVec.at(im) ).Pt();
             reco_mus_eta = ( muonsLVec.at(im) ).Eta();
             reco_mus_phi = ( muonsLVec.at(im) ).Phi();
 	  }
 	}
+        //if ( reco_mus_pt < 0 ) continue;
 
         double deltaphi_mus = DeltaPhi( reco_mus_phi , metphi );
         double mtW_mus = std::sqrt( 2.0 * reco_mus_pt * met * ( 1.0 - cos(deltaphi_mus) ) );
@@ -1216,9 +1205,6 @@ void AccRecoIsoEffs::NormalizeFlowNumber()
   nevents_pred_acc_els_err *= scale;
   nevents_pred_id_els_err *= scale;
   nevents_pred_iso_els_err *= scale;
-
-  
-
 }
 
 void AccRecoIsoEffs::printNormalizeFlowNumber()
@@ -1276,11 +1262,11 @@ void AccRecoIsoEffs::printSearchBin()
     std::cout << "Els Pred MC Numbers: " << nevents_els_pred_SB_MC[i_cal] << "; Els Pred Normalized Numbers: " << nevents_els_pred_SB_Normalized[i_cal] << std::endl;
   }
   
-  TH1D * h_cs_mus_sb = new TH1D("h_cs_mus_sb","",50,0,50);
-  TH1D * h_exp_mus_sb = new TH1D("h_exp_mus_sb","",50,0,50);
-  TH1D * h_pred_mus_sb = new TH1D("h_pred_mus_sb","",50,0,50);
-  TH1D * h_exp_els_sb = new TH1D("h_exp_els_sb","",50,0,50);
-  TH1D * h_pred_els_sb = new TH1D("h_pred_els_sb","",50,0,50);
+  TH1D * h_cs_mus_sb = new TH1D("h_cs_mus_sb","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
+  TH1D * h_exp_mus_sb = new TH1D("h_exp_mus_sb","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
+  TH1D * h_pred_mus_sb = new TH1D("h_pred_mus_sb","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
+  TH1D * h_exp_els_sb = new TH1D("h_exp_els_sb","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
+  TH1D * h_pred_els_sb = new TH1D("h_pred_els_sb","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
 
   for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
   {

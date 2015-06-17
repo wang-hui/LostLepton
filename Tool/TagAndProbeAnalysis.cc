@@ -19,7 +19,6 @@
 #include "TStopwatch.h"
 #include "TString.h"
 
-#include "TagAndProbeAnalysis.h"
 #include "TGraph.h"
 #include "TCanvas.h"
 #include "TH1F.h"
@@ -36,6 +35,8 @@
 #include "TLorentzVector.h"
 //#include "TROOT.h"
 //#include "TInterpreter.h"
+
+#include "TagAndProbeAnalysis.h"
 
 using namespace std;
 
