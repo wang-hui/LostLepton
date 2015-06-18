@@ -204,12 +204,12 @@ void ClosurePlots::ClosureTemplate(
   pad2->SetTopMargin(small);
   pad2->SetBorderMode(0);
 
-  TH1D *ratio = (TH1D*) h_pred->Clone();
-  TH1D *allmc = (TH1D*) h_exp->Clone();
+  TH1D *ratio = (TH1D*) h_exp->Clone();
+  TH1D *allmc = (TH1D*) h_pred->Clone();
 
   ratio->Add(allmc, -1);
   ratio->Divide(allmc);
-  ratio->GetYaxis()->SetTitle( "(pred - exp)/exp" );
+  ratio->GetYaxis()->SetTitle( "(exp - pred)/pred" );
 
   TAxis* xHT = ratio->GetXaxis();
 
