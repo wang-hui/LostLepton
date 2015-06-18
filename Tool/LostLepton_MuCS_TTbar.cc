@@ -1281,9 +1281,11 @@ void AccRecoIsoEffs::printSearchBin(BaseHistgram& myBaseHistgram)
     myBaseHistgram.h_exp_el_sb->SetBinContent( i_cal+1 , nevents_els_exp_SB_Normalized[i_cal] );
     myBaseHistgram.h_exp_el_sb->SetBinError( i_cal+1 , std::sqrt(nevents_els_exp_SB_MC[i_cal])*scale);
     myBaseHistgram.h_pred_el_sb->SetBinContent( i_cal+1 , nevents_els_pred_SB_Normalized[i_cal] );
+    myBaseHistgram.h_pred_el_sb->SetBinError( i_cal+1 , std::sqrt(nevents_els_pred_SB_MC[i_cal])*scale );
     myBaseHistgram.h_exp_lept_sb->SetBinContent( i_cal+1 , nevents_lept_exp_SB_Normalized[i_cal] );
     myBaseHistgram.h_exp_lept_sb->SetBinError( i_cal+1 , std::sqrt(nevents_lept_exp_SB_MC[i_cal])*scale);
     myBaseHistgram.h_pred_lept_sb->SetBinContent( i_cal+1 , nevents_lept_pred_SB_Normalized[i_cal] );
+    myBaseHistgram.h_pred_lept_sb->SetBinError( i_cal+1 , std::sqrt(nevents_lept_pred_SB_MC[i_cal])*scale );
   }
 
   //cmusCS
