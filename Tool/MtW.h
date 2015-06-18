@@ -30,11 +30,11 @@ void BaseHistgram::BookHistgram(const char *outFileName)
 {
   oFile = new TFile(outFileName, "recreate");
 
-  h_b_mtw[0] = new TH1D("h_b_mtw_ttbar","",20,0,500);
-  h_b_mtw[1] = new TH1D("h_b_mtw_t2tt_1","",20,0,500);
-  h_b_mtw[2] = new TH1D("h_b_mtw_t2tt_2","",20,0,500);
-  h_b_mtw[3] = new TH1D("h_b_mtw_t2tt_3","",20,0,500);
-  h_b_mtw[4] = new TH1D("h_b_mtw_t2tt_4","",20,0,500);
+  h_b_mtw[0] = new TH1D("h_b_mtw_ttbar","",40,0,500);
+  h_b_mtw[1] = new TH1D("h_b_mtw_t2tt_1","",40,0,500);
+  h_b_mtw[2] = new TH1D("h_b_mtw_t2tt_2","",40,0,500);
+  h_b_mtw[3] = new TH1D("h_b_mtw_t2tt_3","",40,0,500);
+  h_b_mtw[4] = new TH1D("h_b_mtw_t2tt_4","",40,0,500);
 }
 
 //Fill chain from txt file

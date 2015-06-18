@@ -974,7 +974,7 @@ int main(int argc, char* argv[])
   myAccRecoIsoEffs.printOverview();
   myAccRecoIsoEffs.NormalizeFlowNumber();
   myAccRecoIsoEffs.printNormalizeFlowNumber();
-  myAccRecoIsoEffs.printSearchBin();
+  myAccRecoIsoEffs.printSearchBin(myBaseHistgram);
 
   //write into histgram
   (myBaseHistgram.oFile)->Write();
@@ -1244,7 +1244,7 @@ void AccRecoIsoEffs::printNormalizeFlowNumber()
 
 }
 
-void AccRecoIsoEffs::printSearchBin()
+void AccRecoIsoEffs::printSearchBin(BaseHistgram& myBaseHistgram)
 {
   std::cout << "Muon CS # in Search Bins: " << std::endl;  
   for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
@@ -1255,37 +1255,42 @@ void AccRecoIsoEffs::printSearchBin()
     nevents_els_exp_SB_Normalized[i_cal] = nevents_els_exp_SB_MC[i_cal]*scale;
     nevents_els_pred_SB_Normalized[i_cal] = nevents_els_pred_SB_MC[i_cal]*scale;
 
+    nevents_lept_exp_SB_MC[i_cal] = nevents_mus_exp_SB_MC[i_cal] + nevents_els_exp_SB_MC[i_cal];
+    nevents_lept_pred_SB_MC[i_cal] = nevents_mus_pred_SB_MC[i_cal] + nevents_els_pred_SB_MC[i_cal];
+    nevents_lept_exp_SB_Normalized[i_cal] = nevents_lept_exp_SB_MC[i_cal]*scale;
+    nevents_lept_pred_SB_Normalized[i_cal] = nevents_lept_pred_SB_MC[i_cal]*scale;
+
     std::cout << "idx: " << i_cal << "; MC Numbers: " << nevents_mus_CS_SB_MC[i_cal] << "; Normalized Numbers: " << nevents_mus_CS_SB_Normalized[i_cal] << std::endl;
     std::cout << "Mus Exp MC Numbers: " << nevents_mus_exp_SB_MC[i_cal] << "; Mus Exp Normalized Numbers: " << nevents_mus_exp_SB_Normalized[i_cal] << std::endl;
     std::cout << "Mus Pred MC Numbers: " << nevents_mus_pred_SB_MC[i_cal] << "; Mus Pred Normalized Numbers: " << nevents_mus_pred_SB_Normalized[i_cal] << std::endl;
     std::cout << "Els Exp MC Numbers: " << nevents_els_exp_SB_MC[i_cal] << "; Els Exp Normalized Numbers: " << nevents_els_exp_SB_Normalized[i_cal] << std::endl;
     std::cout << "Els Pred MC Numbers: " << nevents_els_pred_SB_MC[i_cal] << "; Els Pred Normalized Numbers: " << nevents_els_pred_SB_Normalized[i_cal] << std::endl;
+    std::cout << "Lept Exp MC Numbers: " << nevents_lept_exp_SB_MC[i_cal] << "; Lept Exp Normalized Numbers: " << nevents_lept_exp_SB_Normalized[i_cal] << std::endl;
+    std::cout << "Lept Pred MC Numbers: " << nevents_lept_pred_SB_MC[i_cal] << "; Lept Pred Normalized Numbers: " << nevents_lept_pred_SB_Normalized[i_cal] << std::endl;
   }
   
   TH1D * h_cs_mus_sb = new TH1D("h_cs_mus_sb","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
-  TH1D * h_exp_mus_sb = new TH1D("h_exp_mus_sb","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
-  TH1D * h_pred_mus_sb = new TH1D("h_pred_mus_sb","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
-  TH1D * h_exp_els_sb = new TH1D("h_exp_els_sb","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
-  TH1D * h_pred_els_sb = new TH1D("h_pred_els_sb","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
 
   for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
   {
     h_cs_mus_sb->SetBinContent( i_cal+1 , nevents_mus_CS_SB_Normalized[i_cal] );
-    h_exp_mus_sb->SetBinContent( i_cal+1 , nevents_mus_exp_SB_Normalized[i_cal] );
-    h_pred_mus_sb->SetBinContent( i_cal+1 , nevents_mus_pred_SB_Normalized[i_cal] );
-    h_exp_els_sb->SetBinContent( i_cal+1 , nevents_mus_exp_SB_Normalized[i_cal] );
-    h_pred_els_sb->SetBinContent( i_cal+1 , nevents_mus_pred_SB_Normalized[i_cal] );
+    myBaseHistgram.h_exp_mu_sb->SetBinContent( i_cal+1 , nevents_mus_exp_SB_Normalized[i_cal] );
+    myBaseHistgram.h_pred_mu_sb->SetBinContent( i_cal+1 , nevents_mus_pred_SB_Normalized[i_cal] );
+    myBaseHistgram.h_exp_el_sb->SetBinContent( i_cal+1 , nevents_els_exp_SB_Normalized[i_cal] );
+    myBaseHistgram.h_pred_el_sb->SetBinContent( i_cal+1 , nevents_els_pred_SB_Normalized[i_cal] );
+    myBaseHistgram.h_exp_lept_sb->SetBinContent( i_cal+1 , nevents_lept_exp_SB_Normalized[i_cal] );
+    myBaseHistgram.h_pred_lept_sb->SetBinContent( i_cal+1 , nevents_lept_pred_SB_Normalized[i_cal] );
   }
 
+  //cmusCS
   TCanvas *cmusCS = new TCanvas("cmusCS","A Simple Graph Example",200,10,700,500);
   gStyle->SetOptStat(0);
 
   h_cs_mus_sb->SetLineColor(1);
   h_cs_mus_sb->SetLineWidth(3);
-
   h_cs_mus_sb->Draw();
 
-  const std::string titre_musCS="CMS Preliminary 2015, 10 fb^{-1}, #sqrt{s} = 13 TeV; Muon CS in Search Bins";
+  const std::string titre_musCS="CMS Preliminary 2015, 10 fb^{-1}, #sqrt{s} = 13 TeV";
   TLatex *title_musCS = new TLatex(0.09770115,0.9194915,titre_musCS.c_str());
   title_musCS->SetNDC();
   title_musCS->SetTextSize(0.045);
@@ -1298,66 +1303,8 @@ void AccRecoIsoEffs::printSearchBin()
   leg_musCS->AddEntry(h_cs_mus_sb,"Number of Muon CS","l");
   leg_musCS->Draw("same");
 
-  cmusCS->SaveAs( "mus_searchbin_CS.png" );
-  cmusCS->SaveAs( "mus_searchbin_CS.C" );
-
-  TCanvas *cmus = new TCanvas("cmus","A Simple Graph Example",200,10,700,500);
-  gStyle->SetOptStat(0);
-
-  h_exp_mus_sb->SetLineColor(1);
-  h_exp_mus_sb->SetLineWidth(3);
-
-  h_pred_mus_sb->SetLineColor(2);
-  h_pred_mus_sb->SetLineWidth(3);
-
-  h_exp_mus_sb->Draw();
-  h_pred_mus_sb->Draw("same");
-
-  const std::string titre_mus="CMS Preliminary 2015, 10 fb^{-1}, #sqrt{s} = 13 TeV; Muon Search Bin Closure";
-  TLatex *title_mus = new TLatex(0.09770115,0.9194915,titre_mus.c_str());
-  title_mus->SetNDC();
-  title_mus->SetTextSize(0.045);
-  title_mus->Draw("same");
-
-  TLegend* leg_mus = new TLegend(0.6,0.75,0.85,0.85);
-  leg_mus->SetBorderSize(0);
-  leg_mus->SetTextFont(42);
-  leg_mus->SetFillColor(0);
-  leg_mus->AddEntry(h_exp_mus_sb,"Expectation","l");
-  leg_mus->AddEntry(h_pred_mus_sb,"Prediction","l");
-  leg_mus->Draw("same");
-
-  cmus->SaveAs( "mus_searchbin_closure.png" );
-  cmus->SaveAs( "mus_searchbin_closure.C" );
-
-  TCanvas *cels = new TCanvas("cels","A Simple Graph Example",200,10,700,500);
-  gStyle->SetOptStat(0);
-
-  h_exp_els_sb->SetLineColor(1);
-  h_exp_els_sb->SetLineWidth(3);
-
-  h_pred_els_sb->SetLineColor(2);
-  h_pred_els_sb->SetLineWidth(3);
-
-  h_exp_els_sb->Draw();
-  h_pred_els_sb->Draw("same");
-
-  const std::string titre_els="CMS Preliminary 2015, 10 fb^{-1}, #sqrt{s} = 13 TeV; Electron Search Bin Closure";
-  TLatex *title_els = new TLatex(0.09770115,0.9194915,titre_els.c_str());
-  title_els->SetNDC();
-  title_els->SetTextSize(0.045);
-  title_els->Draw("same");
-
-  TLegend* leg_els = new TLegend(0.6,0.75,0.85,0.85);
-  leg_els->SetBorderSize(0);
-  leg_els->SetTextFont(42);
-  leg_els->SetFillColor(0);
-  leg_els->AddEntry(h_exp_els_sb,"Expectation","l");
-  leg_els->AddEntry(h_pred_els_sb,"Prediction","l");
-  leg_els->Draw("same");
-
-  cels->SaveAs( "els_searchbin_closure.png" );
-  cels->SaveAs( "els_searchbin_closure.C" );
+  cmusCS->SaveAs( "searchbin_mus_CS.png" );
+  cmusCS->SaveAs( "searchbin_mus_CS.C" );
 }
 
 void AccRecoIsoEffs::printAccRecoIsoEffs()

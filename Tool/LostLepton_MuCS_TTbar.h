@@ -17,6 +17,7 @@
 #include "LLBinFunction.h"
 
 //############################begin to defin class AccRecoIsoEffs###################
+class BaseHistgram;
 
 class AccRecoIsoEffs
 {
@@ -69,6 +70,8 @@ class AccRecoIsoEffs
   double nevents_mus_exp_SB_MC[NSEARCH_BINS] = {0}, nevents_mus_exp_SB_Normalized[NSEARCH_BINS] = {0};
   double nevents_els_pred_SB_MC[NSEARCH_BINS] = {0}, nevents_els_pred_SB_Normalized[NSEARCH_BINS] = {0};
   double nevents_els_exp_SB_MC[NSEARCH_BINS] = {0}, nevents_els_exp_SB_Normalized[NSEARCH_BINS] = {0};
+  double nevents_lept_pred_SB_MC[NSEARCH_BINS] = {0}, nevents_lept_pred_SB_Normalized[NSEARCH_BINS] = {0};
+  double nevents_lept_exp_SB_MC[NSEARCH_BINS] = {0}, nevents_lept_exp_SB_Normalized[NSEARCH_BINS] = {0};
 
   //di-lepton correction
   double nevents_single_mus = 0, nevents_di_mus = 0;
@@ -117,7 +120,7 @@ class AccRecoIsoEffs
   void EffstoWeights();
   void GetDiLeptonFactor();
   void NormalizeFlowNumber();
-  void printSearchBin();
+  void printSearchBin(BaseHistgram& myBaseHistgram);
 
  private:
   //define the variables we needed for normalization
@@ -233,6 +236,8 @@ class BaseHistgram
 
   TH1D *h_exp_elsingle_all_met, *h_exp_elsingle_all_njets, *h_exp_elsingle_all_mt2, *h_exp_elsingle_all_topmass, *h_exp_elsingle_all_ht, *h_exp_elsingle_all_mht, *h_exp_elsingle_all_ntopjets;
 
+  //closure for search bin
+  TH1D *h_exp_mu_sb, *h_pred_mu_sb, *h_exp_el_sb, *h_pred_el_sb, *h_exp_lept_sb, *h_pred_lept_sb;
 };
 
 void BaseHistgram::BookHistgram(const char *outFileName)
@@ -476,6 +481,14 @@ void BaseHistgram::BookHistgram(const char *outFileName)
   h_exp_elsingle_all_ht = new TH1D("h_exp_elsingle_all_ht","",300,0,3000);
   h_exp_elsingle_all_mht = new TH1D("h_exp_elsingle_all_mht","",100,0,1000);
   h_exp_elsingle_all_ntopjets = new TH1D("h_exp_elsingle_all_ntopjets","",20,0,20);
+
+  //closure for search bin
+  h_exp_mu_sb = new TH1D("h_exp_mu_sb","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
+  h_pred_mu_sb = new TH1D("h_pred_mu_sb","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
+  h_exp_el_sb = new TH1D("h_exp_el_sb","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
+  h_pred_el_sb = new TH1D("h_pred_el_sb","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
+  h_exp_lept_sb = new TH1D("h_exp_lept_sb","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
+  h_pred_lept_sb = new TH1D("h_pred_lept_sb","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
 }
 
 //Fill chain from txt file
