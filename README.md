@@ -48,3 +48,9 @@ And it will be involved into make command automatically and we do not have error
 5.Make Closure Plots:
 
 ./ClosurePlots
+
+6.Make MtW Plots on TTbar/T2tt samples:
+
+./MtW runList_ttbar_skimmed_flattree.txt runList_t2tt_425_325.txt runList_t2tt_500_325.txt runList_t2tt_650_325.txt runList_t2tt_850_100.txt 123.root
+
+
