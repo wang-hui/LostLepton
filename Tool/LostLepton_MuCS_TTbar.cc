@@ -83,7 +83,11 @@ int main(int argc, char* argv[])
   int nevents_muonCS= 0;
   int nevents_baseline= 0;
   //int nevents_baseline_ref= 0;
-  
+  int n_exp_lep_noitv = 0;
+  int n_exp_mu_noitv = 0;
+  int n_exp_ele_noitv = 0;
+  int n_exp_lep_itv = 0;
+
   //first loop, to generate Acc, reco and Iso effs and also fill expected histgram
   std::cout<<"First loop begin: "<<std::endl;
   while(tr.getNextEvent())
@@ -114,6 +118,9 @@ int main(int argc, char* argv[])
       double MT2 = tr.getVar<double>("best_had_brJet_MT2lostlept");
       double bestTopJetMass = tr.getVar<double>("bestTopJetMasslostlept");
       double mht = tr.getVar<double>("mht");
+
+      const int nIsoTrks = tr.getVar<int>("nIsoTrks_CUTlostlept");
+      //std::cout << "nIsoTrks = " << nIsoTrks << std::endl;
 
       vector<int> W_emuVec = tr.getVec<int>("W_emuVec");
       vector<int> W_tau_emuVec = tr.getVec<int>("W_tau_emuVec");
@@ -253,14 +260,17 @@ int main(int argc, char* argv[])
               vector<double> deltar_mus_pool;
               for(int reco_mus_i = 0 ; reco_mus_i < reco_mus_count ; reco_mus_i++)
               {
-                double deltar_media;
-                deltar_media = DeltaR(gen_mus_eta,
-                                      gen_mus_phi,
-                                      (muonsLVec.at(reco_mus_i)).Eta(),
-                                      (muonsLVec.at(reco_mus_i)).Phi()
-                                     );
+		if ((muonsLVec.at(reco_mus_i)).Pt()>(AnaConsts::muonsMiniIsoArr).minPt && std::abs((muonsLVec.at(reco_mus_i)).Eta())<(AnaConsts::muonsMiniIsoArr).maxAbsEta)
+		{
+		  double deltar_media;
+		  deltar_media = DeltaR(gen_mus_eta,
+					gen_mus_phi,
+					(muonsLVec.at(reco_mus_i)).Eta(),
+					(muonsLVec.at(reco_mus_i)).Phi()
+					);
 
-                deltar_mus_pool.push_back(deltar_media);
+		  deltar_mus_pool.push_back(deltar_media);
+		}
               }
 
               double deltar;
@@ -315,6 +325,13 @@ int main(int argc, char* argv[])
                 {
                   myAccRecoIsoEffs.nmus_iso[ptbin_number][acbin_number]++;
                   myAccRecoIsoEffs.nmus_iso_allreco[ptbin_number_allreco][acbin_number_allreco]++;
+
+		  if (nMuons == 0)
+		  {
+		    std::cout << "Warning: mu pass iso but nMuons=0!" << std::endl;
+		    std::cout << "reco_mus_pt = " << reco_mus_pt << std::endl;
+		    std::cout << "reco_mus_eta = " << reco_mus_eta << std::endl;
+		  }
                 }//if isolated
                 else
                 {
@@ -439,23 +456,24 @@ int main(int argc, char* argv[])
                                        );
                   (myBaseHistgram.h_b_deltaR_genup_els)->Fill(deltar_study);
                 }
-                else
-                  continue;
               }
 
               //loop over reco lepton information to determine the smallest deltar
               vector<double> deltar_els_pool;
               for(int reco_els_i = 0 ; reco_els_i < reco_els_count ; reco_els_i++)
               {
-                double deltar_media;
-                deltar_media = DeltaR(
-                                      gen_els_eta,
-                                      gen_els_phi,
-                                      (elesLVec.at(reco_els_i)).Eta(),
-                                      (elesLVec.at(reco_els_i)).Phi()
-                                     );
+		if ((elesLVec.at(reco_els_i)).Pt()>(AnaConsts::elesMiniIsoArr).minPt && std::abs((elesLVec.at(reco_els_i)).Eta())<(AnaConsts::elesMiniIsoArr).maxAbsEta)
+		{
+		  double deltar_media;
+		  deltar_media = DeltaR(
+					gen_els_eta,
+					gen_els_phi,
+					(elesLVec.at(reco_els_i)).Eta(),
+					(elesLVec.at(reco_els_i)).Phi()
+					);
 
-                deltar_els_pool.push_back(deltar_media);
+		  deltar_els_pool.push_back(deltar_media);
+		}
               }
 
               double deltar;
@@ -538,16 +556,19 @@ int main(int argc, char* argv[])
         vector<double> muonsMiniIso = tr.getVec<double>("muonsMiniIso");
 
         double reco_mus_pt = 0, reco_mus_eta = 0, reco_mus_phi = 0;
+ 	int nisomuons=0;
 
-        for(unsigned int im = 0 ; im < muonsLVec.size() ; im++)
+       for(unsigned int im = 0 ; im < muonsLVec.size() ; im++)
         {
-          if( fabs(muonsLVec[im].Eta()) < 2.4 && muonsMiniIso[im] < 0.2 )
+          if( muonsLVec[im].Pt()>(AnaConsts::muonsMiniIsoArr).minPt && fabs(muonsLVec[im].Eta()) < (AnaConsts::muonsMiniIsoArr).maxAbsEta && muonsMiniIso[im] < (AnaConsts::muonsMiniIsoArr).maxIso )
           {
             reco_mus_pt  = ( muonsLVec.at(im) ).Pt();
             reco_mus_eta = ( muonsLVec.at(im) ).Eta();
             reco_mus_phi = ( muonsLVec.at(im) ).Phi();
+	    ++nisomuons;
           }
         }
+	if (nisomuons!=1) std::cout << "Error: nisomuons != 1: nisomuons = " << nisomuons << std::endl;
 
         double deltaphi_mus = DeltaPhi( reco_mus_phi , metphi );
         double mtW_mus = std::sqrt( 2.0 * reco_mus_pt * met * ( 1.0 - cos(deltaphi_mus) ) );
@@ -556,7 +577,7 @@ int main(int argc, char* argv[])
         int ptbin_number_allreco = Set_ptbin_number(reco_mus_pt);
 
         myAccRecoIsoEffs.mtwall[ptbin_number_allreco]++;        
-        if( mtW_mus < 125 )
+        if( mtW_mus < 125.0 )
         {
           myAccRecoIsoEffs.mtw100[ptbin_number_allreco]++;
         }
@@ -616,9 +637,10 @@ int main(int argc, char* argv[])
       }
 
       // exp 1 muon tot
-      if (nElectrons == 0 && nMuons==0 && ngenmu==1 && (ngenmuoutacc==1 || ngenmunotid==1 || ngenmunotiso==1))
-      //if (nElectrons == 0 && nMuons==0 && ngenmu==1)
+      //if (nElectrons == 0 && nMuons==0 && ngenmu==1 && (ngenmuoutacc==1 || ngenmunotid==1 || ngenmunotiso==1))
+      if (nElectrons == 0 && nMuons==0 && ngenmu==1)
       {
+	if (!(ngenmuoutacc==1 || ngenmunotid==1 || ngenmunotiso==1)) std::cout << "ngenmuoutacc = " << ngenmuoutacc << " , ngenmunotid = " << ngenmunotid << " , ngenmunotiso = " << ngenmunotiso << std::endl;
         myAccRecoIsoEffs.nevents_exp_all_mus++;
         myAccRecoIsoEffs.nevents_single_mus++;
 
@@ -645,9 +667,11 @@ int main(int argc, char* argv[])
         (myBaseHistgram.h_exp_mu_all_ntopjets)->Fill(ntopjets);
       }
 
-      if ( nElectrons == 0 && nMuons==0 && ngenmu==2 && ( ngenmuoutacc==2 || ngenmunotid==2 || ngenmunotiso==2 || ( ngenmuoutacc==1 && ngenmunotid==1 ) || (ngenmuoutacc==1 && ngenmunotiso==1 ) || ( ngenmunotiso==1 && ngenmunotid==1 ) ) )
-      //if ( nElectrons == 0 && nMuons==0 && ngenmu==2 )
+      // exp 2 muons tot
+      //if ( nElectrons == 0 && nMuons==0 && ngenmu==2 && ( ngenmuoutacc==2 || ngenmunotid==2 || ngenmunotiso==2 || ( ngenmuoutacc==1 && ngenmunotid==1 ) || (ngenmuoutacc==1 && ngenmunotiso==1 ) || ( ngenmunotiso==1 && ngenmunotid==1 ) ) )
+      if ( nElectrons == 0 && nMuons==0 && ngenmu==2 )
       {
+	if (!( ngenmuoutacc==2 || ngenmunotid==2 || ngenmunotiso==2 || ( ngenmuoutacc==1 && ngenmunotid==1 ) || (ngenmuoutacc==1 && ngenmunotiso==1 ) || ( ngenmunotiso==1 && ngenmunotid==1 ) )) std::cout << "Warning in nElectrons == 0 && nMuons==0 && ngenmu==2" << std::endl;
         myAccRecoIsoEffs.nevents_di_mus++;
         myAccRecoIsoEffs.nevents_exp_all_mus++;
 
@@ -664,6 +688,15 @@ int main(int argc, char* argv[])
         (myBaseHistgram.h_exp_mu_all_ht)->Fill(ht);
         (myBaseHistgram.h_exp_mu_all_mht)->Fill(mht);
         (myBaseHistgram.h_exp_mu_all_ntopjets)->Fill(ntopjets);
+      }
+
+      // exp mu+ele
+      if ( nElectrons == 0 && nMuons==0 && (ngenmu==1 || ngenmu==2 || ngenel==1 || ngenel==2) )
+      {
+	++n_exp_lep_noitv;
+	if (ngenmu==1 || ngenmu==2) ++n_exp_mu_noitv;
+	if (ngenel==1 || ngenel==2) ++n_exp_ele_noitv;
+	if (nIsoTrks==0) ++n_exp_lep_itv;
       }
 
       // exp 1 electron not iso
@@ -709,9 +742,12 @@ int main(int argc, char* argv[])
       }
 
       // exp 1 electron tot
-      if (nElectrons == 0 && nMuons==0 && ngenel==1 && (ngeneloutacc==1 || ngenelnotid==1 || ngenelnotiso==1))
-      //if (nElectrons == 0 && nMuons==0 && ngenel==1)
+      //if (nElectrons == 0 && nMuons==0 && ngenel==1 && (ngeneloutacc==1 || ngenelnotid==1 || ngenelnotiso==1))
+      if (nElectrons == 0 && nMuons==0 && ngenel==1)
       {
+
+	if (!(ngeneloutacc==1 || ngenelnotid==1 || ngenelnotiso==1)) std::cout << "FSL: 1 ele tot warning" << std::endl;
+
         myAccRecoIsoEffs.nevents_exp_all_els++;
         myAccRecoIsoEffs.nevents_single_els++;
 
@@ -816,16 +852,18 @@ int main(int argc, char* argv[])
         vector<double> recoJetschargedEmEnergyFraction = trCS.getVec<double>("recoJetschargedEmEnergyFraction");
 
         double reco_mus_pt = -1, reco_mus_eta = 0, reco_mus_phi = 0;
-
+	int nisomuons=0;
         for(unsigned int im = 0 ; im < muonsLVec.size() ; im++)
         {
-          if( fabs(muonsLVec[im].Eta()) < (AnaConsts::muonsMiniIsoArr).maxAbsEta && muonsMiniIso[im] < (AnaConsts::muonsMiniIsoArr).maxIso )
+          if( muonsLVec[im].Pt()>(AnaConsts::muonsMiniIsoArr).minPt && fabs(muonsLVec[im].Eta()) < (AnaConsts::muonsMiniIsoArr).maxAbsEta && muonsMiniIso[im] < (AnaConsts::muonsMiniIsoArr).maxIso )
 	  {
             reco_mus_pt  = ( muonsLVec.at(im) ).Pt();
             reco_mus_eta = ( muonsLVec.at(im) ).Eta();
             reco_mus_phi = ( muonsLVec.at(im) ).Phi();
+	    ++nisomuons;
 	  }
 	}
+	if (nisomuons!=1) std::cout << "Error: nisomuons!=1: nisomuons = " << nisomuons << std::endl;
         //if ( reco_mus_pt < 0 ) continue;
 
         double deltaphi_mus = DeltaPhi( reco_mus_phi , metphi );
@@ -972,6 +1010,15 @@ int main(int argc, char* argv[])
   }
 
   myAccRecoIsoEffs.printOverview();
+
+  //std::cout << "n_exp_lep_noitv = " << n_exp_lep_noitv << std::endl;
+  //std::cout << "n_exp_mu_noitv = " << n_exp_mu_noitv << std::endl;
+  //std::cout << "n_exp_ele_noitv = " << n_exp_ele_noitv << std::endl;
+  //std::cout << "nevents_exp_all_mus + nevents_exp_all_els = " << myAccRecoIsoEffs.nevents_exp_all_mus+myAccRecoIsoEffs.nevents_exp_all_els << std::endl;
+  //std::cout << "nevents_exp_all_mus = " << myAccRecoIsoEffs.nevents_exp_all_mus << std::endl;
+  //std::cout << "nevents_exp_all_els = " << myAccRecoIsoEffs.nevents_exp_all_els << std::endl;
+  //std::cout << "n_exp_lep_itv = " << n_exp_lep_itv << std::endl;
+
   myAccRecoIsoEffs.NormalizeFlowNumber();
   myAccRecoIsoEffs.printNormalizeFlowNumber();
   myAccRecoIsoEffs.printSearchBin(myBaseHistgram);
@@ -1296,18 +1343,18 @@ void AccRecoIsoEffs::printSearchBin(BaseHistgram& myBaseHistgram)
   h_cs_mus_sb->SetLineWidth(3);
   h_cs_mus_sb->Draw();
 
-  const std::string titre_musCS="CMS Preliminary 2015, 10 fb^{-1}, #sqrt{s} = 13 TeV";
+  const std::string titre_musCS="CMS Simulation 2015, 10 fb^{-1}, #sqrt{s} = 13 TeV";
   TLatex *title_musCS = new TLatex(0.09770115,0.9194915,titre_musCS.c_str());
   title_musCS->SetNDC();
   title_musCS->SetTextSize(0.045);
   title_musCS->Draw("same");
 
-  TLegend* leg_musCS = new TLegend(0.6,0.75,0.85,0.85);
-  leg_musCS->SetBorderSize(0);
-  leg_musCS->SetTextFont(42);
-  leg_musCS->SetFillColor(0);
-  leg_musCS->AddEntry(h_cs_mus_sb,"Number of Muon CS","l");
-  leg_musCS->Draw("same");
+  //TLegend* leg_musCS = new TLegend(0.6,0.75,0.85,0.85);
+  //leg_musCS->SetBorderSize(0);
+  //leg_musCS->SetTextFont(42);
+  //leg_musCS->SetFillColor(0);
+  //leg_musCS->AddEntry(h_cs_mus_sb,"Number of Muon CS","l");
+  //leg_musCS->Draw("same");
 
   cmusCS->SaveAs( "searchbin_mus_CS.png" );
   cmusCS->SaveAs( "searchbin_mus_CS.C" );
