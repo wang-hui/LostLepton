@@ -697,6 +697,13 @@ int main(int argc, char* argv[])
 	if (ngenmu==1 || ngenmu==2) ++n_exp_mu_noitv;
 	if (ngenel==1 || ngenel==2) ++n_exp_ele_noitv;
 	if (nIsoTrks==0) ++n_exp_lep_itv;
+
+        int searchbin_id = find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+        if( searchbin_id >= 0 )
+        {
+          myAccRecoIsoEffs.nevents_lept_exp_SB_MC[searchbin_id]++;
+        }
+
       }
 
       // exp 1 electron not iso
@@ -940,6 +947,7 @@ int main(int argc, char* argv[])
           if( searchbin_id >= 0 )
           {
             myAccRecoIsoEffs.nevents_mus_pred_SB_MC[searchbin_id] += EventWeight_all_mus*EventWeight_mus;
+            myAccRecoIsoEffs.nevents_mus_pred_SB_MC_err[searchbin_id] += EventWeight_all_mus*EventWeight_mus*EventWeight_all_mus*EventWeight_mus;
           }
 
           myAccRecoIsoEffs.nevents_pred_all_mus_err += EventWeight_all_mus*EventWeight_mus*EventWeight_all_mus*EventWeight_mus;
@@ -1302,7 +1310,6 @@ void AccRecoIsoEffs::printSearchBin(BaseHistgram& myBaseHistgram)
     nevents_els_exp_SB_Normalized[i_cal] = nevents_els_exp_SB_MC[i_cal]*scale;
     nevents_els_pred_SB_Normalized[i_cal] = nevents_els_pred_SB_MC[i_cal]*scale;
 
-    nevents_lept_exp_SB_MC[i_cal] = nevents_mus_exp_SB_MC[i_cal] + nevents_els_exp_SB_MC[i_cal];
     nevents_lept_pred_SB_MC[i_cal] = nevents_mus_pred_SB_MC[i_cal] + nevents_els_pred_SB_MC[i_cal];
     nevents_lept_exp_SB_Normalized[i_cal] = nevents_lept_exp_SB_MC[i_cal]*scale;
     nevents_lept_pred_SB_Normalized[i_cal] = nevents_lept_pred_SB_MC[i_cal]*scale;
@@ -1324,7 +1331,7 @@ void AccRecoIsoEffs::printSearchBin(BaseHistgram& myBaseHistgram)
     myBaseHistgram.h_exp_mu_sb->SetBinContent( i_cal+1 , nevents_mus_exp_SB_Normalized[i_cal] );
     myBaseHistgram.h_exp_mu_sb->SetBinError(i_cal+1 , std::sqrt(nevents_mus_exp_SB_MC[i_cal])*scale);
     myBaseHistgram.h_pred_mu_sb->SetBinContent( i_cal+1 , nevents_mus_pred_SB_Normalized[i_cal] );
-    myBaseHistgram.h_pred_mu_sb->SetBinError( i_cal+1 , std::sqrt(nevents_mus_pred_SB_MC[i_cal])*scale);
+    myBaseHistgram.h_pred_mu_sb->SetBinError( i_cal+1 , std::sqrt(nevents_mus_pred_SB_MC_err[i_cal])*scale);
     myBaseHistgram.h_exp_el_sb->SetBinContent( i_cal+1 , nevents_els_exp_SB_Normalized[i_cal] );
     myBaseHistgram.h_exp_el_sb->SetBinError( i_cal+1 , std::sqrt(nevents_els_exp_SB_MC[i_cal])*scale);
     myBaseHistgram.h_pred_el_sb->SetBinContent( i_cal+1 , nevents_els_pred_SB_Normalized[i_cal] );
