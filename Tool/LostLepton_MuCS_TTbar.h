@@ -67,6 +67,7 @@ class AccRecoIsoEffs
   //here we define the search bin variables
   double nevents_mus_CS_SB_MC[NSEARCH_BINS] = {0}, nevents_mus_CS_SB_Normalized[NSEARCH_BINS] = {0};
   double nevents_mus_pred_SB_MC[NSEARCH_BINS] = {0}, nevents_mus_pred_SB_Normalized[NSEARCH_BINS] = {0};
+  double nevents_mus_pred_SB_MC_err[NSEARCH_BINS] = {0};
   double nevents_mus_exp_SB_MC[NSEARCH_BINS] = {0}, nevents_mus_exp_SB_Normalized[NSEARCH_BINS] = {0};
   double nevents_els_pred_SB_MC[NSEARCH_BINS] = {0}, nevents_els_pred_SB_Normalized[NSEARCH_BINS] = {0};
   double nevents_els_exp_SB_MC[NSEARCH_BINS] = {0}, nevents_els_exp_SB_Normalized[NSEARCH_BINS] = {0};
