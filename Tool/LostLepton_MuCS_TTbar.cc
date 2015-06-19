@@ -702,6 +702,7 @@ int main(int argc, char* argv[])
         if( searchbin_id >= 0 )
         {
           myAccRecoIsoEffs.nevents_lept_exp_SB_MC[searchbin_id]++;
+          if (nIsoTrks==0) myAccRecoIsoEffs.nevents_lept_exp_SB_MC_isotrk[searchbin_id]++;
         }
 
       }
@@ -1019,13 +1020,14 @@ int main(int argc, char* argv[])
 
   myAccRecoIsoEffs.printOverview();
 
-  //std::cout << "n_exp_lep_noitv = " << n_exp_lep_noitv << std::endl;
+  std::cout << "n_exp_lep_noitv = " << n_exp_lep_noitv << std::endl;
   //std::cout << "n_exp_mu_noitv = " << n_exp_mu_noitv << std::endl;
   //std::cout << "n_exp_ele_noitv = " << n_exp_ele_noitv << std::endl;
   //std::cout << "nevents_exp_all_mus + nevents_exp_all_els = " << myAccRecoIsoEffs.nevents_exp_all_mus+myAccRecoIsoEffs.nevents_exp_all_els << std::endl;
   //std::cout << "nevents_exp_all_mus = " << myAccRecoIsoEffs.nevents_exp_all_mus << std::endl;
   //std::cout << "nevents_exp_all_els = " << myAccRecoIsoEffs.nevents_exp_all_els << std::endl;
-  //std::cout << "n_exp_lep_itv = " << n_exp_lep_itv << std::endl;
+  std::cout << "n_exp_lep_itv = " << n_exp_lep_itv << std::endl;
+  std::cout << "isotrk corr factor = " << (double)n_exp_lep_itv/(double)n_exp_lep_noitv << std::endl;
 
   myAccRecoIsoEffs.NormalizeFlowNumber();
   myAccRecoIsoEffs.printNormalizeFlowNumber();
@@ -1312,6 +1314,7 @@ void AccRecoIsoEffs::printSearchBin(BaseHistgram& myBaseHistgram)
 
     nevents_lept_pred_SB_MC[i_cal] = nevents_mus_pred_SB_MC[i_cal] + nevents_els_pred_SB_MC[i_cal];
     nevents_lept_exp_SB_Normalized[i_cal] = nevents_lept_exp_SB_MC[i_cal]*scale;
+    nevents_lept_exp_SB_Normalized_isotrk[i_cal] = nevents_lept_exp_SB_MC_isotrk[i_cal]*scale;
     nevents_lept_pred_SB_Normalized[i_cal] = nevents_lept_pred_SB_MC[i_cal]*scale;
 
     std::cout << "idx: " << i_cal << "; MC Numbers: " << nevents_mus_CS_SB_MC[i_cal] << "; Normalized Numbers: " << nevents_mus_CS_SB_Normalized[i_cal] << std::endl;
@@ -1338,8 +1341,12 @@ void AccRecoIsoEffs::printSearchBin(BaseHistgram& myBaseHistgram)
     myBaseHistgram.h_pred_el_sb->SetBinError( i_cal+1 , std::sqrt(nevents_els_pred_SB_MC[i_cal])*scale );
     myBaseHistgram.h_exp_lept_sb->SetBinContent( i_cal+1 , nevents_lept_exp_SB_Normalized[i_cal] );
     myBaseHistgram.h_exp_lept_sb->SetBinError( i_cal+1 , std::sqrt(nevents_lept_exp_SB_MC[i_cal])*scale);
+    myBaseHistgram.h_exp_lept_sb_isotrk->SetBinContent( i_cal+1 , nevents_lept_exp_SB_Normalized_isotrk[i_cal] );
+    myBaseHistgram.h_exp_lept_sb_isotrk->SetBinError( i_cal+1 , std::sqrt(nevents_lept_exp_SB_MC_isotrk[i_cal])*scale);
     myBaseHistgram.h_pred_lept_sb->SetBinContent( i_cal+1 , nevents_lept_pred_SB_Normalized[i_cal] );
     myBaseHistgram.h_pred_lept_sb->SetBinError( i_cal+1 , std::sqrt(nevents_lept_pred_SB_MC[i_cal])*scale );
+    myBaseHistgram.h_pred_lept_sb_isotrk->SetBinContent( i_cal+1 , nevents_lept_pred_SB_MC[i_cal]*scale*0.563499421 );
+    myBaseHistgram.h_pred_lept_sb_isotrk->SetBinError( i_cal+1 , std::sqrt(nevents_lept_pred_SB_MC[i_cal]*0.563499421)*scale );
   }
 
   //cmusCS
