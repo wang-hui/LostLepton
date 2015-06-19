@@ -98,6 +98,7 @@ int main()
     {"_mu_sb"          , "Search Bins"           ,0   , 65  },
     {"_el_sb"          , "Search Bins"           ,0   , 65  },
     {"_lept_sb"        , "Search Bins"           ,0   , 65  },
+    {"_lept_isotrk" , "Search Bins"           ,0   , 65  },
   };
 
   
