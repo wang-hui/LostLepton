@@ -173,6 +173,7 @@ void ClosurePlots::ClosureTemplate(
   h_pred->Scale(scale);
 
   h_exp->GetXaxis()->SetRangeUser(min,max);
+  h_exp->GetXaxis()->SetTitle(XTitle);
   h_exp->SetLineColor(2);
   h_exp->SetLineWidth(3);
   h_exp->Sumw2();
