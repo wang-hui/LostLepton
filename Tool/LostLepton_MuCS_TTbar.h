@@ -223,6 +223,7 @@ class BaseHistgram
   TH1D *h_exp_mu_id_met, *h_exp_mu_id_njets, *h_exp_mu_id_mt2, *h_exp_mu_id_topmass, *h_exp_mu_id_ht, *h_exp_mu_id_mht, *h_exp_mu_id_ntopjets;
   TH1D *h_exp_mu_acc_met, *h_exp_mu_acc_njets, *h_exp_mu_acc_mt2, *h_exp_mu_acc_topmass, *h_exp_mu_acc_ht, *h_exp_mu_acc_mht, *h_exp_mu_acc_ntopjets;
   TH1D *h_exp_mu_all_met, *h_exp_mu_all_njets, *h_exp_mu_all_mt2, *h_exp_mu_all_topmass, *h_exp_mu_all_ht, *h_exp_mu_all_mht, *h_exp_mu_all_ntopjets;
+  TH1D *h_exp_lept_all_met, *h_exp_lept_all_njets, *h_exp_lept_all_mt2, *h_exp_lept_all_topmass, *h_exp_lept_all_ht, *h_exp_lept_all_mht, *h_exp_lept_all_ntopjets;
 
   TH1D *h_exp_musingle_all_met, *h_exp_musingle_all_njets, *h_exp_musingle_all_mt2, *h_exp_musingle_all_topmass, *h_exp_musingle_all_ht, *h_exp_musingle_all_mht, *h_exp_musingle_all_ntopjets;
 
@@ -230,6 +231,7 @@ class BaseHistgram
   TH1D *h_pred_el_id_met, *h_pred_el_id_njets, *h_pred_el_id_mt2, *h_pred_el_id_topmass, *h_pred_el_id_ht, *h_pred_el_id_mht, *h_pred_el_id_ntopjets;
   TH1D *h_pred_el_acc_met, *h_pred_el_acc_njets, *h_pred_el_acc_mt2, *h_pred_el_acc_topmass, *h_pred_el_acc_ht, *h_pred_el_acc_mht, *h_pred_el_acc_ntopjets;
   TH1D *h_pred_el_all_met, *h_pred_el_all_njets, *h_pred_el_all_mt2, *h_pred_el_all_topmass, *h_pred_el_all_ht, *h_pred_el_all_mht, *h_pred_el_all_ntopjets;
+  TH1D *h_pred_lept_all_met, *h_pred_lept_all_njets, *h_pred_lept_all_mt2, *h_pred_lept_all_topmass, *h_pred_lept_all_ht, *h_pred_lept_all_mht, *h_pred_lept_all_ntopjets;
 
   TH1D *h_exp_el_iso_met, *h_exp_el_iso_njets, *h_exp_el_iso_mt2, *h_exp_el_iso_topmass, *h_exp_el_iso_ht, *h_exp_el_iso_mht, *h_exp_el_iso_ntopjets;
   TH1D *h_exp_el_id_met, *h_exp_el_id_njets, *h_exp_el_id_mt2, *h_exp_el_id_topmass, *h_exp_el_id_ht, *h_exp_el_id_mht, *h_exp_el_id_ntopjets;
@@ -404,6 +406,14 @@ void BaseHistgram::BookHistgram(const char *outFileName)
   h_exp_mu_all_mht = new TH1D("h_exp_mu_all_mht","",100,0,1000);
   h_exp_mu_all_ntopjets = new TH1D("h_exp_mu_all_ntopjets","",20,0,20);
 
+  h_exp_lept_all_met = new TH1D("h_exp_lept_all_met","",100,0,1000);
+  h_exp_lept_all_njets = new TH1D("h_exp_lept_all_njets","",20,0,20);
+  h_exp_lept_all_mt2 = new TH1D("h_exp_lept_all_mt2","",100,0,1000);
+  h_exp_lept_all_topmass = new TH1D("h_exp_lept_all_topmass","",100,50,300);
+  h_exp_lept_all_ht = new TH1D("h_exp_lept_all_ht","",300,0,3000);
+  h_exp_lept_all_mht = new TH1D("h_exp_lept_all_mht","",100,0,1000);
+  h_exp_lept_all_ntopjets = new TH1D("h_exp_lept_all_ntopjets","",20,0,20);
+
   h_exp_musingle_all_met = new TH1D("h_exp_musingle_all_met","",100,0,1000);
   h_exp_musingle_all_njets = new TH1D("h_exp_musingle_all_njets","",20,0,20);
   h_exp_musingle_all_mt2 = new TH1D("h_exp_musingle_all_mt2","",100,0,1000);
@@ -443,6 +453,14 @@ void BaseHistgram::BookHistgram(const char *outFileName)
   h_pred_el_all_ht = new TH1D("h_pred_el_all_ht","",300,0,3000);
   h_pred_el_all_mht = new TH1D("h_pred_el_all_mht","",100,0,1000);
   h_pred_el_all_ntopjets = new TH1D("h_pred_el_all_ntopjets","",20,0,20);
+
+  h_pred_lept_all_met = new TH1D("h_pred_lept_all_met","",100,0,1000);
+  h_pred_lept_all_njets = new TH1D("h_pred_lept_all_njets","",20,0,20);
+  h_pred_lept_all_mt2 = new TH1D("h_pred_lept_all_mt2","",100,0,1000);
+  h_pred_lept_all_topmass = new TH1D("h_pred_lept_all_topmass","",100,50,300);
+  h_pred_lept_all_ht = new TH1D("h_pred_lept_all_ht","",300,0,3000);
+  h_pred_lept_all_mht = new TH1D("h_pred_lept_all_mht","",100,0,1000);
+  h_pred_lept_all_ntopjets = new TH1D("h_pred_lept_all_ntopjets","",20,0,20);
 
   h_exp_el_iso_met = new TH1D("h_exp_el_iso_met","",100,0,1000);
   h_exp_el_iso_njets = new TH1D("h_exp_el_iso_njets","",20,0,20);
