@@ -99,6 +99,15 @@ int main()
     {"_el_sb"          , "Search Bins"           ,0   , 65  },
     {"_lept_sb"        , "Search Bins"           ,0   , 65  },
     {"_lept_isotrk" , "Search Bins"           ,0   , 65  },
+    // mu+ele all closure plots
+    {"_lept_all_met"     , "MET [GeV]"             ,200 , 600  },
+    {"_lept_all_njets"   , "Number of 30 GeV jets" ,2   , 17   }, 
+    {"_lept_all_mt2"     , "MT2 [GeV]"             ,100 , 600  },                                               
+    {"_lept_all_topmass" , "Top mass [GeV]"        ,50  , 300  },
+    {"_lept_all_ht"      , "HT [GeV]"              ,100 , 1100 },
+    {"_lept_all_mht"     , "MHT [GeV]"             ,100 , 500  },
+    {"_lept_all_ntopjets", "Number of Top jets"    ,0   , 5    },
+
   };
 
   
