@@ -15,7 +15,7 @@ cmsenv
 
 git clone -b TestMiniAOD https://github.com/lihux25/recipeAUX.git
 
-git clone -b align_leptDef_better_search_bins https://github.com/susy2015/SusyAnaTools.git
+git clone -b Ntp_74X_16Jul2015_v1 https://github.com/susy2015/SusyAnaTools.git
 
 git clone https://github.com/susy2015/LostLepton.git
 

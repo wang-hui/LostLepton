@@ -120,7 +120,7 @@ void BaseHistgram::BookHistgram(const char *outFileName)
 //Fill chain from txt file
 bool FillChain(TChain *chain, const TString &inputFileList)
 {
-  ifstream infile(inputFileList, ifstream::in);
+  std::ifstream infile(inputFileList, std::ifstream::in);
   std::string buffer;
 
   if(!infile.is_open())
