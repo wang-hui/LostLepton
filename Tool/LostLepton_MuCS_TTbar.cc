@@ -37,14 +37,12 @@
 //#include "TROOT.h"
 //#include "TInterpreter.h"
 
-#include "Baseline.h"
 #include "LostLepton_MuCS_TTbar.h"
 #include "Activity.h"
 
-using namespace std;
-
-const double isotrackvetoeff=0.563499421;
-const bool applyisotrkveto=true;
+const double isotrackvetoeff = 0.563499421;
+const bool applyisotrkveto = true;
+//const double isotrackvetoeff = 1;
 
 int main(int argc, char* argv[])
 {
@@ -59,8 +57,8 @@ int main(int argc, char* argv[])
   const char *inputFileList = argv[1];
   const char *outFileName   = argv[2];
 
-  //TChain *fChain = new TChain("stopTreeMaker/AUX");
-  TChain *fChain = new TChain("AUX");
+  TChain *fChain = new TChain("stopTreeMaker/AUX");
+  //TChain *fChain = new TChain("AUX");
 
   if(!FillChain(fChain, inputFileList))
   {
@@ -70,11 +68,15 @@ int main(int argc, char* argv[])
   //clock to monitor the run time
   size_t t0 = clock();
 
+  //use class BaselineVessel in the SusyAnaTools/Tools/baselineDef.h file
+  std::string spec = "lostlept";
+  myBaselineVessel = new BaselineVessel(spec);
+
   NTupleReader tr(fChain);
   //initialize the type3Ptr defined in the customize.h
   AnaFunctions::prepareTopTagger();
   //The passBaselineFunc is registered here
-  tr.registerFunction(&passBaselineFunc);
+  tr.registerFunction(&mypassBaselineFunc);
   //define activity variables
   Activity myActivity;
   //define my AccRecoIsoEffs class to stroe counts and efficiencies
@@ -100,7 +102,7 @@ int main(int argc, char* argv[])
     myAccRecoIsoEffs.nevents_tot++;
 
     //baseline cut without lepton veto
-    bool passBaselinelostlept = tr.getVar<bool>("passBaselinelostlept");
+    bool passBaselinelostlept = tr.getVar<bool>("passBaseline"+spec);
 
     if ( 
         passBaselinelostlept 
@@ -109,25 +111,24 @@ int main(int argc, char* argv[])
       myAccRecoIsoEffs.nevents_sel_base++;
 
       //nMuons in flatree means no iso cut muons; CUT we add iso
-      int nElectrons = tr.getVar<int>("nElectrons_CUTlostlept");
-      int nMuons = tr.getVar<int>("nMuons_CUTlostlept");
+      int nElectrons = tr.getVar<int>("nElectrons_CUT"+spec);
+      int nMuons = tr.getVar<int>("nMuons_CUT"+spec);
 
       double met = tr.getVar<double>("met");
       double metphi = tr.getVar<double>("metphi");
-      int njets30 = tr.getVar<int>("cntNJetsPt30Eta24lostlept");
+      int njets30 = tr.getVar<int>("cntNJetsPt30Eta24"+spec);
       const double ht = tr.getVar<double>("ht");
-      int ntopjets = tr.getVar<int>("nTopCandSortedCntlostlept");
-      int nbottomjets = tr.getVar<int>("cntCSVSlostlept");
-      double MT2 = tr.getVar<double>("best_had_brJet_MT2lostlept");
-      double bestTopJetMass = tr.getVar<double>("bestTopJetMasslostlept");
+      int ntopjets = tr.getVar<int>("nTopCandSortedCnt"+spec);
+      int nbottomjets = tr.getVar<int>("cntCSVS"+spec);
+      double MT2 = tr.getVar<double>("best_had_brJet_MT2"+spec);
       double mht = tr.getVar<double>("mht");
 
-      const int nIsoTrks = tr.getVar<int>("nIsoTrks_CUTlostlept");
+      const int nIsoTrks = tr.getVar<int>("nIsoTrks_CUT"+spec);
       //std::cout << "nIsoTrks = " << nIsoTrks << std::endl;
 
-      vector<int> W_emuVec = tr.getVec<int>("W_emuVec");
-      vector<int> W_tau_emuVec = tr.getVec<int>("W_tau_emuVec");
-      vector<int> emuVec_merge;
+      std::vector<int> W_emuVec = tr.getVec<int>("W_emuVec");
+      std::vector<int> W_tau_emuVec = tr.getVec<int>("W_tau_emuVec");
+      std::vector<int> emuVec_merge;
       emuVec_merge.reserve( W_emuVec.size() + W_tau_emuVec.size() ); 
       emuVec_merge.insert( emuVec_merge.end(), W_emuVec.begin(), W_emuVec.end() );
       emuVec_merge.insert( emuVec_merge.end(), W_tau_emuVec.begin(), W_tau_emuVec.end() );
@@ -144,12 +145,12 @@ int main(int argc, char* argv[])
         myAccRecoIsoEffs.nevents_sel_mus++;
     
         //get reco level information of muons
-        vector<TLorentzVector> muonsLVec = tr.getVec<TLorentzVector>("muonsLVec");
+        std::vector<TLorentzVector> muonsLVec = tr.getVec<TLorentzVector>("muonsLVec");
         int reco_mus_count = muonsLVec.size();
 
-        vector<TLorentzVector> jetsLVec = tr.getVec<TLorentzVector>("jetsLVec");
-        vector<double> recoJetschargedHadronEnergyFraction = tr.getVec<double>("recoJetschargedHadronEnergyFraction");
-        vector<double> recoJetschargedEmEnergyFraction = tr.getVec<double>("recoJetschargedEmEnergyFraction");
+        std::vector<TLorentzVector> jetsLVec = tr.getVec<TLorentzVector>("jetsLVec");
+        std::vector<double> recoJetschargedHadronEnergyFraction = tr.getVec<double>("recoJetschargedHadronEnergyFraction");
+        std::vector<double> recoJetschargedEmEnergyFraction = tr.getVec<double>("recoJetschargedEmEnergyFraction");
 
         //for( unsigned int i = 0 ; i < jetsLVec.size() ; i++ )
         //{
@@ -159,7 +160,7 @@ int main(int argc, char* argv[])
         for(int gen_emus_i = 0 ; gen_emus_i < gen_emus_count ; gen_emus_i++)
         {
           //determine if this gen particle is Muon;
-          vector<int> genDecayPdgIdVec = tr.getVec<int>("genDecayPdgIdVec");
+          std::vector<int> genDecayPdgIdVec = tr.getVec<int>("genDecayPdgIdVec");
           bool isMuon;
           isMuon = false;
           isMuon = ( ( genDecayPdgIdVec.at ( emuVec_merge.at ( gen_emus_i ) ) == 13 ) || ( genDecayPdgIdVec.at ( emuVec_merge.at ( gen_emus_i ) ) == -13 ) );
@@ -174,7 +175,7 @@ int main(int argc, char* argv[])
             double gen_mus_eta, gen_mus_phi, gen_mus_pt;
             int genId;
             genId = emuVec_merge.at ( gen_emus_i );
-            vector<TLorentzVector> genDecayLVec = tr.getVec<TLorentzVector>("genDecayLVec");
+            std::vector<TLorentzVector> genDecayLVec = tr.getVec<TLorentzVector>("genDecayLVec");
 
             gen_mus_eta = ( genDecayLVec.at ( genId ) ).Eta();
             gen_mus_phi = ( genDecayLVec.at ( genId ) ).Phi();
@@ -260,7 +261,7 @@ int main(int argc, char* argv[])
               }
 
               //loop over reco lepton information to find out smallest deltaR value
-              vector<double> deltar_mus_pool;
+              std::vector<double> deltar_mus_pool;
               for(int reco_mus_i = 0 ; reco_mus_i < reco_mus_count ; reco_mus_i++)
               {
 		if ((muonsLVec.at(reco_mus_i)).Pt()>(AnaConsts::muonsMiniIsoArr).minPt && std::abs((muonsLVec.at(reco_mus_i)).Eta())<(AnaConsts::muonsMiniIsoArr).maxAbsEta)
@@ -318,7 +319,7 @@ int main(int argc, char* argv[])
 
                 myAccRecoIsoEffs.nmus_reco_allreco[ptbin_number_allreco][acbin_number_allreco]++;
                 //vector<double> muonsRelIso = tr.getVec<double>("muonsRelIso");
-                vector<double> muonsMiniIso = tr.getVec<double>("muonsMiniIso");
+                std::vector<double> muonsMiniIso = tr.getVec<double>("muonsMiniIso");
 
                 bool mus_pass_iso;
                 mus_pass_iso = false;               
@@ -359,17 +360,17 @@ int main(int argc, char* argv[])
         myAccRecoIsoEffs.nevents_sel_els++;
 
         //get reco level information of electrons
-        vector<TLorentzVector> elesLVec = tr.getVec<TLorentzVector>("elesLVec");
+        std::vector<TLorentzVector> elesLVec = tr.getVec<TLorentzVector>("elesLVec");
         int reco_els_count = elesLVec.size();
         
-        vector<TLorentzVector> jetsLVec = tr.getVec<TLorentzVector>("jetsLVec");
-        vector<double> recoJetschargedHadronEnergyFraction = tr.getVec<double>("recoJetschargedHadronEnergyFraction");
-        vector<double> recoJetschargedEmEnergyFraction = tr.getVec<double>("recoJetschargedEmEnergyFraction");
+        std::vector<TLorentzVector> jetsLVec = tr.getVec<TLorentzVector>("jetsLVec");
+        std::vector<double> recoJetschargedHadronEnergyFraction = tr.getVec<double>("recoJetschargedHadronEnergyFraction");
+        std::vector<double> recoJetschargedEmEnergyFraction = tr.getVec<double>("recoJetschargedEmEnergyFraction");
 
         for(int gen_emus_i = 0 ; gen_emus_i < gen_emus_count ; gen_emus_i++)
         {
           //determine if this gen particle is electrons;
-          vector<int> genDecayPdgIdVec = tr.getVec<int>("genDecayPdgIdVec");
+          std::vector<int> genDecayPdgIdVec = tr.getVec<int>("genDecayPdgIdVec");
           bool isElectron;
           isElectron = false;
           isElectron = ( ( genDecayPdgIdVec.at ( emuVec_merge.at ( gen_emus_i ) ) == 11 )||( genDecayPdgIdVec.at ( emuVec_merge.at ( gen_emus_i ) ) == -11 ) );
@@ -384,7 +385,7 @@ int main(int argc, char* argv[])
             double gen_els_eta, gen_els_phi, gen_els_pt;
             int genId;
             genId = emuVec_merge.at ( gen_emus_i );
-            vector<TLorentzVector> genDecayLVec = tr.getVec<TLorentzVector>("genDecayLVec");
+            std::vector<TLorentzVector> genDecayLVec = tr.getVec<TLorentzVector>("genDecayLVec");
           
             gen_els_eta = ( genDecayLVec.at ( genId ) ).Eta();
             gen_els_phi = ( genDecayLVec.at ( genId ) ).Phi();
@@ -462,7 +463,7 @@ int main(int argc, char* argv[])
               }
 
               //loop over reco lepton information to determine the smallest deltar
-              vector<double> deltar_els_pool;
+              std::vector<double> deltar_els_pool;
               for(int reco_els_i = 0 ; reco_els_i < reco_els_count ; reco_els_i++)
               {
 		if ((elesLVec.at(reco_els_i)).Pt()>(AnaConsts::elesMiniIsoArr).minPt && std::abs((elesLVec.at(reco_els_i)).Eta())<(AnaConsts::elesMiniIsoArr).maxAbsEta)
@@ -522,7 +523,7 @@ int main(int argc, char* argv[])
 
                 myAccRecoIsoEffs.nels_reco_allreco[ptbin_number_allreco][acbin_number_allreco]++;
                 //vector<double> elesRelIso = tr.getVec<double>("elesRelIso");
-                vector<double> elesMiniIso = tr.getVec<double>("elesMiniIso");
+                std::vector<double> elesMiniIso = tr.getVec<double>("elesMiniIso");
 
                 bool els_pass_iso;
                 els_pass_iso = false;
@@ -555,13 +556,13 @@ int main(int argc, char* argv[])
       if (nElectrons == 0 && nMuons == 1)
       {
         //mtw correction factor calculation
-        vector<TLorentzVector> muonsLVec = tr.getVec<TLorentzVector>("muonsLVec");
-        vector<double> muonsMiniIso = tr.getVec<double>("muonsMiniIso");
+        std::vector<TLorentzVector> muonsLVec = tr.getVec<TLorentzVector>("muonsLVec");
+        std::vector<double> muonsMiniIso = tr.getVec<double>("muonsMiniIso");
 
         double reco_mus_pt = 0, reco_mus_eta = 0, reco_mus_phi = 0;
  	int nisomuons=0;
 
-       for(unsigned int im = 0 ; im < muonsLVec.size() ; im++)
+        for(unsigned int im = 0 ; im < muonsLVec.size() ; im++)
         {
           if( muonsLVec[im].Pt()>(AnaConsts::muonsMiniIsoArr).minPt && fabs(muonsLVec[im].Eta()) < (AnaConsts::muonsMiniIsoArr).maxAbsEta && muonsMiniIso[im] < (AnaConsts::muonsMiniIsoArr).maxIso )
           {
@@ -607,7 +608,6 @@ int main(int argc, char* argv[])
 	  (myBaseHistgram.h_exp_mu_iso_met)->Fill(met);
 	  (myBaseHistgram.h_exp_mu_iso_njets)->Fill(njets30);
 	  (myBaseHistgram.h_exp_mu_iso_mt2)->Fill(MT2);
-	  (myBaseHistgram.h_exp_mu_iso_topmass)->Fill(bestTopJetMass);
 	  (myBaseHistgram.h_exp_mu_iso_ht)->Fill(ht);
 	  (myBaseHistgram.h_exp_mu_iso_mht)->Fill(mht);
 	  (myBaseHistgram.h_exp_mu_iso_ntopjets)->Fill(ntopjets);
@@ -624,7 +624,6 @@ int main(int argc, char* argv[])
 	  (myBaseHistgram.h_exp_mu_id_met)->Fill(met);
 	  (myBaseHistgram.h_exp_mu_id_njets)->Fill(njets30);
 	  (myBaseHistgram.h_exp_mu_id_mt2)->Fill(MT2);
-	  (myBaseHistgram.h_exp_mu_id_topmass)->Fill(bestTopJetMass);
 	  (myBaseHistgram.h_exp_mu_id_ht)->Fill(ht);
 	  (myBaseHistgram.h_exp_mu_id_mht)->Fill(mht);
 	  (myBaseHistgram.h_exp_mu_id_ntopjets)->Fill(ntopjets);
@@ -641,7 +640,6 @@ int main(int argc, char* argv[])
 	  (myBaseHistgram.h_exp_mu_acc_met)->Fill(met);
 	  (myBaseHistgram.h_exp_mu_acc_njets)->Fill(njets30);
 	  (myBaseHistgram.h_exp_mu_acc_mt2)->Fill(MT2);
-	  (myBaseHistgram.h_exp_mu_acc_topmass)->Fill(bestTopJetMass);
 	  (myBaseHistgram.h_exp_mu_acc_ht)->Fill(ht);
 	  (myBaseHistgram.h_exp_mu_acc_mht)->Fill(mht);
 	  (myBaseHistgram.h_exp_mu_acc_ntopjets)->Fill(ntopjets);
@@ -667,7 +665,6 @@ int main(int argc, char* argv[])
 	  (myBaseHistgram.h_exp_musingle_all_met)->Fill(met);
 	  (myBaseHistgram.h_exp_musingle_all_njets)->Fill(njets30);
 	  (myBaseHistgram.h_exp_musingle_all_mt2)->Fill(MT2);
-	  (myBaseHistgram.h_exp_musingle_all_topmass)->Fill(bestTopJetMass);
 	  (myBaseHistgram.h_exp_musingle_all_ht)->Fill(ht);
 	  (myBaseHistgram.h_exp_musingle_all_mht)->Fill(mht);
 	  (myBaseHistgram.h_exp_musingle_all_ntopjets)->Fill(ntopjets);
@@ -675,7 +672,6 @@ int main(int argc, char* argv[])
 	  (myBaseHistgram.h_exp_mu_all_met)->Fill(met);
 	  (myBaseHistgram.h_exp_mu_all_njets)->Fill(njets30);
 	  (myBaseHistgram.h_exp_mu_all_mt2)->Fill(MT2);
-	  (myBaseHistgram.h_exp_mu_all_topmass)->Fill(bestTopJetMass);
 	  (myBaseHistgram.h_exp_mu_all_ht)->Fill(ht);
 	  (myBaseHistgram.h_exp_mu_all_mht)->Fill(mht);
 	  (myBaseHistgram.h_exp_mu_all_ntopjets)->Fill(ntopjets);
@@ -701,7 +697,6 @@ int main(int argc, char* argv[])
 	  (myBaseHistgram.h_exp_mu_all_met)->Fill(met);
 	  (myBaseHistgram.h_exp_mu_all_njets)->Fill(njets30);
 	  (myBaseHistgram.h_exp_mu_all_mt2)->Fill(MT2);
-	  (myBaseHistgram.h_exp_mu_all_topmass)->Fill(bestTopJetMass);
 	  (myBaseHistgram.h_exp_mu_all_ht)->Fill(ht);
 	  (myBaseHistgram.h_exp_mu_all_mht)->Fill(mht);
 	  (myBaseHistgram.h_exp_mu_all_ntopjets)->Fill(ntopjets);
@@ -728,7 +723,6 @@ int main(int argc, char* argv[])
 	  (myBaseHistgram.h_exp_lept_all_met)->Fill(met);
 	  (myBaseHistgram.h_exp_lept_all_njets)->Fill(njets30);
 	  (myBaseHistgram.h_exp_lept_all_mt2)->Fill(MT2);
-	  (myBaseHistgram.h_exp_lept_all_topmass)->Fill(bestTopJetMass);
 	  (myBaseHistgram.h_exp_lept_all_ht)->Fill(ht);
 	  (myBaseHistgram.h_exp_lept_all_mht)->Fill(mht);
 	  (myBaseHistgram.h_exp_lept_all_ntopjets)->Fill(ntopjets);
@@ -745,7 +739,6 @@ int main(int argc, char* argv[])
 	  (myBaseHistgram.h_exp_el_iso_met)->Fill(met);
 	  (myBaseHistgram.h_exp_el_iso_njets)->Fill(njets30);
 	  (myBaseHistgram.h_exp_el_iso_mt2)->Fill(MT2);
-	  (myBaseHistgram.h_exp_el_iso_topmass)->Fill(bestTopJetMass);
 	  (myBaseHistgram.h_exp_el_iso_ht)->Fill(ht);
 	  (myBaseHistgram.h_exp_el_iso_mht)->Fill(mht);
 	  (myBaseHistgram.h_exp_el_iso_ntopjets)->Fill(ntopjets);
@@ -762,7 +755,6 @@ int main(int argc, char* argv[])
 	  (myBaseHistgram.h_exp_el_id_met)->Fill(met);
 	  (myBaseHistgram.h_exp_el_id_njets)->Fill(njets30);
 	  (myBaseHistgram.h_exp_el_id_mt2)->Fill(MT2);
-	  (myBaseHistgram.h_exp_el_id_topmass)->Fill(bestTopJetMass);
 	  (myBaseHistgram.h_exp_el_id_ht)->Fill(ht);
 	  (myBaseHistgram.h_exp_el_id_mht)->Fill(mht);
 	  (myBaseHistgram.h_exp_el_id_ntopjets)->Fill(ntopjets);
@@ -779,7 +771,6 @@ int main(int argc, char* argv[])
 	  (myBaseHistgram.h_exp_el_acc_met)->Fill(met);
 	  (myBaseHistgram.h_exp_el_acc_njets)->Fill(njets30);
 	  (myBaseHistgram.h_exp_el_acc_mt2)->Fill(MT2);
-	  (myBaseHistgram.h_exp_el_acc_topmass)->Fill(bestTopJetMass);
 	  (myBaseHistgram.h_exp_el_acc_ht)->Fill(ht);
 	  (myBaseHistgram.h_exp_el_acc_mht)->Fill(mht);
 	  (myBaseHistgram.h_exp_el_acc_ntopjets)->Fill(ntopjets);
@@ -807,7 +798,6 @@ int main(int argc, char* argv[])
 	  (myBaseHistgram.h_exp_elsingle_all_met)->Fill(met);
 	  (myBaseHistgram.h_exp_elsingle_all_njets)->Fill(njets30);
 	  (myBaseHistgram.h_exp_elsingle_all_mt2)->Fill(MT2);
-	  (myBaseHistgram.h_exp_elsingle_all_topmass)->Fill(bestTopJetMass);
 	  (myBaseHistgram.h_exp_elsingle_all_ht)->Fill(ht);
 	  (myBaseHistgram.h_exp_elsingle_all_mht)->Fill(mht);
 	  (myBaseHistgram.h_exp_elsingle_all_ntopjets)->Fill(ntopjets);  
@@ -815,7 +805,6 @@ int main(int argc, char* argv[])
 	  (myBaseHistgram.h_exp_el_all_met)->Fill(met);
 	  (myBaseHistgram.h_exp_el_all_njets)->Fill(njets30);
 	  (myBaseHistgram.h_exp_el_all_mt2)->Fill(MT2);
-	  (myBaseHistgram.h_exp_el_all_topmass)->Fill(bestTopJetMass);
 	  (myBaseHistgram.h_exp_el_all_ht)->Fill(ht);
 	  (myBaseHistgram.h_exp_el_all_mht)->Fill(mht);
 	  (myBaseHistgram.h_exp_el_all_ntopjets)->Fill(ntopjets);
@@ -839,7 +828,6 @@ int main(int argc, char* argv[])
 	  (myBaseHistgram.h_exp_el_all_met)->Fill(met);
 	  (myBaseHistgram.h_exp_el_all_njets)->Fill(njets30);
 	  (myBaseHistgram.h_exp_el_all_mt2)->Fill(MT2);
-	  (myBaseHistgram.h_exp_el_all_topmass)->Fill(bestTopJetMass);
 	  (myBaseHistgram.h_exp_el_all_ht)->Fill(ht);
 	  (myBaseHistgram.h_exp_el_all_mht)->Fill(mht);
 	  (myBaseHistgram.h_exp_el_all_ntopjets)->Fill(ntopjets);
@@ -860,7 +848,7 @@ int main(int argc, char* argv[])
   //initialize the type3Ptr defined in the customize.h
   AnaFunctions::prepareTopTagger();
   //The passBaselineFunc is registered here
-  trCS.registerFunction(&passBaselineFunc);
+  trCS.registerFunction(&mypassBaselineFunc);
 
   //second loop, to select CS sample and make prediction
   std::cout<<"Second loop begin: "<<std::endl;
@@ -868,23 +856,22 @@ int main(int argc, char* argv[])
   {
     if(trCS.getEvtNum()%20000 == 0) std::cout << trCS.getEvtNum() << "\t" << ((clock() - t0)/1000000.0) << std::endl;
 
-    bool passBaselinelostlept = trCS.getVar<bool>("passBaselinelostlept");
+    bool passBaselinelostlept = trCS.getVar<bool>("passBaseline"+spec);
  
     if(
        passBaselinelostlept
       )
     {
-      int nElectrons = trCS.getVar<int>("nElectrons_CUTlostlept");
-      int nMuons = trCS.getVar<int>("nMuons_CUTlostlept");
+      int nElectrons = trCS.getVar<int>("nElectrons_CUT"+spec);
+      int nMuons = trCS.getVar<int>("nMuons_CUT"+spec);
 
       double met = trCS.getVar<double>("met");
       double metphi = trCS.getVar<double>("metphi");
 
-      int njets30 = trCS.getVar<int>("cntNJetsPt30Eta24lostlept");
-      int ntopjets = trCS.getVar<int>("nTopCandSortedCntlostlept");
-      int nbottomjets = trCS.getVar<int>("cntCSVSlostlept");
-      double MT2 = trCS.getVar<double>("best_had_brJet_MT2lostlept");
-      double bestTopJetMass = trCS.getVar<double>("bestTopJetMasslostlept");
+      int njets30 = trCS.getVar<int>("cntNJetsPt30Eta24"+spec);
+      int ntopjets = trCS.getVar<int>("nTopCandSortedCnt"+spec);
+      int nbottomjets = trCS.getVar<int>("cntCSVS"+spec);
+      double MT2 = trCS.getVar<double>("best_had_brJet_MT2"+spec);
       double ht = trCS.getVar<double>("ht");
       double mht = trCS.getVar<double>("mht");
 
@@ -894,13 +881,13 @@ int main(int argc, char* argv[])
         //counting the events for muon control sample
         myAccRecoIsoEffs.nevents_cs_mus++;
         //get muon variables
-	vector<TLorentzVector> muonsLVec = trCS.getVec<TLorentzVector>("muonsLVec");
+	std::vector<TLorentzVector> muonsLVec = trCS.getVec<TLorentzVector>("muonsLVec");
         //vector<double> muonsRelIso = trCS.getVec<double>("muonsRelIso");
-        vector<double> muonsMiniIso = trCS.getVec<double>("muonsMiniIso");
+        std::vector<double> muonsMiniIso = trCS.getVec<double>("muonsMiniIso");
         //get jet variables for activity calculation
-        vector<TLorentzVector> jetsLVec = trCS.getVec<TLorentzVector>("jetsLVec");
-        vector<double> recoJetschargedHadronEnergyFraction = trCS.getVec<double>("recoJetschargedHadronEnergyFraction");
-        vector<double> recoJetschargedEmEnergyFraction = trCS.getVec<double>("recoJetschargedEmEnergyFraction");
+        std::vector<TLorentzVector> jetsLVec = trCS.getVec<TLorentzVector>("jetsLVec");
+        std::vector<double> recoJetschargedHadronEnergyFraction = trCS.getVec<double>("recoJetschargedHadronEnergyFraction");
+        std::vector<double> recoJetschargedEmEnergyFraction = trCS.getVec<double>("recoJetschargedEmEnergyFraction");
 
         double reco_mus_pt = -1, reco_mus_eta = 0, reco_mus_phi = 0;
 	int nisomuons=0;
@@ -953,7 +940,6 @@ int main(int argc, char* argv[])
 	  (myBaseHistgram.h_pred_mu_iso_met)->Fill(met, myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
 	  (myBaseHistgram.h_pred_mu_iso_njets)->Fill(njets30, myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
 	  (myBaseHistgram.h_pred_mu_iso_mt2)->Fill(MT2, myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
-	  (myBaseHistgram.h_pred_mu_iso_topmass)->Fill(bestTopJetMass, myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
           (myBaseHistgram.h_pred_mu_iso_ht)->Fill(ht, myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
           (myBaseHistgram.h_pred_mu_iso_mht)->Fill(mht, myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
           (myBaseHistgram.h_pred_mu_iso_ntopjets)->Fill(ntopjets, myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
@@ -961,7 +947,6 @@ int main(int argc, char* argv[])
 	  (myBaseHistgram.h_pred_mu_id_met)->Fill(met, myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
 	  (myBaseHistgram.h_pred_mu_id_njets)->Fill(njets30, myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
 	  (myBaseHistgram.h_pred_mu_id_mt2)->Fill(MT2, myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
-	  (myBaseHistgram.h_pred_mu_id_topmass)->Fill(bestTopJetMass, myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
           (myBaseHistgram.h_pred_mu_id_ht)->Fill(ht, myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
           (myBaseHistgram.h_pred_mu_id_mht)->Fill(mht, myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
           (myBaseHistgram.h_pred_mu_id_ntopjets)->Fill(ntopjets, myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
@@ -969,7 +954,6 @@ int main(int argc, char* argv[])
 	  (myBaseHistgram.h_pred_mu_acc_met)->Fill(met, myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
 	  (myBaseHistgram.h_pred_mu_acc_njets)->Fill(njets30, myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
 	  (myBaseHistgram.h_pred_mu_acc_mt2)->Fill(MT2, myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
-	  (myBaseHistgram.h_pred_mu_acc_topmass)->Fill(bestTopJetMass, myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
           (myBaseHistgram.h_pred_mu_acc_ht)->Fill(ht, myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
           (myBaseHistgram.h_pred_mu_acc_mht)->Fill(mht, myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
           (myBaseHistgram.h_pred_mu_acc_ntopjets)->Fill(ntopjets, myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
@@ -979,7 +963,6 @@ int main(int argc, char* argv[])
 	  (myBaseHistgram.h_pred_mu_all_met)->Fill(met, EventWeight_all_mus*EventWeight_mus);
 	  (myBaseHistgram.h_pred_mu_all_njets)->Fill(njets30, EventWeight_all_mus*EventWeight_mus);
 	  (myBaseHistgram.h_pred_mu_all_mt2)->Fill(MT2, EventWeight_all_mus*EventWeight_mus);
-	  (myBaseHistgram.h_pred_mu_all_topmass)->Fill(bestTopJetMass, EventWeight_all_mus*EventWeight_mus);
           (myBaseHistgram.h_pred_mu_all_ht)->Fill(ht, EventWeight_all_mus*EventWeight_mus);
           (myBaseHistgram.h_pred_mu_all_mht)->Fill(mht, EventWeight_all_mus*EventWeight_mus);
           (myBaseHistgram.h_pred_mu_all_ntopjets)->Fill(ntopjets, EventWeight_all_mus*EventWeight_mus);
@@ -987,7 +970,6 @@ int main(int argc, char* argv[])
 	  (myBaseHistgram.h_pred_lept_all_met)->Fill(met, EventWeight_all_mus*EventWeight_mus);
 	  (myBaseHistgram.h_pred_lept_all_njets)->Fill(njets30, EventWeight_all_mus*EventWeight_mus);
 	  (myBaseHistgram.h_pred_lept_all_mt2)->Fill(MT2, EventWeight_all_mus*EventWeight_mus);
-	  (myBaseHistgram.h_pred_lept_all_topmass)->Fill(bestTopJetMass, EventWeight_all_mus*EventWeight_mus);
           (myBaseHistgram.h_pred_lept_all_ht)->Fill(ht, EventWeight_all_mus*EventWeight_mus);
           (myBaseHistgram.h_pred_lept_all_mht)->Fill(mht, EventWeight_all_mus*EventWeight_mus);
           (myBaseHistgram.h_pred_lept_all_ntopjets)->Fill(ntopjets, EventWeight_all_mus*EventWeight_mus);
@@ -1023,7 +1005,6 @@ int main(int argc, char* argv[])
           (myBaseHistgram.h_pred_el_iso_met)->Fill(met, myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
           (myBaseHistgram.h_pred_el_iso_njets)->Fill(njets30, myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
           (myBaseHistgram.h_pred_el_iso_mt2)->Fill(MT2, myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
-          (myBaseHistgram.h_pred_el_iso_topmass)->Fill(bestTopJetMass, myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
           (myBaseHistgram.h_pred_el_iso_ht)->Fill(ht, myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
           (myBaseHistgram.h_pred_el_iso_mht)->Fill(mht, myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
           (myBaseHistgram.h_pred_el_iso_ntopjets)->Fill(ntopjets, myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
@@ -1031,7 +1012,6 @@ int main(int argc, char* argv[])
           (myBaseHistgram.h_pred_el_id_met)->Fill(met, myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
           (myBaseHistgram.h_pred_el_id_njets)->Fill(njets30, myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
           (myBaseHistgram.h_pred_el_id_mt2)->Fill(MT2, myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
-          (myBaseHistgram.h_pred_el_id_topmass)->Fill(bestTopJetMass, myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
           (myBaseHistgram.h_pred_el_id_ht)->Fill(ht, myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
           (myBaseHistgram.h_pred_el_id_mht)->Fill(mht, myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
           (myBaseHistgram.h_pred_el_id_ntopjets)->Fill(ntopjets, myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
@@ -1039,7 +1019,6 @@ int main(int argc, char* argv[])
           (myBaseHistgram.h_pred_el_acc_met)->Fill(met, myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
           (myBaseHistgram.h_pred_el_acc_njets)->Fill(njets30, myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
           (myBaseHistgram.h_pred_el_acc_mt2)->Fill(MT2, myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
-          (myBaseHistgram.h_pred_el_acc_topmass)->Fill(bestTopJetMass, myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
           (myBaseHistgram.h_pred_el_acc_ht)->Fill(ht, myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
           (myBaseHistgram.h_pred_el_acc_mht)->Fill(mht, myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
           (myBaseHistgram.h_pred_el_acc_ntopjets)->Fill(ntopjets, myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
@@ -1049,7 +1028,6 @@ int main(int argc, char* argv[])
           (myBaseHistgram.h_pred_el_all_met)->Fill(met, EventWeight_all_els*EventWeight_els);
           (myBaseHistgram.h_pred_el_all_njets)->Fill(njets30, EventWeight_all_els*EventWeight_els);
           (myBaseHistgram.h_pred_el_all_mt2)->Fill(MT2, EventWeight_all_els*EventWeight_els);
-          (myBaseHistgram.h_pred_el_all_topmass)->Fill(bestTopJetMass, EventWeight_all_els*EventWeight_els);
           (myBaseHistgram.h_pred_el_all_ht)->Fill(ht, EventWeight_all_els*EventWeight_els);
           (myBaseHistgram.h_pred_el_all_mht)->Fill(mht, EventWeight_all_els*EventWeight_els);
           (myBaseHistgram.h_pred_el_all_ntopjets)->Fill(ntopjets, EventWeight_all_els*EventWeight_els);
@@ -1057,7 +1035,6 @@ int main(int argc, char* argv[])
           (myBaseHistgram.h_pred_lept_all_met)->Fill(met, EventWeight_all_els*EventWeight_els);
           (myBaseHistgram.h_pred_lept_all_njets)->Fill(njets30, EventWeight_all_els*EventWeight_els);
           (myBaseHistgram.h_pred_lept_all_mt2)->Fill(MT2, EventWeight_all_els*EventWeight_els);
-          (myBaseHistgram.h_pred_lept_all_topmass)->Fill(bestTopJetMass, EventWeight_all_els*EventWeight_els);
           (myBaseHistgram.h_pred_lept_all_ht)->Fill(ht, EventWeight_all_els*EventWeight_els);
           (myBaseHistgram.h_pred_lept_all_mht)->Fill(mht, EventWeight_all_els*EventWeight_els);
           (myBaseHistgram.h_pred_lept_all_ntopjets)->Fill(ntopjets, EventWeight_all_els*EventWeight_els);
@@ -1805,7 +1782,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
 
 void AccRecoIsoEffs::printEffsHeader()
 {
-  ofstream EffsHeader;
+  std::ofstream EffsHeader;
   EffsHeader.open ("EffsHeader_MuCS.h");
 
   int i_cal = 0;

@@ -69,7 +69,6 @@
   gStyle->SetPaintTextFormat("1.2f");
   h_els_iso_eff->Draw("colztexte");
 
-  TLatex *title = new TLatex(0.09770115,0.9194915,titre.c_str());
   title->SetNDC();
   title->SetTextSize(0.045);
   title->Draw("same");
@@ -108,7 +107,6 @@
   gStyle->SetPaintTextFormat("1.2f");
   h_mus_reco_eff->Draw("colztexte");
 
-  TLatex *title = new TLatex(0.09770115,0.9194915,titre.c_str());
   title->SetNDC();
   title->SetTextSize(0.045);
   title->Draw("same");
@@ -147,7 +145,6 @@
   gStyle->SetPaintTextFormat("1.2f");
   h_els_reco_eff->Draw("colztexte");
 
-  TLatex *title = new TLatex(0.09770115,0.9194915,titre.c_str());
   title->SetNDC();
   title->SetTextSize(0.045);
   title->Draw("same");

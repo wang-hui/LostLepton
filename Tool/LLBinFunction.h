@@ -2,7 +2,7 @@
 #define AC_BINS 8
 #define NJETS_BINS 6
 
-#define NSEARCH_BINS 64
+#define NSEARCH_BINS 45
 //############determine the pt bin number############
 int Set_ptbin_number(
                      double lep_pt

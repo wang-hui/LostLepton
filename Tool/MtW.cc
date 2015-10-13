@@ -37,10 +37,7 @@
 //#include "TROOT.h"
 //#include "TInterpreter.h"
 
-#include "Baseline.h"
 #include "MtW.h"
-
-using namespace std;
 
 int main(int argc, char* argv[])
 {
@@ -70,12 +67,16 @@ int main(int argc, char* argv[])
   weight[4] = Lumi*0.0189612/102839;
 
   TChain *fChain[N_FILES];
-  fChain[0] = new TChain("AUX");
+  fChain[0] = new TChain("stopTreeMaker/AUX");
   fChain[1] = new TChain("stopTreeMaker/AUX");
   fChain[2] = new TChain("stopTreeMaker/AUX");
   fChain[3] = new TChain("stopTreeMaker/AUX");
   fChain[4] = new TChain("stopTreeMaker/AUX");
 
+
+  //use class BaselineVessel in the SusyAnaTools/Tools/baselineDef.h file
+  std::string spec = "lostlept";
+  myBaselineVessel = new BaselineVessel(spec);
 
   for(int i = 0 ; i < N_FILES ; i++ )
   {
@@ -100,26 +101,26 @@ int main(int argc, char* argv[])
     {
       if(tr.getEvtNum()%20000 == 0) std::cout << tr.getEvtNum() << "\t" << ((clock() - t0)/1000000.0) << std::endl;
 
-      bool passBaselinelostlept = tr.getVar<bool>("passBaselinelostlept");
+      bool passBaselinelostlept = tr.getVar<bool>("passBaseline"+spec);
  
       if(
          passBaselinelostlept
         )
       {
-        int nElectrons = tr.getVar<int>("nElectrons_CUTlostlept");
-        int nMuons = tr.getVar<int>("nMuons_CUTlostlept");
+        int nElectrons = tr.getVar<int>("nElectrons_CUT"+spec);
+        int nMuons = tr.getVar<int>("nMuons_CUT"+spec);
 
         double met = tr.getVar<double>("met");
         double metphi = tr.getVar<double>("metphi");
 
-        int njets30 = tr.getVar<int>("cntNJetsPt30Eta24lostlept");
-        int ntopjets = tr.getVar<int>("nTopCandSortedCntlostlept");
-        int nbottomjets = tr.getVar<int>("cntCSVSlostlept");
-        double MT2 = tr.getVar<double>("best_had_brJet_MT2lostlept");
+        int njets30 = tr.getVar<int>("cntNJetsPt30Eta24"+spec);
+        int ntopjets = tr.getVar<int>("nTopCandSortedCnt"+spec);
+        int nbottomjets = tr.getVar<int>("cntCSVS"+spec);
+        double MT2 = tr.getVar<double>("best_had_brJet_MT2"+spec);
 
         //get muon variables
-        vector<TLorentzVector> muonsLVec = tr.getVec<TLorentzVector>("muonsLVec");
-        vector<double> muonsMiniIso = tr.getVec<double>("muonsMiniIso");
+        std::vector<TLorentzVector> muonsLVec = tr.getVec<TLorentzVector>("muonsLVec");
+        std::vector<double> muonsMiniIso = tr.getVec<double>("muonsMiniIso");
 
         double reco_mus_pt = -1, reco_mus_eta = 0, reco_mus_phi = 0;
 

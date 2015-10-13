@@ -3,19 +3,21 @@
 
 1.Set CMS Environment:
 
-setenv SCRAM_ARCH slc6_amd64_gcc481(export SCRAM_ARCH = slc6_amd64_gcc481)
+setenv SCRAM_ARCH slc6_amd64_gcc491(export SCRAM_ARCH = slc6_amd64_gcc491)
 
-cmsrel CMSSW_7_2_0
+cmsrel CMSSW_7_4_6_patch6
 
-cd CMSSW_7_2_0/src
+cd CMSSW_7_4_6_patch6/src
 
 cmsenv
 
 2.Download source code from github and compile plugins:
 
-git clone -b TestMiniAOD https://github.com/lihux25/recipeAUX.git
+git cms-merge-topic -u cms-met:METCorUnc74X
 
-git clone -b Ntp_74X_16Jul2015_v1 https://github.com/susy2015/SusyAnaTools.git
+git clone -b TestMiniAOD git@github.com:susy2015/recipeAUX.git
+
+git clone git@github.com:susy2015/SusyAnaTools.git
 
 git clone https://github.com/susy2015/LostLepton.git
 

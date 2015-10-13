@@ -13,10 +13,17 @@
 #include "Math/QuantFuncMathCore.h"
 #include "TMath.h"
 #include "SusyAnaTools/Tools/NTupleReader.h"
+#include "SusyAnaTools/Tools/baselineDef.h"
 
 #include "LLBinFunction.h"
 
 #define N_FILES 5
+
+static BaselineVessel *myBaselineVessel;
+void mypassBaselineFunc(NTupleReader& tr)
+{
+  (*myBaselineVessel)(tr);
+}
 
 class BaseHistgram
 {
