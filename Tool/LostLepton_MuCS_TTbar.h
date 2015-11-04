@@ -47,16 +47,25 @@ class AccRecoIsoEffs
 
   double mus_recoeff[PT_BINS][AC_BINS] = {{0}}, els_recoeff[PT_BINS][AC_BINS] = {{0}};
   double mus_isoeff[PT_BINS][AC_BINS] = {{0}}, els_isoeff[PT_BINS][AC_BINS] = {{0}};
-
   double mus_isoeff_allreco[PT_BINS][AC_BINS] = {{0}}, els_isoeff_allreco[PT_BINS][AC_BINS] = {{0}};
  
   double mus_recoeff_err[PT_BINS][AC_BINS] = {{0}}, els_recoeff_err[PT_BINS][AC_BINS] = {{0}};
   double mus_isoeff_err[PT_BINS][AC_BINS] = {{0}}, els_isoeff_err[PT_BINS][AC_BINS] = {{0}};
-
   double mus_isoeff_err_allreco[PT_BINS][AC_BINS] = {{0}}, els_isoeff_err_allreco[PT_BINS][AC_BINS] = {{0}};
 
   double mtwcorrfactor[PT_BINS] = {0}, mtwcorrfactor_err[PT_BINS] = {0};
+ 
   //here we define the muon/electron number we need to count in the loop
+  double nmus_MC[NJETS_BINS] = {0}, nmus_acc_MC[NJETS_BINS] = {0}, nels_MC[NJETS_BINS] = {0}, nels_acc_MC[NJETS_BINS] = {0};
+  double nmus_acc_bin_MC[PT_BINS][AC_BINS] = {{0}}, nels_acc_bin_MC[PT_BINS][AC_BINS] = {{0}};
+  double nmus_reco_MC[PT_BINS][AC_BINS] = {{0}}, nels_reco_MC[PT_BINS][AC_BINS] = {{0}};
+  double nmus_iso_MC[PT_BINS][AC_BINS] = {{0}}, nels_iso_MC[PT_BINS][AC_BINS] = {{0}};
+
+  double nmus_reco_MC_allreco[PT_BINS][AC_BINS] = {{0}}, nels_reco_MC_allreco[PT_BINS][AC_BINS] = {{0}};
+  double nmus_iso_MC_allreco[PT_BINS][AC_BINS] = {{0}}, nels_iso_MC_allreco[PT_BINS][AC_BINS] = {{0}};
+
+  double mtwall_MC[PT_BINS] = {0}, mtw100_MC[PT_BINS] = {0};
+
   double nmus[NJETS_BINS] = {0}, nmus_acc[NJETS_BINS] = {0}, nels[NJETS_BINS] = {0}, nels_acc[NJETS_BINS] = {0};
   double nmus_acc_bin[PT_BINS][AC_BINS] = {{0}}, nels_acc_bin[PT_BINS][AC_BINS] = {{0}};
   double nmus_reco[PT_BINS][AC_BINS] = {{0}}, nels_reco[PT_BINS][AC_BINS] = {{0}};
@@ -133,10 +142,11 @@ class AccRecoIsoEffs
 
  private:
   //define the variables we needed for normalization
-  double Nevents = 25446993;
-  double XSec = 806.1;
-  double Lumi = 10000;
-  double scale = XSec*Lumi/Nevents;
+  //double Nevents = 25446993;
+  //double XSec = 806.1;
+  //double Lumi = 10000;
+  //double scale = XSec*Lumi/Nevents;
+  double scale = 1;  
 
   double get_stat_Error(
                         double a,
@@ -498,30 +508,6 @@ void BaseHistgram::BookHistgram(const char *outFileName)
   h_pred_lept_sb_isotrk = new TH1D("h_pred_lept_isotrk","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
 }
 
-//Fill chain from txt file
-bool FillChain(TChain *chain, const TString &inputFileList)
-{
-  std::ifstream infile(inputFileList, std::ifstream::in);
-  std::string buffer;
-
-  if(!infile.is_open())
-  {
-    std::cerr << "** ERROR: Can't open '" << inputFileList << "' for input" << std::endl;
-    return false;
-  }
-
-  std::cout << "TreeUtilities : FillChain " << std::endl;
-  while(1)
-  {
-    infile >> buffer;
-    if(!infile.good()) break;
-    //std::cout << "Adding tree from " << buffer.c_str() << std::endl;                                                              
-    chain->Add(buffer.c_str());
-  }
-  std::cout << "No. of Entries in this tree : " << chain->GetEntries() << std::endl;
-  return true;
-}
-
 //##########functions to calculate Delta_R and Delta Phi###############
 double DeltaPhi(double phi1, double phi2) 
 {
@@ -537,43 +523,3 @@ double DeltaR(double eta1, double phi1, double eta2, double phi2)
   double dphi = DeltaPhi(phi1, phi2);
   return std::sqrt(deta*deta + dphi*dphi);
 }
-
-/*
-bool isGoodMuonID(double id_GlobalMuonPromptTight,
-                  //double isGlobalMuon,
-                  double isPFMuon,
-                  //double tk_chi2,
-                  //double tk_numvalhits,
-                  double numberOfMatchedStations,
-                  double id_d0,
-                  double id_tk_dz,
-                  double tk_numvalPixelhits,
-                  double tk_LayersWithMeasurement
-                  )
-{
-
-  if((int)id_GlobalMuonPromptTight==0)
-    return false;
-  //if((int)isGlobalMuon==0)
-    //return false;
-  if((int)isPFMuon==0)
-    return false;
-  
-  //if(tk_chi2>=10)
-    //return false;
-  //if(tk_numvalhits<=0)
-    //return false;
-  if(numberOfMatchedStations<=1)
-    return false;
-  if(id_d0>=0.2 || id_d0<=-0.2)
-    return false;
-  if(id_tk_dz>=0.5 || id_tk_dz<=-0.5)
-    return false;
-  if(tk_numvalPixelhits<=0)
-    return false;
-  if(tk_LayersWithMeasurement<=5)
-    return false;
-  
-  return true;
-}
-*/

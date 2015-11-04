@@ -100,4 +100,3 @@ double Activity::DeltaR(double eta1, double phi1, double eta2, double phi2)
   double dphi = DeltaPhi(phi1, phi2);
   return std::sqrt(deta*deta + dphi*dphi);
 }
-
