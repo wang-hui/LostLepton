@@ -152,6 +152,8 @@ int main(int argc, char* argv[])
           std::vector<TLorentzVector> muonsLVec = tr.getVec<TLorentzVector>("muonsLVec");
           int reco_mus_count = muonsLVec.size();
 
+          std::vector<int> muonsFlagMedium = tr.getVec<int>("muonsFlagMedium");
+
           std::vector<TLorentzVector> jetsLVec = tr.getVec<TLorentzVector>("jetsLVec");
           std::vector<double> recoJetschargedHadronEnergyFraction = tr.getVec<double>("recoJetschargedHadronEnergyFraction");
           std::vector<double> recoJetschargedEmEnergyFraction = tr.getVec<double>("recoJetschargedEmEnergyFraction");
@@ -228,7 +230,8 @@ int main(int argc, char* argv[])
                 std::vector<double> deltar_mus_pool;
                 for(int reco_mus_i = 0 ; reco_mus_i < reco_mus_count ; reco_mus_i++)
                 {
-	    	  if ((muonsLVec.at(reco_mus_i)).Pt()>(AnaConsts::muonsMiniIsoArr).minPt && std::abs((muonsLVec.at(reco_mus_i)).Eta())<(AnaConsts::muonsMiniIsoArr).maxAbsEta)
+		  //std::cout << "muonsFlagMedium = " << muonsFlagMedium.at(reco_mus_i) << std::endl;
+	    	  if (muonsFlagMedium.at(reco_mus_i) && (muonsLVec.at(reco_mus_i)).Pt()>(AnaConsts::muonsMiniIsoArr).minPt && std::abs((muonsLVec.at(reco_mus_i)).Eta())<(AnaConsts::muonsMiniIsoArr).maxAbsEta)
 		  {
 		    double deltar_media;
 		    deltar_media = DeltaR(gen_mus_eta,
@@ -258,10 +261,7 @@ int main(int argc, char* argv[])
                 bool ismatcheddeltaR;
                 ismatcheddeltaR = (deltar < 0.2);
 
-                if(ismatcheddeltaR
-                   //&& 
-                   //isgoodmuonid
-                  )
+                if(ismatcheddeltaR)
                 {
                   myAccRecoIsoEffs.nmus_reco[ptbin_number][acbin_number]+=thisweight;
                   myAccRecoIsoEffs.nmus_reco_MC[ptbin_number][acbin_number]++;
@@ -847,12 +847,13 @@ int main(int argc, char* argv[])
           std::vector<TLorentzVector> jetsLVec = trCS.getVec<TLorentzVector>("jetsLVec");
           std::vector<double> recoJetschargedHadronEnergyFraction = trCS.getVec<double>("recoJetschargedHadronEnergyFraction");
           std::vector<double> recoJetschargedEmEnergyFraction = trCS.getVec<double>("recoJetschargedEmEnergyFraction");
+          std::vector<int> muonsFlagMedium = trCS.getVec<int>("muonsFlagMedium");
 
           double reco_mus_pt = -1, reco_mus_eta = 0, reco_mus_phi = 0;
 	  int nisomuons=0;
           for(unsigned int im = 0 ; im < muonsLVec.size() ; im++)
           {
-            if( muonsLVec[im].Pt()>(AnaConsts::muonsMiniIsoArr).minPt && fabs(muonsLVec[im].Eta()) < (AnaConsts::muonsMiniIsoArr).maxAbsEta && muonsMiniIso[im] < (AnaConsts::muonsMiniIsoArr).maxIso )
+            if(muonsFlagMedium[im] && muonsLVec[im].Pt()>(AnaConsts::muonsMiniIsoArr).minPt && fabs(muonsLVec[im].Eta()) < (AnaConsts::muonsMiniIsoArr).maxAbsEta && muonsMiniIso[im] < (AnaConsts::muonsMiniIsoArr).maxIso )
 	    {
               reco_mus_pt  = ( muonsLVec.at(im) ).Pt();
               reco_mus_eta = ( muonsLVec.at(im) ).Eta();
