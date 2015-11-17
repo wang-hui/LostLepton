@@ -508,6 +508,42 @@ void BaseHistgram::BookHistgram(const char *outFileName)
   h_pred_lept_sb_isotrk = new TH1D("h_pred_lept_isotrk","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
 }
 
+//a small class of the lepton we need to analysis
+class LostLeptonObj
+{
+ public:
+  //initialize those variables with some crazy number
+  bool isMu = false, isEl = false;
+  double gen_eta = -10, gen_phi = -10, gen_pt = -10, gen_activity = -10;
+  double reco_eta = -10, reco_phi = -10, reco_pt = -10, reco_activity = -10;
+  bool passAcc = false, passId = false, passIso = false;
+  bool doneAcc = false, doneId = false, doneIso = false;
+  int reco_index = -10;  
+
+  void SetMyLL(
+                //LL variables that will be always useful 
+                int pid,
+                TLorentzVector onegenlept,
+                std::vector<int> IdFlagMedium,
+                std::vector<TLorentzVector> recoleptLVec,
+                std::vector<double> MiniIso,
+                //LL variable thta will be replaced by other
+                Activity myActivity,
+                std::vector<TLorentzVector> jetsLVec,
+                std::vector<double> recoJetschargedHadronEnergyFraction,
+                std::vector<double> recoJetschargedEmEnergyFraction
+              );
+
+ private:
+  void SetFlavor(int pid);
+  void genLeptonSetup(TLorentzVector onegenlept, double activity);
+  void gogoAcc();
+  void gogoId(std::vector<int> IdFlagMedium, std::vector<TLorentzVector> leptLVec);
+  void recoLeptonSetup(TLorentzVector onerecolept, double activity);
+  void gogoIso(std::vector<double> iso);
+};
+
+
 //##########functions to calculate Delta_R and Delta Phi###############
 double DeltaPhi(double phi1, double phi2) 
 {

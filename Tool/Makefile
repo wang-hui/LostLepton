@@ -23,7 +23,10 @@ LIBS       = $(shell root-config --glibs)
 
 PROGRAMS = tupleTest LostLepton_MuCS_TTbar ClosurePlots TagAndProbeAnalysis MtW
 
-all: $(PROGRAMS)
+all: mkobj $(PROGRAMS)
+
+mkobj:
+	@mkdir -p obj
 
 $(ODIR)/%.o : $(SDIR)/%.C
 	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) -o $@ -c $<

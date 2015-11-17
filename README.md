@@ -27,8 +27,6 @@ scram b -j9
 
 cd LostLepton/Tool
 
-mkdir obj
-
 make
 
 PS: We have Error like "cannot find libtbb.so.2", to solve this problem, we want to build a soft link to this lib for temporary solution. To do this:

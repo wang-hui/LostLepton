@@ -71,10 +71,12 @@ void TTJetsSampleWeight::FillTTJetsSampleInfos( const TString &inputFileList )
   double W_Lept_BR = 0.1086*3;
   double TTbar_SingleLept_BR = 0.43930872; // 2*W_Lept_BR*(1-W_Lept_BR)
   double TTbar_DiLept_BR = 0.10614564; // W_Lept_BR^2
+  //TTJets nominal
+  TTJetsSampleInfo_push_back( "TTJets_", 831.76, 11339232, LUMI, inputFileList );
   //TTJets single lepton and di-lepton
-  TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromT_", 831.76*0.5*TTbar_SingleLept_BR, 11327907+46863183 , LUMI, inputFileList );
-  TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromTbar_", 831.76*0.5*TTbar_SingleLept_BR, 11692936+48473419, LUMI, inputFileList );
-  TTJetsSampleInfo_push_back( "TTJets_DiLept_", 831.76*TTbar_SingleLept_BR, 5924706+24501877, LUMI, inputFileList );
+  //TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromT_", 831.76*0.5*TTbar_SingleLept_BR, 11327907+46863183, LUMI, inputFileList );
+  //TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromTbar_", 831.76*0.5*TTbar_SingleLept_BR, 11692936+48473419, LUMI, inputFileList );
+  //TTJetsSampleInfo_push_back( "TTJets_DiLept_", 831.76*TTbar_SingleLept_BR, 5924706+24501877, LUMI, inputFileList );
 }
 
 void TTJetsSampleWeight::TTJetsSampleInfo_push_back( std::string tag, double xsec, double nevents, double lumi, const TString &inputFileList)

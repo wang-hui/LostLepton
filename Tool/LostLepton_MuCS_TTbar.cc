@@ -147,12 +147,14 @@ int main(int argc, char* argv[])
         if(nElectrons == 0)
         {
           myAccRecoIsoEffs.nevents_sel_mus+=thisweight;
-    
+
+          //get gen level information of leptons
+          std::vector<int> genDecayPdgIdVec = tr.getVec<int>("genDecayPdgIdVec");
+          std::vector<TLorentzVector> genDecayLVec = tr.getVec<TLorentzVector>("genDecayLVec");
           //get reco level information of muons
           std::vector<TLorentzVector> muonsLVec = tr.getVec<TLorentzVector>("muonsLVec");
-          int reco_mus_count = muonsLVec.size();
-
           std::vector<int> muonsFlagMedium = tr.getVec<int>("muonsFlagMedium");
+          std::vector<double> muonsMiniIso = tr.getVec<double>("muonsMiniIso");
 
           std::vector<TLorentzVector> jetsLVec = tr.getVec<TLorentzVector>("jetsLVec");
           std::vector<double> recoJetschargedHadronEnergyFraction = tr.getVec<double>("recoJetschargedHadronEnergyFraction");
@@ -160,164 +162,90 @@ int main(int argc, char* argv[])
 
           for(int gen_emus_i = 0 ; gen_emus_i < gen_emus_count ; gen_emus_i++)
           {
-            //determine if this gen particle is Muon;
-            std::vector<int> genDecayPdgIdVec = tr.getVec<int>("genDecayPdgIdVec");
-            bool isMuon;
-            isMuon = false;
-            isMuon = ( ( genDecayPdgIdVec.at ( emuVec_merge.at ( gen_emus_i ) ) == 13 ) || ( genDecayPdgIdVec.at ( emuVec_merge.at ( gen_emus_i ) ) == -13 ) );
+            int genId;
+            genId = emuVec_merge.at ( gen_emus_i );
 
-            if( isMuon )
-            {
+            LostLeptonObj myLostMuonObj;
+            
+            myLostMuonObj.SetMyLL(
+                                   //LL variables that will be always useful 
+                                   genDecayPdgIdVec.at ( genId ),
+                             	   ( genDecayLVec.at ( genId ) ),
+                                   muonsFlagMedium,
+                                   muonsLVec,
+                                   muonsMiniIso,
+                                   //LL variable thta will be replaced by other
+                                   myActivity,
+                                   jetsLVec,
+                                   recoJetschargedHadronEnergyFraction,
+                                   recoJetschargedEmEnergyFraction
+                                 );
+
+            if( myLostMuonObj.isMu ) 
+            { 
               ngenmu++;
+              if( myLostMuonObj.doneAcc && !myLostMuonObj.passAcc ) ngenmuoutacc++;
+              if( myLostMuonObj.doneId && !myLostMuonObj.passId ) ngenmunotid++;
+              if( myLostMuonObj.doneIso && !myLostMuonObj.passIso ) ngenmunotiso++;
+            }
 
+            if( myLostMuonObj.isMu )
+            {
               int njetsbin_number = Set_njetsbin_number(njets30);
+            
               myAccRecoIsoEffs.nmus[njetsbin_number]+=thisweight;
               myAccRecoIsoEffs.nmus_MC[njetsbin_number]++;
-
-              double gen_mus_eta, gen_mus_phi, gen_mus_pt;
-              int genId;
-              genId = emuVec_merge.at ( gen_emus_i );
-              std::vector<TLorentzVector> genDecayLVec = tr.getVec<TLorentzVector>("genDecayLVec");
-
-              gen_mus_eta = ( genDecayLVec.at ( genId ) ).Eta();
-              gen_mus_phi = ( genDecayLVec.at ( genId ) ).Phi();
-              gen_mus_pt  = ( genDecayLVec.at ( genId ) ).Pt();
-
-              myActivity.getVariables(
-                                      gen_mus_eta,
-                                      gen_mus_phi,
-                                      jetsLVec,
-                                      recoJetschargedHadronEnergyFraction,
-                                      recoJetschargedEmEnergyFraction
-                                     );
-              double activity = myActivity.getMuActivity();
-              myActivity.reset();
-
-              (myBaseHistgram.h_b_njets_mus)->Fill(njets30,thisweight);
-              (myBaseHistgram.h_b_njets30_pt_mus)->Fill( njets30 , gen_mus_pt , thisweight );
-              (myBaseHistgram.h_b_njets30_eta_mus)->Fill( njets30 , gen_mus_eta , thisweight );
-
-              if( (std::abs(gen_mus_eta)) < (AnaConsts::muonsMiniIsoArr).maxAbsEta && gen_mus_pt > (AnaConsts::muonsMiniIsoArr).minPt )
+            
+              if( myLostMuonObj.passAcc )
               {
                 myAccRecoIsoEffs.nmus_acc[njetsbin_number]+=thisweight;
                 myAccRecoIsoEffs.nmus_acc_MC[njetsbin_number]++;
 
-                int ptbin_number = Set_ptbin_number(gen_mus_pt);
-                int acbin_number = Set_acbin_number(activity);
+                int ptbin_number = Set_ptbin_number(myLostMuonObj.gen_pt);
+                int acbin_number = Set_acbin_number(myLostMuonObj.gen_activity);
 
                 myAccRecoIsoEffs.nmus_acc_bin[ptbin_number][acbin_number]+=thisweight;
                 myAccRecoIsoEffs.nmus_acc_bin_MC[ptbin_number][acbin_number]++;
+              }
 
-                for( int i = 0 ; i < genDecayPdgIdVec.size() ; i++ )
-                {
-                  int genindice = genDecayPdgIdVec.at(i);
-                  if( ( genindice == 13 || genindice  == -13 ) && i != genId )
-                  {
-                    double deltar_study;
-                    deltar_study = DeltaR(
-                                          gen_mus_eta,
-                                          gen_mus_phi,
-                                          ( genDecayLVec.at ( i ) ).Eta(),
-                                          ( genDecayLVec.at ( i ) ).Phi()
-                                         );
-                    (myBaseHistgram.h_b_deltaR_genup_mus)->Fill(deltar_study,thisweight);
-                  }
-                  else
-                    continue;
-                }
-
-                //loop over reco lepton information to find out smallest deltaR value
-                std::vector<double> deltar_mus_pool;
-                for(int reco_mus_i = 0 ; reco_mus_i < reco_mus_count ; reco_mus_i++)
-                {
-		  //std::cout << "muonsFlagMedium = " << muonsFlagMedium.at(reco_mus_i) << std::endl;
-	    	  if (muonsFlagMedium.at(reco_mus_i) && (muonsLVec.at(reco_mus_i)).Pt()>(AnaConsts::muonsMiniIsoArr).minPt && std::abs((muonsLVec.at(reco_mus_i)).Eta())<(AnaConsts::muonsMiniIsoArr).maxAbsEta)
-		  {
-		    double deltar_media;
-		    deltar_media = DeltaR(gen_mus_eta,
-		  			  gen_mus_phi,
-					  (muonsLVec.at(reco_mus_i)).Eta(),
-					  (muonsLVec.at(reco_mus_i)).Phi()
-					  );
-
-		    deltar_mus_pool.push_back(deltar_media);
-		  }
-                }
-
-                double deltar;
-                deltar = 1000;
-                int mindeltar_index;
-
-                if(deltar_mus_pool.size() > 0)
-                {
-                  deltar = *(std::min_element(deltar_mus_pool.begin(), deltar_mus_pool.end()));
-                  mindeltar_index = std::min_element(deltar_mus_pool.begin(), deltar_mus_pool.end()) - deltar_mus_pool.begin();
-                }
-                (myBaseHistgram.h_b_deltaR_mus)->Fill( deltar,thisweight );
-                (myBaseHistgram.h_b_deltaR_pt_mus)->Fill( deltar , gen_mus_pt , thisweight );
-
-                deltar_mus_pool.clear();
-
-                bool ismatcheddeltaR;
-                ismatcheddeltaR = (deltar < 0.2);
-
-                if(ismatcheddeltaR)
-                {
-                  myAccRecoIsoEffs.nmus_reco[ptbin_number][acbin_number]+=thisweight;
-                  myAccRecoIsoEffs.nmus_reco_MC[ptbin_number][acbin_number]++;
-                  //call another process for iso eff calculation, reset pt bin number for iso efficiency, as reco_pt
-                  double reco_mus_pt = (muonsLVec.at(mindeltar_index)).Pt();
-                  int ptbin_number_allreco = Set_ptbin_number(reco_mus_pt);
-
-                  double reco_mus_eta = (muonsLVec.at(mindeltar_index)).Eta();
-                  double reco_mus_phi = (muonsLVec.at(mindeltar_index)).Phi();
-                  myActivity.getVariables(
-                                          reco_mus_eta,
-                                          reco_mus_phi,
-                                          jetsLVec,
-                                          recoJetschargedHadronEnergyFraction,
-                                          recoJetschargedEmEnergyFraction
-                                         );
-                  double activity_allreco = myActivity.getMuActivity();
-                  myActivity.reset();
-                  int acbin_number_allreco = Set_acbin_number(activity_allreco);
-
-                  myAccRecoIsoEffs.nmus_reco_allreco[ptbin_number_allreco][acbin_number_allreco]+=thisweight;
-                  myAccRecoIsoEffs.nmus_reco_MC_allreco[ptbin_number_allreco][acbin_number_allreco]++;
-                  //vector<double> muonsRelIso = tr.getVec<double>("muonsRelIso");
-                  std::vector<double> muonsMiniIso = tr.getVec<double>("muonsMiniIso");
-
-                  bool mus_pass_iso;
-                  mus_pass_iso = false;               
-                  mus_pass_iso = ( muonsMiniIso.at(mindeltar_index) < (AnaConsts::muonsMiniIsoArr).maxIso );
-                
-                  if(mus_pass_iso)
-                  {
-                    myAccRecoIsoEffs.nmus_iso[ptbin_number][acbin_number]+=thisweight;
-                    myAccRecoIsoEffs.nmus_iso_MC[ptbin_number][acbin_number]++;
-                    myAccRecoIsoEffs.nmus_iso_allreco[ptbin_number_allreco][acbin_number_allreco]+=thisweight;
-                    myAccRecoIsoEffs.nmus_iso_MC_allreco[ptbin_number][acbin_number]++;
-
-		    if (nMuons == 0)
-		    { 
-		      std::cout << "Warning: mu pass iso but nMuons=0!" << std::endl;
-		      std::cout << "reco_mus_pt = " << reco_mus_pt << std::endl;
-		      std::cout << "reco_mus_eta = " << reco_mus_eta << std::endl;
-		    }
-                  }//if isolated
-                  else
-                  {
-                    ngenmunotiso++;
-                  }
-                }//if reconstructed
-                else
-                {
-                  ngenmunotid++;
-                }
-              }//if accepted
-              else
+              //call another process for iso eff calculation, reset pt bin number for iso efficiency, as reco_pt
+              if( myLostMuonObj.passId )
               {
-                ngenmuoutacc++;
+                int ptbin_number = Set_ptbin_number(myLostMuonObj.gen_pt);
+                int acbin_number = Set_acbin_number(myLostMuonObj.gen_activity);
+
+                myAccRecoIsoEffs.nmus_reco[ptbin_number][acbin_number]+=thisweight;
+                myAccRecoIsoEffs.nmus_reco_MC[ptbin_number][acbin_number]++;
+
+                //call another process for iso eff calculation, reset pt bin number for iso efficiency, as reco_pt
+                int ptbin_number_allreco = Set_ptbin_number(myLostMuonObj.reco_pt);
+                int acbin_number_allreco = Set_acbin_number(myLostMuonObj.reco_activity);
+
+                myAccRecoIsoEffs.nmus_reco_allreco[ptbin_number_allreco][acbin_number_allreco]+=thisweight;
+                myAccRecoIsoEffs.nmus_reco_MC_allreco[ptbin_number_allreco][acbin_number_allreco]++;
+              }
+
+              if( myLostMuonObj.passIso )
+              {
+                int ptbin_number = Set_ptbin_number(myLostMuonObj.gen_pt);
+                int acbin_number = Set_acbin_number(myLostMuonObj.gen_activity);
+
+                myAccRecoIsoEffs.nmus_iso[ptbin_number][acbin_number]+=thisweight;
+                myAccRecoIsoEffs.nmus_iso_MC[ptbin_number][acbin_number]++;
+              
+                //call another process for iso eff calculation, reset pt bin number for iso efficiency, as reco_pt
+                int ptbin_number_allreco = Set_ptbin_number(myLostMuonObj.reco_pt);
+                int acbin_number_allreco = Set_acbin_number(myLostMuonObj.reco_activity);
+                
+                myAccRecoIsoEffs.nmus_iso_allreco[ptbin_number_allreco][acbin_number_allreco]+=thisweight;
+                myAccRecoIsoEffs.nmus_iso_MC_allreco[ptbin_number][acbin_number]++;
+              }
+              //check warning function when we calculate the efficienies!
+              if ( nMuons == 0 && myLostMuonObj.passIso )
+              { 
+		std::cout << "Warning: mu pass iso but nMuons=0!" << std::endl;
+		std::cout << "reco_mus_pt = " << myLostMuonObj.reco_pt << std::endl;
+		std::cout << "reco_mus_eta = " << myLostMuonObj.reco_eta << std::endl;
               }
             }//if the gen particle is muon
           }//loop gen electrons/muons
@@ -1508,7 +1436,6 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
     }
   }
 
-
   std::cout << "muons from top, acceptance: " << std::endl;
   for( i_cal=0 ; i_cal < NJETS_BINS ; i_cal++ )
   {
@@ -1854,4 +1781,153 @@ void AccRecoIsoEffs::printEffsHeader()
   EffsHeader << "  const double ttbar_corrfactor_di_els = " << corrfactor_di_els << ";" << std::endl;
 
   EffsHeader.close();
+}
+
+
+void LostLeptonObj::SetMyLL( 
+                             //LL variables that will be always useful 
+                             int pid, 
+                             TLorentzVector onegenlept,
+                             std::vector<int> IdFlagMedium, 
+                             std::vector<TLorentzVector> recoleptLVec,
+                             std::vector<double> MiniIso,
+                             //LL variable thta will be replaced by other
+                             Activity myActivity,
+                             std::vector<TLorentzVector> jetsLVec,
+                             std::vector<double> recoJetschargedHadronEnergyFraction,
+                             std::vector<double> recoJetschargedEmEnergyFraction
+                           )
+{
+
+
+  SetFlavor( pid );
+  
+  //temporary function for activity, will get rid of it when we start to use the gen level activity in the flattree
+  myActivity.getVariables(
+                           onegenlept.Eta(),
+                           onegenlept.Phi(),
+                           jetsLVec,
+                           recoJetschargedHadronEnergyFraction,
+                           recoJetschargedEmEnergyFraction
+                         );
+  double activity;
+  if( isMu ) activity = myActivity.getMuActivity();
+  else if( isEl ) activity = myActivity.getElActivity();
+  myActivity.reset();
+ 
+  genLeptonSetup( onegenlept, activity );
+  gogoAcc();
+  gogoId( IdFlagMedium, recoleptLVec );
+ 
+  //here is just a temporary protect against segmentation error we may have during the run, will get rid of this once we go to use the actvity variable stored in then flattrees
+  if( reco_index >= 0 )
+  {
+    myActivity.getVariables(
+                             (recoleptLVec.at(reco_index)).Eta(),
+                             (recoleptLVec.at(reco_index)).Phi(),
+                             jetsLVec,
+                             recoJetschargedHadronEnergyFraction,
+                             recoJetschargedEmEnergyFraction
+                           );
+    if( isMu ) activity = myActivity.getMuActivity();
+    else if( isEl ) activity = myActivity.getElActivity();
+    myActivity.reset();
+    recoLeptonSetup( recoleptLVec.at(reco_index), activity );
+  }
+
+  gogoIso( MiniIso );
+
+  return ;
+}
+
+void LostLeptonObj::SetFlavor(int pid)
+{
+  isMu = (pid == 13) || (pid == -13);
+  isEl = (pid == 11) || (pid == -11);
+
+  if( (!isMu) && (!isEl) ) { std::cout << "The particle in the emuVec is not mu nor el, what the fuck is going on ?!" << std::endl; }
+
+  return ;
+}
+
+void LostLeptonObj::genLeptonSetup(TLorentzVector onegenlept, double activity)
+{
+  gen_eta = onegenlept.Eta(); 
+  gen_phi = onegenlept.Phi(); 
+  gen_pt = onegenlept.Pt(); 
+  gen_activity = activity;
+}
+
+void LostLeptonObj::gogoAcc()
+{
+  if( isMu ) passAcc = (std::abs(gen_eta)) < (AnaConsts::muonsMiniIsoArr).maxAbsEta && gen_pt > (AnaConsts::muonsMiniIsoArr).minPt;
+  if( isEl ) passAcc = (std::abs(gen_eta)) < (AnaConsts::elesMiniIsoArr).maxAbsEta && gen_pt > (AnaConsts::elesMiniIsoArr).minPt;
+
+  doneAcc = true;
+  return ;
+}
+
+void LostLeptonObj::gogoId( std::vector<int> IdFlagMedium, std::vector<TLorentzVector> recoleptLVec )
+{
+  if( (doneAcc && !passAcc) ){ return ; }
+
+  //loop over reco lepton information to find out smallest deltaR value, but those muon must be medium or tight muon first
+  int reco_count = recoleptLVec.size();
+  std::vector<double> deltar_pool;
+  for(int reco_i = 0 ; reco_i < reco_count ; reco_i++)
+  {
+    //make sure the reco lepton also pass the acc requirement
+    if( isMu && !( (recoleptLVec.at(reco_i)).Pt()>(AnaConsts::muonsMiniIsoArr).minPt && std::abs((recoleptLVec.at(reco_i)).Eta())<(AnaConsts::muonsMiniIsoArr).maxAbsEta ) )  continue;
+    if( isEl && !( (recoleptLVec.at(reco_i)).Pt()>(AnaConsts::elesMiniIsoArr).minPt && std::abs((recoleptLVec.at(reco_i)).Eta())<(AnaConsts::elesMiniIsoArr).maxAbsEta ) )  continue;
+
+    if ( IdFlagMedium.at(reco_i) )
+    {
+      double deltar_media;
+      deltar_media = DeltaR(
+                            gen_eta,
+		            gen_phi,
+			    (recoleptLVec.at(reco_i)).Eta(),
+			    (recoleptLVec.at(reco_i)).Phi()
+			   );
+
+      deltar_pool.push_back(deltar_media);
+    }
+  }
+
+  double deltar;
+  deltar = 1000;
+
+  if(deltar_pool.size() > 0)
+  {
+    deltar = *(std::min_element(deltar_pool.begin(), deltar_pool.end()));
+    reco_index = std::min_element(deltar_pool.begin(), deltar_pool.end()) - deltar_pool.begin();
+  }
+
+  deltar_pool.clear();
+
+  passId = (deltar < 0.2);
+
+  doneId = true;
+  return ;
+}
+
+void LostLeptonObj::recoLeptonSetup(TLorentzVector onerecolept, double activity)
+{
+  reco_eta = onerecolept.Eta(); 
+  reco_phi = onerecolept.Phi(); 
+  reco_pt = onerecolept.Pt(); 
+  reco_activity = activity;
+}
+
+void LostLeptonObj::gogoIso(std::vector<double> iso)
+{
+  if( (doneAcc && !passAcc) || (doneId && !passId) ){ return ; }
+
+  if( reco_index < 0) std::cout << "Segmentation voilation protection do not work! Please think hard!" << std::endl;   
+
+  if( isMu ) passIso = ( iso.at(reco_index) < (AnaConsts::muonsMiniIsoArr).maxIso );
+  if( isEl ) passIso = ( iso.at(reco_index) < (AnaConsts::elesMiniIsoArr).maxIsoEB );
+
+  doneIso = true;
+  return ; 
 }
