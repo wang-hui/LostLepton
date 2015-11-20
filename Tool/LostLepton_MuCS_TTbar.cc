@@ -64,8 +64,6 @@ int main(int argc, char* argv[])
   std::string spec = "lostlept";
   myBaselineVessel = new BaselineVessel(spec);
 
-  //define activity variables
-  Activity myActivity;
   //define my AccRecoIsoEffs class to stroe counts and efficiencies
   AccRecoIsoEffs myAccRecoIsoEffs;
   //define my histgram class
@@ -138,6 +136,13 @@ int main(int argc, char* argv[])
         emuVec_merge.insert( emuVec_merge.end(), W_tau_emuVec.begin(), W_tau_emuVec.end() );
         int gen_emus_count = emuVec_merge.size();
 
+        std::vector<double> W_emu_pfActivityVec = tr.getVec<double>("W_emu_pfActivityVec");
+        std::vector<double> W_tau_emu_pfActivityVec = tr.getVec<double>("W_tau_emu_pfActivityVec");
+        std::vector<double> emu_pfActivityVec_merge;
+        emu_pfActivityVec_merge.reserve( W_emu_pfActivityVec.size() + W_tau_emu_pfActivityVec.size() );
+        emu_pfActivityVec_merge.insert( emu_pfActivityVec_merge.end(), W_emu_pfActivityVec.begin(), W_emu_pfActivityVec.end() );
+        emu_pfActivityVec_merge.insert( emu_pfActivityVec_merge.end(), W_tau_emu_pfActivityVec.begin(), W_tau_emu_pfActivityVec.end() );
+
         int ngenmunotiso = 0, ngenmunotid = 0, ngenmuoutacc = 0;
         int ngenelnotiso = 0, ngenelnotid = 0, ngeneloutacc = 0;
 
@@ -153,17 +158,15 @@ int main(int argc, char* argv[])
           std::vector<TLorentzVector> genDecayLVec = tr.getVec<TLorentzVector>("genDecayLVec");
           //get reco level information of muons
           std::vector<TLorentzVector> muonsLVec = tr.getVec<TLorentzVector>("muonsLVec");
+          std::vector<double> muonspfActivity = tr.getVec<double>("muonspfActivity");
           std::vector<int> muonsFlagMedium = tr.getVec<int>("muonsFlagMedium");
           std::vector<double> muonsMiniIso = tr.getVec<double>("muonsMiniIso");
-
-          std::vector<TLorentzVector> jetsLVec = tr.getVec<TLorentzVector>("jetsLVec");
-          std::vector<double> recoJetschargedHadronEnergyFraction = tr.getVec<double>("recoJetschargedHadronEnergyFraction");
-          std::vector<double> recoJetschargedEmEnergyFraction = tr.getVec<double>("recoJetschargedEmEnergyFraction");
 
           for(int gen_emus_i = 0 ; gen_emus_i < gen_emus_count ; gen_emus_i++)
           {
             int genId;
             genId = emuVec_merge.at ( gen_emus_i );
+            double genmuonpfActivity = emu_pfActivityVec_merge.at(gen_emus_i);
 
             LostLeptonObj myLostMuonObj;
             
@@ -171,22 +174,26 @@ int main(int argc, char* argv[])
                                    //LL variables that will be always useful 
                                    genDecayPdgIdVec.at ( genId ),
                              	   ( genDecayLVec.at ( genId ) ),
+                                   genmuonpfActivity,
                                    muonsFlagMedium,
                                    muonsLVec,
-                                   muonsMiniIso,
-                                   //LL variable thta will be replaced by other
-                                   myActivity,
-                                   jetsLVec,
-                                   recoJetschargedHadronEnergyFraction,
-                                   recoJetschargedEmEnergyFraction
+                                   muonspfActivity,
+                                   muonsMiniIso
                                  );
 
             if( myLostMuonObj.isMu ) 
             { 
               ngenmu++;
-              if( myLostMuonObj.doneAcc && !myLostMuonObj.passAcc ) ngenmuoutacc++;
-              if( myLostMuonObj.doneId && !myLostMuonObj.passId ) ngenmunotid++;
-              if( myLostMuonObj.doneIso && !myLostMuonObj.passIso ) ngenmunotiso++;
+              if( myLostMuonObj.passAcc ) 
+              {
+                if( myLostMuonObj.passId ) 
+                {
+                  if( myLostMuonObj.passIso ){ }
+                  else ngenmunotiso++;
+                }
+                else ngenmunotid++;
+              }
+              else ngenmuoutacc++;
             }
 
             if( myLostMuonObj.isMu )
@@ -223,6 +230,9 @@ int main(int argc, char* argv[])
 
                 myAccRecoIsoEffs.nmus_reco_allreco[ptbin_number_allreco][acbin_number_allreco]+=thisweight;
                 myAccRecoIsoEffs.nmus_reco_MC_allreco[ptbin_number_allreco][acbin_number_allreco]++;
+                //std::cout << myLostMuonObj.gen_activity <<"," << myLostMuonObj.reco_activity << std::endl;
+                (myBaseHistgram.h_id_genactivity_mus)->Fill(myLostMuonObj.gen_activity,thisweight);
+                (myBaseHistgram.h_id_recoactivity_mus)->Fill(myLostMuonObj.reco_activity,thisweight);
               }
 
               if( myLostMuonObj.passIso )
@@ -238,7 +248,8 @@ int main(int argc, char* argv[])
                 int acbin_number_allreco = Set_acbin_number(myLostMuonObj.reco_activity);
                 
                 myAccRecoIsoEffs.nmus_iso_allreco[ptbin_number_allreco][acbin_number_allreco]+=thisweight;
-                myAccRecoIsoEffs.nmus_iso_MC_allreco[ptbin_number][acbin_number]++;
+                myAccRecoIsoEffs.nmus_iso_MC_allreco[ptbin_number_allreco][acbin_number_allreco]++;
+                //std::cout << muonsMiniIso.size() << "," << myLostMuonObj.reco_index << "ISO:" << muonsMiniIso.at(myLostMuonObj.reco_index) << std::endl;
               }
               //check warning function when we calculate the efficienies!
               if ( nMuons == 0 && myLostMuonObj.passIso )
@@ -255,172 +266,111 @@ int main(int argc, char* argv[])
         {
           myAccRecoIsoEffs.nevents_sel_els+=thisweight;
 
-          //get reco level information of electrons
+          //get gen level information of leptons
+          std::vector<int> genDecayPdgIdVec = tr.getVec<int>("genDecayPdgIdVec");
+          std::vector<TLorentzVector> genDecayLVec = tr.getVec<TLorentzVector>("genDecayLVec");
+          //get reco level information of muons
           std::vector<TLorentzVector> elesLVec = tr.getVec<TLorentzVector>("elesLVec");
-          int reco_els_count = elesLVec.size();
-        
-          std::vector<TLorentzVector> jetsLVec = tr.getVec<TLorentzVector>("jetsLVec");
-          std::vector<double> recoJetschargedHadronEnergyFraction = tr.getVec<double>("recoJetschargedHadronEnergyFraction");
-          std::vector<double> recoJetschargedEmEnergyFraction = tr.getVec<double>("recoJetschargedEmEnergyFraction");
+          std::vector<double> elespfActivity = tr.getVec<double>("elespfActivity");
+          std::vector<int> elesFlagVeto = tr.getVec<int>("elesFlagVeto");
+          std::vector<double> elesMiniIso = tr.getVec<double>("elesMiniIso");
 
           for(int gen_emus_i = 0 ; gen_emus_i < gen_emus_count ; gen_emus_i++)
           {
-            //determine if this gen particle is electrons;
-            std::vector<int> genDecayPdgIdVec = tr.getVec<int>("genDecayPdgIdVec");
-            bool isElectron;
-            isElectron = false;
-            isElectron = ( ( genDecayPdgIdVec.at ( emuVec_merge.at ( gen_emus_i ) ) == 11 )||( genDecayPdgIdVec.at ( emuVec_merge.at ( gen_emus_i ) ) == -11 ) );
-          
-            if( isElectron )
-            {
-              ngenel++;
+            int genId;
+            genId = emuVec_merge.at ( gen_emus_i );
+            double genelectronpfActivity = emu_pfActivityVec_merge.at(gen_emus_i);
 
+            LostLeptonObj myLostElectronObj;
+
+            myLostElectronObj.SetMyLL(
+                                       //LL variables that will be always useful 
+                                       genDecayPdgIdVec.at ( genId ),
+                                       ( genDecayLVec.at ( genId ) ),
+                                       genelectronpfActivity,
+                                       elesFlagVeto,
+                                       elesLVec,
+                                       elespfActivity,
+                                       elesMiniIso
+                                     );
+
+            if( myLostElectronObj.isEl )
+            { 
+              ngenel++;
+              if( myLostElectronObj.passAcc )
+              { 
+                if( myLostElectronObj.passId )
+                { 
+                  if( myLostElectronObj.passIso ){ }
+                  else ngenelnotiso++;
+                }
+                else ngenelnotid++;
+              }
+              else ngeneloutacc++;
+            }
+
+            if( myLostElectronObj.isEl )
+            {
               int njetsbin_number = Set_njetsbin_number(njets30);
+            
               myAccRecoIsoEffs.nels[njetsbin_number]+=thisweight;
               myAccRecoIsoEffs.nels_MC[njetsbin_number]++;
-
-              double gen_els_eta, gen_els_phi, gen_els_pt;
-              int genId;
-              genId = emuVec_merge.at ( gen_emus_i );
-              std::vector<TLorentzVector> genDecayLVec = tr.getVec<TLorentzVector>("genDecayLVec");
-          
-              gen_els_eta = ( genDecayLVec.at ( genId ) ).Eta();
-              gen_els_phi = ( genDecayLVec.at ( genId ) ).Phi();
-              gen_els_pt  = ( genDecayLVec.at ( genId ) ).Pt();
-    
-              myActivity.getVariables(
-                                      gen_els_eta,
-                                      gen_els_phi,
-                                      jetsLVec,
-                                      recoJetschargedHadronEnergyFraction,
-                                      recoJetschargedEmEnergyFraction
-                                     );
-              double activity = myActivity.getElActivity();
-              myActivity.reset();
-              (myBaseHistgram.h_b_activity_els)->Fill(activity,thisweight);
-              (myBaseHistgram.h_b_njets_els)->Fill(njets30,thisweight);
-
-              (myBaseHistgram.h_b_njets30_pt_els)->Fill( njets30 , gen_els_pt,thisweight );
-              (myBaseHistgram.h_b_njets30_eta_els)->Fill( njets30 , gen_els_eta,thisweight );
-
-              if( (std::abs(gen_els_eta)) < (AnaConsts::elesMiniIsoArr).maxAbsEta && gen_els_pt > (AnaConsts::elesMiniIsoArr).minPt )
+            
+              if( myLostElectronObj.passAcc )
               {
                 myAccRecoIsoEffs.nels_acc[njetsbin_number]+=thisweight;
                 myAccRecoIsoEffs.nels_acc_MC[njetsbin_number]++;
 
-                int ptbin_number = Set_ptbin_number(gen_els_pt);
-                int acbin_number = Set_acbin_number(activity);
+                int ptbin_number = Set_ptbin_number(myLostElectronObj.gen_pt);
+                int acbin_number = Set_acbin_number(myLostElectronObj.gen_activity);
 
                 myAccRecoIsoEffs.nels_acc_bin[ptbin_number][acbin_number]+=thisweight;
                 myAccRecoIsoEffs.nels_acc_bin_MC[ptbin_number][acbin_number]++;
-
-                for( int i = 0 ; i < genDecayPdgIdVec.size() ; i++ )
-                {
-                  int genindice = genDecayPdgIdVec.at(i);
-                  if( ( genindice == 11 || genindice  == -11 ) && i != genId )
-                  {
-                    double deltar_study;
-                    deltar_study = DeltaR(
-                                          gen_els_eta,
-                                          gen_els_phi,
-                                          ( genDecayLVec.at ( i ) ).Eta(),
-                                          ( genDecayLVec.at ( i ) ).Phi()
-                                         );
-                    (myBaseHistgram.h_b_deltaR_genup_els)->Fill(deltar_study,thisweight);
-                  }
-                }
-
-                //loop over reco lepton information to determine the smallest deltar
-                std::vector<double> deltar_els_pool;
-                for(int reco_els_i = 0 ; reco_els_i < reco_els_count ; reco_els_i++)
-                {
-	  	  if ((elesLVec.at(reco_els_i)).Pt()>(AnaConsts::elesMiniIsoArr).minPt && std::abs((elesLVec.at(reco_els_i)).Eta())<(AnaConsts::elesMiniIsoArr).maxAbsEta)
-	  	  {
-		    double deltar_media;
-		    deltar_media = DeltaR(
-		  			  gen_els_eta,
-					  gen_els_phi,
-					  (elesLVec.at(reco_els_i)).Eta(),
-					  (elesLVec.at(reco_els_i)).Phi()
-					  );
-
-		    deltar_els_pool.push_back(deltar_media);
-	  	  }
-                }
-
-                double deltar;
-                deltar = 1000;
-                int mindeltar_index;
-
-                if(deltar_els_pool.size() > 0)
-                {
-                  deltar = *(std::min_element(deltar_els_pool.begin(), deltar_els_pool.end()));
-                  mindeltar_index = std::min_element(deltar_els_pool.begin(), deltar_els_pool.end()) - deltar_els_pool.begin();
-                }
-                (myBaseHistgram.h_b_deltaR_els)->Fill(deltar,thisweight);
-                (myBaseHistgram.h_b_deltaR_pt_els)->Fill( deltar , gen_els_pt,thisweight );
-
-                deltar_els_pool.clear();
-
-                bool ismatcheddeltaR;
-                ismatcheddeltaR = (deltar < 0.2);
-    
-                if(ismatcheddeltaR
-                   //&& 
-                   //isgoodmuonid
-                  )
-                {
-                  myAccRecoIsoEffs.nels_reco[ptbin_number][acbin_number]+=thisweight;
-                  myAccRecoIsoEffs.nels_reco_MC[ptbin_number][acbin_number]++;
-
-                  //call another process for iso eff calculation, reset pt bin number for iso efficiency, as reco_pt
-                  double reco_els_pt = (elesLVec.at(mindeltar_index)).Pt();
-                  int ptbin_number_allreco = Set_ptbin_number(reco_els_pt);
-
-                  double reco_els_eta = (elesLVec.at(mindeltar_index)).Eta();
-                  double reco_els_phi = (elesLVec.at(mindeltar_index)).Phi();
-                  myActivity.getVariables(
-                                          reco_els_eta,
-                                          reco_els_phi,
-                                          jetsLVec,
-                                          recoJetschargedHadronEnergyFraction,
-                                          recoJetschargedEmEnergyFraction
-                                         );
-                  double activity_allreco = myActivity.getElActivity();
-                  myActivity.reset();
-                  int acbin_number_allreco = Set_acbin_number(activity_allreco);
-
-                  myAccRecoIsoEffs.nels_reco_allreco[ptbin_number_allreco][acbin_number_allreco]+=thisweight;
-                  myAccRecoIsoEffs.nels_reco_MC_allreco[ptbin_number_allreco][acbin_number_allreco]++;
-                  //vector<double> elesRelIso = tr.getVec<double>("elesRelIso");
-                  std::vector<double> elesMiniIso = tr.getVec<double>("elesMiniIso");
-
-                  bool els_pass_iso;
-                  els_pass_iso = false;
-                  els_pass_iso = ( elesMiniIso.at(mindeltar_index) < (AnaConsts::elesMiniIsoArr).maxIsoEB );
-
-                  if(els_pass_iso)
-                  {
-                    myAccRecoIsoEffs.nels_iso[ptbin_number][acbin_number]+=thisweight;
-                    myAccRecoIsoEffs.nels_iso_MC[ptbin_number][acbin_number]++;
-                    myAccRecoIsoEffs.nels_iso_allreco[ptbin_number_allreco][acbin_number_allreco]+=thisweight;
-                    myAccRecoIsoEffs.nels_iso_MC_allreco[ptbin_number_allreco][acbin_number_allreco]++;
-                  }//if isolated
-                  else
-                  {
-                    ngenelnotiso++;
-                  }
-                }//if reconstructed
-                else
-                {
-                  ngenelnotid++;
-                }
-              }//if accepted
-              else
-              {
-                ngeneloutacc++;
               }
-            }//if the gen particle is electron 
+
+              //call another process for iso eff calculation, reset pt bin number for iso efficiency, as reco_pt
+              if( myLostElectronObj.passId )
+              {
+                int ptbin_number = Set_ptbin_number(myLostElectronObj.gen_pt);
+                int acbin_number = Set_acbin_number(myLostElectronObj.gen_activity);
+
+                myAccRecoIsoEffs.nels_reco[ptbin_number][acbin_number]+=thisweight;
+                myAccRecoIsoEffs.nels_reco_MC[ptbin_number][acbin_number]++;
+
+                //call another process for iso eff calculation, reset pt bin number for iso efficiency, as reco_pt
+                int ptbin_number_allreco = Set_ptbin_number(myLostElectronObj.reco_pt);
+                int acbin_number_allreco = Set_acbin_number(myLostElectronObj.reco_activity);
+
+                myAccRecoIsoEffs.nels_reco_allreco[ptbin_number_allreco][acbin_number_allreco]+=thisweight;
+                myAccRecoIsoEffs.nels_reco_MC_allreco[ptbin_number_allreco][acbin_number_allreco]++;
+
+                (myBaseHistgram.h_id_genactivity_els)->Fill(myLostElectronObj.gen_activity,thisweight);
+                (myBaseHistgram.h_id_recoactivity_els)->Fill(myLostElectronObj.reco_activity,thisweight);
+              }
+
+              if( myLostElectronObj.passIso )
+              {
+                int ptbin_number = Set_ptbin_number(myLostElectronObj.gen_pt);
+                int acbin_number = Set_acbin_number(myLostElectronObj.gen_activity);
+
+                myAccRecoIsoEffs.nels_iso[ptbin_number][acbin_number]+=thisweight;
+                myAccRecoIsoEffs.nels_iso_MC[ptbin_number][acbin_number]++;
+              
+                //call another process for iso eff calculation, reset pt bin number for iso efficiency, as reco_pt
+                int ptbin_number_allreco = Set_ptbin_number(myLostElectronObj.reco_pt);
+                int acbin_number_allreco = Set_acbin_number(myLostElectronObj.reco_activity);
+                
+                myAccRecoIsoEffs.nels_iso_allreco[ptbin_number_allreco][acbin_number_allreco]+=thisweight;
+                myAccRecoIsoEffs.nels_iso_MC_allreco[ptbin_number_allreco][acbin_number_allreco]++;
+              }
+              //check warning function when we calculate the efficienies!
+              if ( nElectrons == 0 && myLostElectronObj.passIso )
+              { 
+		std::cout << "Warning: el pass iso but nElectrons=0!" << std::endl;
+		std::cout << "reco_els_pt = " << myLostElectronObj.reco_pt << std::endl;
+		std::cout << "reco_els_eta = " << myLostElectronObj.reco_eta << std::endl;
+              }
+            }//if the gen particle is muon
           }//loop gen electrons/muons
         }//if no muons
       
@@ -767,17 +717,14 @@ int main(int argc, char* argv[])
         {
           //counting the events for muon control sample
           myAccRecoIsoEffs.nevents_cs_mus++;
-          //get muon variables
+          //get reco muon variables
   	  std::vector<TLorentzVector> muonsLVec = trCS.getVec<TLorentzVector>("muonsLVec");
-          //vector<double> muonsRelIso = trCS.getVec<double>("muonsRelIso");
-          std::vector<double> muonsMiniIso = trCS.getVec<double>("muonsMiniIso");
-          //get jet variables for activity calculation
-          std::vector<TLorentzVector> jetsLVec = trCS.getVec<TLorentzVector>("jetsLVec");
-          std::vector<double> recoJetschargedHadronEnergyFraction = trCS.getVec<double>("recoJetschargedHadronEnergyFraction");
-          std::vector<double> recoJetschargedEmEnergyFraction = trCS.getVec<double>("recoJetschargedEmEnergyFraction");
+          std::vector<double> muonspfActivity = trCS.getVec<double>("muonspfActivity");
           std::vector<int> muonsFlagMedium = trCS.getVec<int>("muonsFlagMedium");
+          std::vector<double> muonsMiniIso = trCS.getVec<double>("muonsMiniIso");
 
           double reco_mus_pt = -1, reco_mus_eta = 0, reco_mus_phi = 0;
+          double activity = -1;
 	  int nisomuons=0;
           for(unsigned int im = 0 ; im < muonsLVec.size() ; im++)
           {
@@ -786,6 +733,7 @@ int main(int argc, char* argv[])
               reco_mus_pt  = ( muonsLVec.at(im) ).Pt();
               reco_mus_eta = ( muonsLVec.at(im) ).Eta();
               reco_mus_phi = ( muonsLVec.at(im) ).Phi();
+              activity = muonspfActivity.at(im);
 	      ++nisomuons;
 	    }
 	  }
@@ -794,16 +742,6 @@ int main(int argc, char* argv[])
 
           double deltaphi_mus = DeltaPhi( reco_mus_phi , metphi );
           double mtW_mus = std::sqrt( 2.0 * reco_mus_pt * met * ( 1.0 - cos(deltaphi_mus) ) );
-
-          myActivity.getVariables(
-                                  reco_mus_eta,
-                                  reco_mus_phi,
-                                  jetsLVec,
-                                  recoJetschargedHadronEnergyFraction,
-                                  recoJetschargedEmEnergyFraction
-                                 );
-          double activity = myActivity.getMuActivity();
-          myActivity.reset();
 
           if ( mtW_mus < 125.0 )
           {
@@ -1233,8 +1171,6 @@ void AccRecoIsoEffs::printNormalizeFlowNumber()
   std::cout<<"els,percentage,acc: "<< nevents_pred_acc_els/nevents_exp_acc_els - 1 << std::endl;
   std::cout<<"els,percentage,id: " << nevents_pred_id_els/nevents_exp_id_els - 1   << std::endl;
   std::cout<<"els,percentage,iso: "<< nevents_pred_iso_els/nevents_exp_iso_els - 1 << std::endl;
-
-
 }
 
 void AccRecoIsoEffs::printSearchBin(BaseHistgram& myBaseHistgram)
@@ -1785,54 +1721,26 @@ void AccRecoIsoEffs::printEffsHeader()
 
 
 void LostLeptonObj::SetMyLL( 
-                             //LL variables that will be always useful 
-                             int pid, 
+                             int pid,
                              TLorentzVector onegenlept,
-                             std::vector<int> IdFlagMedium, 
+                             double genpfActivity,
+                             std::vector<int> IdFlag,
                              std::vector<TLorentzVector> recoleptLVec,
-                             std::vector<double> MiniIso,
-                             //LL variable thta will be replaced by other
-                             Activity myActivity,
-                             std::vector<TLorentzVector> jetsLVec,
-                             std::vector<double> recoJetschargedHadronEnergyFraction,
-                             std::vector<double> recoJetschargedEmEnergyFraction
+                             std::vector<double> recoleptactivityVec,
+                             std::vector<double> MiniIso
                            )
 {
 
 
   SetFlavor( pid );
-  
-  //temporary function for activity, will get rid of it when we start to use the gen level activity in the flattree
-  myActivity.getVariables(
-                           onegenlept.Eta(),
-                           onegenlept.Phi(),
-                           jetsLVec,
-                           recoJetschargedHadronEnergyFraction,
-                           recoJetschargedEmEnergyFraction
-                         );
-  double activity;
-  if( isMu ) activity = myActivity.getMuActivity();
-  else if( isEl ) activity = myActivity.getElActivity();
-  myActivity.reset();
- 
-  genLeptonSetup( onegenlept, activity );
+  genLeptonSetup( onegenlept, genpfActivity );
   gogoAcc();
-  gogoId( IdFlagMedium, recoleptLVec );
+  gogoId( IdFlag, recoleptLVec );
  
   //here is just a temporary protect against segmentation error we may have during the run, will get rid of this once we go to use the actvity variable stored in then flattrees
   if( reco_index >= 0 )
   {
-    myActivity.getVariables(
-                             (recoleptLVec.at(reco_index)).Eta(),
-                             (recoleptLVec.at(reco_index)).Phi(),
-                             jetsLVec,
-                             recoJetschargedHadronEnergyFraction,
-                             recoJetschargedEmEnergyFraction
-                           );
-    if( isMu ) activity = myActivity.getMuActivity();
-    else if( isEl ) activity = myActivity.getElActivity();
-    myActivity.reset();
-    recoLeptonSetup( recoleptLVec.at(reco_index), activity );
+    recoLeptonSetup( recoleptLVec.at(reco_index), recoleptactivityVec.at(reco_index) );
   }
 
   gogoIso( MiniIso );
@@ -1867,7 +1775,7 @@ void LostLeptonObj::gogoAcc()
   return ;
 }
 
-void LostLeptonObj::gogoId( std::vector<int> IdFlagMedium, std::vector<TLorentzVector> recoleptLVec )
+void LostLeptonObj::gogoId( std::vector<int> IdFlag, std::vector<TLorentzVector> recoleptLVec )
 {
   if( (doneAcc && !passAcc) ){ return ; }
 
@@ -1880,7 +1788,7 @@ void LostLeptonObj::gogoId( std::vector<int> IdFlagMedium, std::vector<TLorentzV
     if( isMu && !( (recoleptLVec.at(reco_i)).Pt()>(AnaConsts::muonsMiniIsoArr).minPt && std::abs((recoleptLVec.at(reco_i)).Eta())<(AnaConsts::muonsMiniIsoArr).maxAbsEta ) )  continue;
     if( isEl && !( (recoleptLVec.at(reco_i)).Pt()>(AnaConsts::elesMiniIsoArr).minPt && std::abs((recoleptLVec.at(reco_i)).Eta())<(AnaConsts::elesMiniIsoArr).maxAbsEta ) )  continue;
 
-    if ( IdFlagMedium.at(reco_i) )
+    if ( IdFlag.at(reco_i) )
     {
       double deltar_media;
       deltar_media = DeltaR(

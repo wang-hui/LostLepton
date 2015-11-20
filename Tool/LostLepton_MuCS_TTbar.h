@@ -215,7 +215,7 @@ class BaseHistgram
   TH1D *h_b_acc_njets, *h_b_acc_nbjetsCSVM, *h_b_acc_MET, *h_b_acc_jetpt2, *h_b_acc_jetpt4, *h_b_acc_jet1_met_phi_diff, *h_b_acc_jet2_met_phi_diff, *h_b_acc_jet3_met_phi_diff;
   TH1D *h_b_reco_nMuons, *h_b_reco_njets, *h_b_reco_nbjetsCSVM, *h_b_reco_MET, *h_b_reco_jetpt2, *h_b_reco_jetpt4, *h_b_reco_jet1_met_phi_diff, *h_b_reco_jet2_met_phi_diff, *h_b_reco_jet3_met_phi_diff;
   TH1D *h_b_deltaR_mus, *h_b_deltaR_els;
-  TH1D *h_b_activity_mus, *h_b_activity_els;
+  TH1D *h_id_genactivity_mus, *h_id_genactivity_els, *h_id_recoactivity_mus, *h_id_recoactivity_els;
   TH1D *h_b_njets_mus, *h_b_njets_els;
   TH1D *h_b_jet_pt;
 
@@ -348,8 +348,10 @@ void BaseHistgram::BookHistgram(const char *outFileName)
 
   h_mtw_mus = new TH1D("h_mtw_mus","",200,0,200);
 
-  h_b_activity_mus = new TH1D("h_b_activity_mus","",1000,0,200);
-  h_b_activity_els = new TH1D("h_b_activity_els","",1000,0,200);
+  h_id_genactivity_mus = new TH1D("h_id_genactivity_mus","",200,0,1);
+  h_id_genactivity_els = new TH1D("h_id_genactivity_els","",200,0,1);
+  h_id_recoactivity_mus = new TH1D("h_id_recoactivity_mus","",200,0,1);
+  h_id_recoactivity_els = new TH1D("h_id_recoactivity_els","",200,0,1);
 
   h_b_njets_mus = new TH1D("h_b_njets_mus","",40,0,40);
   h_b_njets_els = new TH1D("h_b_njets_els","",40,0,40);
@@ -524,21 +526,18 @@ class LostLeptonObj
                 //LL variables that will be always useful 
                 int pid,
                 TLorentzVector onegenlept,
-                std::vector<int> IdFlagMedium,
+                double genpfActivity,
+                std::vector<int> IdFlag,
                 std::vector<TLorentzVector> recoleptLVec,
-                std::vector<double> MiniIso,
-                //LL variable thta will be replaced by other
-                Activity myActivity,
-                std::vector<TLorentzVector> jetsLVec,
-                std::vector<double> recoJetschargedHadronEnergyFraction,
-                std::vector<double> recoJetschargedEmEnergyFraction
+                std::vector<double> recoleptactivityVec,
+                std::vector<double> MiniIso
               );
 
  private:
   void SetFlavor(int pid);
   void genLeptonSetup(TLorentzVector onegenlept, double activity);
   void gogoAcc();
-  void gogoId(std::vector<int> IdFlagMedium, std::vector<TLorentzVector> leptLVec);
+  void gogoId(std::vector<int> IdFlag, std::vector<TLorentzVector> leptLVec);
   void recoLeptonSetup(TLorentzVector onerecolept, double activity);
   void gogoIso(std::vector<double> iso);
 };
