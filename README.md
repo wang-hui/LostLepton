@@ -43,7 +43,7 @@ And it will be involved into make command automatically and we do not have error
 
 4.Run the LostLepton code:
 
-./LostLepton_MuCS_TTbar runList_inputfile.txt outputfile.root
+./LostLepton_MuCS_TTbar runList_cal.txt runList_exppred.txt
 
 5.Make Closure Plots:
 
