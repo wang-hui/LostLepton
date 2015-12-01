@@ -4,11 +4,15 @@
 1.Set CMS Environment:
 
 setenv SCRAM_ARCH slc6_amd64_gcc491
+
 cmsrel CMSSW_7_4_15
+
 cd CMSSW_7_4_15/src/
+
 cmsenv
 
 git clone -b TestMiniAOD git@github.com:susy2015/recipeAUX.git
+
 git clone -b Ana_74X_17Nov2015_v3.0 git@github.com:susy2015/SusyAnaTools.git
 
 git clone -b hua_change_structure https://github.com/susy2015/LostLepton.git
@@ -16,7 +20,9 @@ git clone -b hua_change_structure https://github.com/susy2015/LostLepton.git
 scram b -j 6
 
 cd LostLepton/Tool
+
 mkdir obj
+
 make
 
 
