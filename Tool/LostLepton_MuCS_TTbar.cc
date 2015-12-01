@@ -71,9 +71,11 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
  
     double thisweight = (*iter_TTJetsSampleInfos).weight;
     std::cout << "Weight " << thisweight << std::endl;
-
+    int neventc=0;
     while(tr.getNextEvent())
+      //while(tr.getNextEvent() && neventc<10000)
     {
+      ++neventc;
       if(tr.getEvtNum()%20000 == 0) std::cout << tr.getEvtNum() << "\t" << ((clock() - t0)/1000000.0) << std::endl;
     
       myAccRecoIsoEffs.nevents_tot+=thisweight;
@@ -81,9 +83,7 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
       //baseline cut without lepton veto
       bool passBaselinelostlept = tr.getVar<bool>("passBaseline"+spec);
 
-      if ( 
-          passBaselinelostlept 
-         )
+      if (passBaselinelostlept)
       {
         myAccRecoIsoEffs.nevents_sel_base+=thisweight;
 
@@ -98,6 +98,8 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
         double met = tr.getVar<double>("met");
         double metphi = tr.getVar<double>("metphi");
         
+        int ngenmu = 0;
+        int ngenel = 0;
 
         int njets30 = tr.getVar<int>("cntNJetsPt30Eta24"+spec);
 
@@ -119,6 +121,8 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
         emu_pfActivityVec_merge.reserve( W_emu_pfActivityVec.size() + W_tau_emu_pfActivityVec.size() );
         emu_pfActivityVec_merge.insert( emu_pfActivityVec_merge.end(), W_emu_pfActivityVec.begin(), W_emu_pfActivityVec.end() );
         emu_pfActivityVec_merge.insert( emu_pfActivityVec_merge.end(), W_tau_emu_pfActivityVec.begin(), W_tau_emu_pfActivityVec.end() );
+
+	double thisweight = (*iter_TTJetsSampleInfos).weight;
 
         if(nElectrons == 0)
         {
@@ -154,6 +158,7 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 
             if( myLostMuonObj.isMu )
             {
+	      ngenmu++;
               int njetsbin_number = Set_njetsbin_number(njets30);
             
               myAccRecoIsoEffs.nmus[njetsbin_number]+=thisweight;
@@ -216,6 +221,15 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
               }
             }//if the gen particle is muon
           }//loop gen electrons/muons
+
+	  // dilepton computation
+	  if (nMuons==0)
+	  {
+	    if (ngenmu==1) myAccRecoIsoEffs.nevents_single_mus+=thisweight;
+	    if (ngenmu==2) myAccRecoIsoEffs.nevents_di_mus+=thisweight;
+	  }
+
+
         }//if no electrons
 
         if(nMuons == 0)
@@ -252,6 +266,7 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 
             if( myLostElectronObj.isEl )
             {
+	      ngenel++;
               int njetsbin_number = Set_njetsbin_number(njets30);
             
               myAccRecoIsoEffs.nels[njetsbin_number]+=thisweight;
@@ -313,6 +328,15 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
               }
             }//if the gen particle is muon
           }//loop gen electrons/muons
+
+	  // dilepton computation
+	  if (nElectrons == 0)
+	  {
+	    if (ngenel==1) myAccRecoIsoEffs.nevents_single_els+=thisweight;
+	    if (ngenel==2) myAccRecoIsoEffs.nevents_di_els+=thisweight;
+	  }
+
+
         }//if no muons
       
         //loop over muon CS, mtW correction factor calculation and other calculations
@@ -321,13 +345,14 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
           //mtw correction factor calculation
           std::vector<TLorentzVector> muonsLVec = tr.getVec<TLorentzVector>("muonsLVec");
           std::vector<double> muonsMiniIso = tr.getVec<double>("muonsMiniIso");
+	  std::vector<int> muonsFlagMedium = tr.getVec<int>("muonsFlagMedium");
 
           double reco_mus_pt = 0, reco_mus_eta = 0, reco_mus_phi = 0;
  	  int nisomuons=0;
 
           for(unsigned int im = 0 ; im < muonsLVec.size() ; im++)
           {
-            if( muonsLVec[im].Pt()>(AnaConsts::muonsMiniIsoArr).minPt && fabs(muonsLVec[im].Eta()) < (AnaConsts::muonsMiniIsoArr).maxAbsEta && muonsMiniIso[im] < (AnaConsts::muonsMiniIsoArr).maxIso )
+            if(muonsFlagMedium[im] && muonsLVec[im].Pt()>(AnaConsts::muonsMiniIsoArr).minPt && fabs(muonsLVec[im].Eta()) < (AnaConsts::muonsMiniIsoArr).maxAbsEta && muonsMiniIso[im] < (AnaConsts::muonsMiniIsoArr).maxIso )
             {
               reco_mus_pt  = ( muonsLVec.at(im) ).Pt();
               reco_mus_eta = ( muonsLVec.at(im) ).Eta();
@@ -344,11 +369,11 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
           int ptbin_number_allreco = Set_ptbin_number(reco_mus_pt);
 
           myAccRecoIsoEffs.mtwall[ptbin_number_allreco]+=thisweight;
-          myAccRecoIsoEffs.mtwall_MC[ptbin_number_allreco]++;
-          if( mtW_mus < 125.0 )
+          myAccRecoIsoEffs.mtwall_MC[ptbin_number_allreco]+=thisweight*thisweight;
+          if( mtW_mus < 100.0 )
           {
             myAccRecoIsoEffs.mtw100[ptbin_number_allreco]+=thisweight;
-            myAccRecoIsoEffs.mtw100_MC[ptbin_number_allreco]++;
+            myAccRecoIsoEffs.mtw100_MC[ptbin_number_allreco]+=thisweight*thisweight;
           }
 
           //muon CS statistics
@@ -368,6 +393,7 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
   myAccRecoIsoEffs.EffstoWeights();
   myAccRecoIsoEffs.GetDiLeptonFactor();
   myAccRecoIsoEffs.printAccRecoIsoEffs();
+  myAccRecoIsoEffs.printEffsHeader();
 
   (myBaseHistgram.oFile)->Write();
   (myBaseHistgram.oFile)->Close();
@@ -398,9 +424,12 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
  
     double thisweight = (*iter_TTJetsSampleInfos).weight;
     std::cout << "Weight " << thisweight << std::endl;
+    int neventc=0;
 
+    //while(tr.getNextEvent() && neventc<10000)
     while(tr.getNextEvent())
     {
+      ++neventc;
       if(tr.getEvtNum()%20000 == 0) std::cout << tr.getEvtNum() << "\t" << ((clock() - t0)/1000000.0) << std::endl;
     
       myAccRecoIsoEffs.nevents_tot+=thisweight;
@@ -605,12 +634,13 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
         {
 	  if (!(ngenmuoutacc==1 || ngenmunotid==1 || ngenmunotiso==1)) std::cout << "ngenmuoutacc = " << ngenmuoutacc << " , ngenmunotid = " << ngenmunotid << " , ngenmunotiso = " << ngenmunotiso << std::endl;
           myAccRecoIsoEffs.nevents_exp_all_mus+=thisweight;
-          myAccRecoIsoEffs.nevents_single_mus+=thisweight;
+          //myAccRecoIsoEffs.nevents_single_mus+=thisweight;
 
           int searchbin_id = find_Binning_Index( nbottomjets , ntopjets , MT2, met );
           if( searchbin_id >= 0 )
           {
-            myAccRecoIsoEffs.nevents_mus_exp_SB_MC[searchbin_id]++;
+            //myAccRecoIsoEffs.nevents_mus_exp_SB_MC[searchbin_id]++;
+            myAccRecoIsoEffs.nevents_mus_exp_SB_MC[searchbin_id]+=thisweight*thisweight;
             myAccRecoIsoEffs.nevents_mus_exp_SB_Normalized[searchbin_id]+=thisweight;
           }
 	
@@ -637,13 +667,14 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
         if ( nElectrons == 0 && nMuons==0 && ngenmu==2 )
         {
 	  if (!( ngenmuoutacc==2 || ngenmunotid==2 || ngenmunotiso==2 || ( ngenmuoutacc==1 && ngenmunotid==1 ) || (ngenmuoutacc==1 && ngenmunotiso==1 ) || ( ngenmunotiso==1 && ngenmunotid==1 ) )) std::cout << "Warning in nElectrons == 0 && nMuons==0 && ngenmu==2" << std::endl;
-          myAccRecoIsoEffs.nevents_di_mus+=thisweight;
+          //myAccRecoIsoEffs.nevents_di_mus+=thisweight;
           myAccRecoIsoEffs.nevents_exp_all_mus+=thisweight;
 
           int searchbin_id = find_Binning_Index( nbottomjets , ntopjets , MT2, met );
           if( searchbin_id >= 0 )
           {
-            myAccRecoIsoEffs.nevents_mus_exp_SB_MC[searchbin_id]++;
+            //myAccRecoIsoEffs.nevents_mus_exp_SB_MC[searchbin_id]++;
+            myAccRecoIsoEffs.nevents_mus_exp_SB_MC[searchbin_id]+=thisweight*thisweight;
             myAccRecoIsoEffs.nevents_mus_exp_SB_Normalized[searchbin_id]+=thisweight;
           }
 
@@ -669,9 +700,10 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
           int searchbin_id = find_Binning_Index( nbottomjets , ntopjets , MT2, met );
           if( searchbin_id >= 0 )
           {
-            myAccRecoIsoEffs.nevents_lept_exp_SB_MC[searchbin_id]++;
+            //myAccRecoIsoEffs.nevents_lept_exp_SB_MC[searchbin_id]++;
+            myAccRecoIsoEffs.nevents_lept_exp_SB_MC[searchbin_id]+=thisweight*thisweight;
             myAccRecoIsoEffs.nevents_lept_exp_SB_Normalized[searchbin_id]+=thisweight;
-            if (nIsoTrks==0) { myAccRecoIsoEffs.nevents_lept_exp_SB_MC_isotrk[searchbin_id]++; myAccRecoIsoEffs.nevents_lept_exp_SB_Normalized_isotrk[searchbin_id]+=thisweight; }
+            if (nIsoTrks==0) { myAccRecoIsoEffs.nevents_lept_exp_SB_MC_isotrk[searchbin_id]+=thisweight*thisweight; myAccRecoIsoEffs.nevents_lept_exp_SB_Normalized_isotrk[searchbin_id]+=thisweight; }
           }
 
 	  if (!applyisotrkveto || nIsoTrks==0)
@@ -740,12 +772,13 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 	  if (!(ngeneloutacc==1 || ngenelnotid==1 || ngenelnotiso==1)) std::cout << "FSL: 1 ele tot warning" << std::endl;
 
           myAccRecoIsoEffs.nevents_exp_all_els+=thisweight;
-          myAccRecoIsoEffs.nevents_single_els+=thisweight;
+          //myAccRecoIsoEffs.nevents_single_els+=thisweight;
 
           int searchbin_id = find_Binning_Index( nbottomjets , ntopjets , MT2, met );
           if( searchbin_id >= 0 )
           {
-            myAccRecoIsoEffs.nevents_els_exp_SB_MC[searchbin_id]++;
+            //myAccRecoIsoEffs.nevents_els_exp_SB_MC[searchbin_id]++;
+            myAccRecoIsoEffs.nevents_els_exp_SB_MC[searchbin_id]+=thisweight*thisweight;
             myAccRecoIsoEffs.nevents_els_exp_SB_Normalized[searchbin_id]+=thisweight;
           }
 
@@ -767,16 +800,17 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 	  }
         }  
 
-        if ( nElectrons == 0 && nMuons==0 && ngenel==2 && ( ngeneloutacc==2 || ngenelnotid==2 || ngenelnotiso==2 || ( ngeneloutacc==1 && ngenelnotid==1 ) || (ngeneloutacc==1 && ngenelnotiso==1 ) || ( ngenelnotiso==1 && ngenelnotid==1 ) ) )
-        //if (nElectrons == 0 && nMuons==0 && ngenel==2)
+        //if ( nElectrons == 0 && nMuons==0 && ngenel==2 && ( ngeneloutacc==2 || ngenelnotid==2 || ngenelnotiso==2 || ( ngeneloutacc==1 && ngenelnotid==1 ) || (ngeneloutacc==1 && ngenelnotiso==1 ) || ( ngenelnotiso==1 && ngenelnotid==1 ) ) )
+        if (nElectrons == 0 && nMuons==0 && ngenel==2)
         {
           myAccRecoIsoEffs.nevents_exp_all_els+=thisweight;
-          myAccRecoIsoEffs.nevents_di_els+=thisweight;
+          //myAccRecoIsoEffs.nevents_di_els+=thisweight;
 
           int searchbin_id = find_Binning_Index( nbottomjets , ntopjets , MT2, met );
           if( searchbin_id >= 0 )
           {
-            myAccRecoIsoEffs.nevents_els_exp_SB_MC[searchbin_id]++;
+            //myAccRecoIsoEffs.nevents_els_exp_SB_MC[searchbin_id]++;
+            myAccRecoIsoEffs.nevents_els_exp_SB_MC[searchbin_id]+=thisweight*thisweight;
             myAccRecoIsoEffs.nevents_els_exp_SB_Normalized[searchbin_id]+=thisweight;
           }
 
@@ -794,8 +828,72 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
     }//TTjets samples class
   }//end of first loop
 
-  myAccRecoIsoEffs.GetDiLeptonFactor();
-  myAccRecoIsoEffs.printEffsHeader();
+  // printSearchBin
+//  //std::cout << "Muon CS # in Search Bins: " << std::endl;  
+//  for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
+//  {
+//    //myAccRecoIsoEffs.nevents_lept_exp_SB_MC[i_cal] = nevents_mus_exp_SB_MC[i_cal] + nevents_els_exp_SB_MC[i_cal];
+//    //nevents_lept_pred_SB_MC[i_cal] = nevents_mus_pred_SB_MC[i_cal] + nevents_els_pred_SB_MC[i_cal];
+//    //myAccRecoIsoEffs.nevents_lept_exp_SB_Normalized[i_cal] = nevents_mus_exp_SB_Normalized[i_cal] + nevents_els_exp_SB_Normalized[i_cal];
+//    //myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal] = nevents_mus_pred_SB_Normalized[i_cal] + nevents_els_pred_SB_Normalized[i_cal];
+//    //nevents_lept_pred_SB_Normalized[i_cal] = nevents_lept_pred_SB_MC[i_cal]*scale;
+//
+//    //std::cout << "idx: " << i_cal << "; MC Numbers: " << nevents_mus_CS_SB_MC[i_cal] << "; Normalized Numbers: " << nevents_mus_CS_SB_Normalized[i_cal] << std::endl;
+//    //std::cout << "Mus Exp MC Numbers: " << nevents_mus_exp_SB_MC[i_cal] << "; Mus Exp Normalized Numbers: " << nevents_mus_exp_SB_Normalized[i_cal] << std::endl;
+//    //std::cout << "Mus Pred Normalized Numbers: " << nevents_mus_pred_SB_Normalized[i_cal] << std::endl;
+//    //std::cout << "Els Exp MC Numbers: " << nevents_els_exp_SB_MC[i_cal] << "; Els Exp Normalized Numbers: " << nevents_els_exp_SB_Normalized[i_cal] << std::endl;
+//    //std::cout << "Els Pred Normalized Numbers: " << nevents_els_pred_SB_Normalized[i_cal] << std::endl;
+//    std::cout << "Lept Exp MC Numbers: " << myAccRecoIsoEffs.nevents_lept_exp_SB_MC[i_cal] << "; Lept Exp Normalized Numbers: " << myAccRecoIsoEffs.nevents_lept_exp_SB_Normalized[i_cal] << std::endl;
+//    //std::cout << "Lept Pred Normalized Numbers: " << nevents_lept_pred_SB_Normalized[i_cal] << std::endl;
+//  }
+  
+//  TH1D * h_cs_mus_sb = new TH1D("h_cs_mus_sb","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
+//
+  for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
+  {
+    //double tmpscale = 0.01;
+//    h_cs_mus_sb->SetBinContent( i_cal+1 , nevents_mus_CS_SB_Normalized[i_cal] );
+    myClosureHistgram.h_exp_mu_sb->SetBinContent( i_cal+1 , myAccRecoIsoEffs.nevents_mus_exp_SB_Normalized[i_cal] );
+    myClosureHistgram.h_exp_mu_sb->SetBinError(i_cal+1 , std::sqrt(myAccRecoIsoEffs.nevents_mus_exp_SB_MC[i_cal]));
+    //myClosureHistgram.h_pred_mu_sb->SetBinContent( i_cal+1 , myAccRecoIsoEffs.nevents_mus_pred_SB_Normalized[i_cal] );
+    //myClosureHistgram.h_pred_mu_sb->SetBinError( i_cal+1 , std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC_err[i_cal])*tmpscale);
+    myClosureHistgram.h_exp_el_sb->SetBinContent( i_cal+1 , myAccRecoIsoEffs.nevents_els_exp_SB_Normalized[i_cal] );
+    myClosureHistgram.h_exp_el_sb->SetBinError( i_cal+1 , std::sqrt(myAccRecoIsoEffs.nevents_els_exp_SB_MC[i_cal]));
+    //myClosureHistgram.h_pred_el_sb->SetBinContent( i_cal+1 , myAccRecoIsoEffs.nevents_els_pred_SB_Normalized[i_cal] );
+    //myClosureHistgram.h_pred_el_sb->SetBinError( i_cal+1 , std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal])*tmpscale );
+    myClosureHistgram.h_exp_lept_sb->SetBinContent( i_cal+1 , myAccRecoIsoEffs.nevents_lept_exp_SB_Normalized[i_cal] );
+    myClosureHistgram.h_exp_lept_sb->SetBinError( i_cal+1 , std::sqrt(myAccRecoIsoEffs.nevents_lept_exp_SB_MC[i_cal]));
+    myClosureHistgram.h_exp_lept_sb_isotrk->SetBinContent( i_cal+1 , myAccRecoIsoEffs.nevents_lept_exp_SB_Normalized_isotrk[i_cal] );
+    myClosureHistgram.h_exp_lept_sb_isotrk->SetBinError( i_cal+1 , std::sqrt(myAccRecoIsoEffs.nevents_lept_exp_SB_MC_isotrk[i_cal]));
+    //myClosureHistgram.h_pred_lept_sb->SetBinContent( i_cal+1 , myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal] );
+    //myClosureHistgram.h_pred_lept_sb->SetBinError( i_cal+1 , std::sqrt(myAccRecoIsoEffs.nevents_lept_pred_SB_MC[i_cal])*tmpscale );
+    //myClosureHistgram.h_pred_lept_sb_isotrk->SetBinContent( i_cal+1 , myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isotrackvetoeff );
+    //myClosureHistgram.h_pred_lept_sb_isotrk->SetBinError( i_cal+1 , std::sqrt(myAccRecoIsoEffs.nevents_lept_pred_SB_MC[i_cal]*isotrackvetoeff)*tmpscale );
+  }
+//
+//  //cmusCS
+//  TCanvas *cmusCS = new TCanvas("cmusCS","A Simple Graph Example",200,10,700,500);
+//  gStyle->SetOptStat(0);
+//
+//  h_cs_mus_sb->SetLineColor(1);
+//  h_cs_mus_sb->SetLineWidth(3);
+//  h_cs_mus_sb->Draw();
+//
+//  const std::string titre_musCS="CMS Simulation 2015, 10 fb^{-1}, #sqrt{s} = 13 TeV";
+//  TLatex *title_musCS = new TLatex(0.09770115,0.9194915,titre_musCS.c_str());
+//  title_musCS->SetNDC();
+//  title_musCS->SetTextSize(0.045);
+//  title_musCS->Draw("same");
+//
+//  //TLegend* leg_musCS = new TLegend(0.6,0.75,0.85,0.85);
+//  //leg_musCS->SetBorderSize(0);
+//  //leg_musCS->SetTextFont(42);
+//  //leg_musCS->SetFillColor(0);
+//  //leg_musCS->AddEntry(h_cs_mus_sb,"Number of Muon CS","l");
+//  //leg_musCS->Draw("same");
+//
+//  cmusCS->SaveAs( "searchbin_mus_CS.png" );
+//  cmusCS->SaveAs( "searchbin_mus_CS.C" );
 
   (myClosureHistgram.oFile)->Write();
   (myClosureHistgram.oFile)->Close();
@@ -882,7 +980,7 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
           double deltaphi_mus = DeltaPhi( reco_mus_phi , metphi );
           double mtW_mus = std::sqrt( 2.0 * reco_mus_pt * met * ( 1.0 - cos(deltaphi_mus) ) );
 
-          if ( mtW_mus < 125.0 )
+          if ( mtW_mus < 100.0 )
           {
 	    //////////////////////////
 	    // prediction computation
@@ -1052,22 +1150,23 @@ int main(int argc, char* argv[])
   double TTbar_SingleLept_BR = 0.43930872; // 2*W_Lept_BR*(1-W_Lept_BR)
   double TTbar_DiLept_BR = 0.10614564; // W_Lept_BR^2
   //TTJets nominal
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_", 831.76, 11339232, LUMI, inputFileList_Cal );
+  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_", 831.76, 11339232, LUMI, inputFileList_Cal );
   //TTJets single lepton and di-lepton
-  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromT_", 831.76*0.5*TTbar_SingleLept_BR, 60144642, LUMI, inputFileList );
-  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromTbar_", 831.76*0.5*TTbar_SingleLept_BR, 59816364, LUMI, inputFileList );
-  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_DiLept_", 831.76*TTbar_DiLept_BR, 30498962, LUMI, inputFileList );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromT_", 831.76*0.5*TTbar_SingleLept_BR, 60144642, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromTbar_", 831.76*0.5*TTbar_SingleLept_BR, 59816364, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_DiLept_", 831.76*TTbar_DiLept_BR, 30498962, LUMI, inputFileList_Cal );
 
-  TTJetsSampleWeight myExpPredSampleWeight;
-  myExpPredSampleWeight.TTJetsSampleInfo_push_back( "TTJets_", 831.76, 11339232, LUMI, inputFileList_Exp_Pred );
+  //TTJetsSampleWeight myExpPredSampleWeight;
+  //myExpPredSampleWeight.TTJetsSampleInfo_push_back( "TTJets_", 831.76, 11339232, LUMI, inputFileList_Exp_Pred );
 
-  LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
-  LoopLLExp( myAccRecoIsoEffs, myExpPredSampleWeight );
-  LoopLLPred( myAccRecoIsoEffs, myExpPredSampleWeight );
+  //LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
+  LoopLLExp( myAccRecoIsoEffs, myTTJetsSampleWeight );
+  //LoopLLPred( myAccRecoIsoEffs, myExpPredSampleWeight );
 
-  myAccRecoIsoEffs.printOverview();
-  myAccRecoIsoEffs.NormalizeFlowNumber();
-  myAccRecoIsoEffs.printNormalizeFlowNumber();
+  //std::cout << "main: printOverview" << std::endl;
+  //myAccRecoIsoEffs.printOverview();
+  //myAccRecoIsoEffs.NormalizeFlowNumber();
+  // myAccRecoIsoEffs.printNormalizeFlowNumber();
 
   return 0;
 }
@@ -1131,9 +1230,8 @@ void AccRecoIsoEffs::NumberstoEffs()
   
   for(i_cal = 0 ; i_cal < PT_BINS ; i_cal++)
   {
-    //here the error calculation is wrong...
     mtwcorrfactor[i_cal] = mtwall[i_cal]/mtw100[i_cal];
-    mtwcorrfactor_err[i_cal] = get_stat_Error(mtw100_MC[i_cal],mtwall_MC[i_cal]);
+    mtwcorrfactor_err[i_cal] = get_stat_Error_APNOA(mtw100[i_cal],mtwall[i_cal],std::sqrt(mtw100_MC[i_cal]),std::sqrt(mtwall_MC[i_cal]-mtw100_MC[i_cal]));
   }
 
   return ;
@@ -1148,15 +1246,15 @@ void AccRecoIsoEffs::EffsPlotsGen()
   {
     for(j_cal = 0 ; j_cal < AC_BINS ; j_cal++)
     {
-      mus_recoeffs2d->SetBinContent( i_cal+1 , j_cal+1, mus_recoeff[i_cal][j_cal] );
-      mus_isoeffs2d->SetBinContent( i_cal+1 , j_cal+1, mus_isoeff_allreco[i_cal][j_cal] );
-      els_recoeffs2d->SetBinContent( i_cal+1 , j_cal+1, els_recoeff[i_cal][j_cal] );
-      els_isoeffs2d->SetBinContent( i_cal+1 , j_cal+1, els_isoeff_allreco[i_cal][j_cal] );
+      mus_recoeffs2d->SetBinContent( i_cal+1 , j_cal+2, mus_recoeff[i_cal][j_cal] );
+      mus_isoeffs2d->SetBinContent( i_cal+1 , j_cal+2, mus_isoeff_allreco[i_cal][j_cal] );
+      els_recoeffs2d->SetBinContent( i_cal+1 , j_cal+2, els_recoeff[i_cal][j_cal] );
+      els_isoeffs2d->SetBinContent( i_cal+1 , j_cal+2, els_isoeff_allreco[i_cal][j_cal] );
 
-      mus_recoeffs2d->SetBinError( i_cal+1 , j_cal+1, mus_recoeff_err[i_cal][j_cal] );
-      mus_isoeffs2d->SetBinError( i_cal+1 , j_cal+1, mus_isoeff_err_allreco[i_cal][j_cal] );
-      els_recoeffs2d->SetBinError( i_cal+1 , j_cal+1, els_recoeff_err[i_cal][j_cal] );
-      els_isoeffs2d->SetBinError( i_cal+1 , j_cal+1, els_isoeff_err_allreco[i_cal][j_cal] );
+      mus_recoeffs2d->SetBinError( i_cal+1 , j_cal+2, mus_recoeff_err[i_cal][j_cal] );
+      mus_isoeffs2d->SetBinError( i_cal+1 , j_cal+2, mus_isoeff_err_allreco[i_cal][j_cal] );
+      els_recoeffs2d->SetBinError( i_cal+1 , j_cal+2, els_recoeff_err[i_cal][j_cal] );
+      els_isoeffs2d->SetBinError( i_cal+1 , j_cal+2, els_isoeff_err_allreco[i_cal][j_cal] );
     }       
   }
 
@@ -1328,101 +1426,26 @@ void AccRecoIsoEffs::printNormalizeFlowNumber()
   std::cout<<"els,percentage,id: " << nevents_pred_id_els/nevents_exp_id_els - 1   << std::endl;
   std::cout<<"els,percentage,iso: "<< nevents_pred_iso_els/nevents_exp_iso_els - 1 << std::endl;
 }
-/*
-void AccRecoIsoEffs::printSearchBin(BaseHistgram& myBaseHistgram)
-{
-  std::cout << "Muon CS # in Search Bins: " << std::endl;  
-  for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
-  {
-    //nevents_mus_CS_SB_Normalized[i_cal] = nevents_mus_CS_SB_MC[i_cal]*scale;
-    //nevents_mus_exp_SB_Normalized[i_cal] = nevents_mus_exp_SB_MC[i_cal]*scale;
-    //nevents_mus_pred_SB_Normalized[i_cal] = nevents_mus_pred_SB_MC[i_cal]*scale;
-    //nevents_els_exp_SB_Normalized[i_cal] = nevents_els_exp_SB_MC[i_cal]*scale;
-    //nevents_els_pred_SB_Normalized[i_cal] = nevents_els_pred_SB_MC[i_cal]*scale;
 
-    nevents_lept_exp_SB_MC[i_cal] = nevents_mus_exp_SB_MC[i_cal] + nevents_els_exp_SB_MC[i_cal];
-    nevents_lept_pred_SB_MC[i_cal] = nevents_mus_pred_SB_MC[i_cal] + nevents_els_pred_SB_MC[i_cal];
-    nevents_lept_exp_SB_Normalized[i_cal] = nevents_mus_exp_SB_Normalized[i_cal] + nevents_els_exp_SB_Normalized[i_cal];
-    nevents_lept_pred_SB_Normalized[i_cal] = nevents_mus_pred_SB_Normalized[i_cal] + nevents_els_pred_SB_Normalized[i_cal];
-    //nevents_lept_pred_SB_Normalized[i_cal] = nevents_lept_pred_SB_MC[i_cal]*scale;
-
-    std::cout << "idx: " << i_cal << "; MC Numbers: " << nevents_mus_CS_SB_MC[i_cal] << "; Normalized Numbers: " << nevents_mus_CS_SB_Normalized[i_cal] << std::endl;
-    std::cout << "Mus Exp MC Numbers: " << nevents_mus_exp_SB_MC[i_cal] << "; Mus Exp Normalized Numbers: " << nevents_mus_exp_SB_Normalized[i_cal] << std::endl;
-    std::cout << "Mus Pred Normalized Numbers: " << nevents_mus_pred_SB_Normalized[i_cal] << std::endl;
-    std::cout << "Els Exp MC Numbers: " << nevents_els_exp_SB_MC[i_cal] << "; Els Exp Normalized Numbers: " << nevents_els_exp_SB_Normalized[i_cal] << std::endl;
-    std::cout << "Els Pred Normalized Numbers: " << nevents_els_pred_SB_Normalized[i_cal] << std::endl;
-    std::cout << "Lept Exp MC Numbers: " << nevents_lept_exp_SB_MC[i_cal] << "; Lept Exp Normalized Numbers: " << nevents_lept_exp_SB_Normalized[i_cal] << std::endl;
-    std::cout << "Lept Pred Normalized Numbers: " << nevents_lept_pred_SB_Normalized[i_cal] << std::endl;
-  }
-  
-  TH1D * h_cs_mus_sb = new TH1D("h_cs_mus_sb","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
-
-  for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
-  {
-    double tmpscale = 0.01;
-    h_cs_mus_sb->SetBinContent( i_cal+1 , nevents_mus_CS_SB_Normalized[i_cal] );
-    myBaseHistgram.h_exp_mu_sb->SetBinContent( i_cal+1 , nevents_mus_exp_SB_Normalized[i_cal] );
-    myBaseHistgram.h_exp_mu_sb->SetBinError(i_cal+1 , std::sqrt(nevents_mus_exp_SB_MC[i_cal])*tmpscale);
-    myBaseHistgram.h_pred_mu_sb->SetBinContent( i_cal+1 , nevents_mus_pred_SB_Normalized[i_cal] );
-    myBaseHistgram.h_pred_mu_sb->SetBinError( i_cal+1 , std::sqrt(nevents_mus_pred_SB_MC_err[i_cal])*tmpscale);
-    myBaseHistgram.h_exp_el_sb->SetBinContent( i_cal+1 , nevents_els_exp_SB_Normalized[i_cal] );
-    myBaseHistgram.h_exp_el_sb->SetBinError( i_cal+1 , std::sqrt(nevents_els_exp_SB_MC[i_cal])*tmpscale);
-    myBaseHistgram.h_pred_el_sb->SetBinContent( i_cal+1 , nevents_els_pred_SB_Normalized[i_cal] );
-    myBaseHistgram.h_pred_el_sb->SetBinError( i_cal+1 , std::sqrt(nevents_els_pred_SB_MC[i_cal])*tmpscale );
-    myBaseHistgram.h_exp_lept_sb->SetBinContent( i_cal+1 , nevents_lept_exp_SB_Normalized[i_cal] );
-    myBaseHistgram.h_exp_lept_sb->SetBinError( i_cal+1 , std::sqrt(nevents_lept_exp_SB_MC[i_cal])*tmpscale);
-    myBaseHistgram.h_exp_lept_sb_isotrk->SetBinContent( i_cal+1 , nevents_lept_exp_SB_Normalized_isotrk[i_cal] );
-    myBaseHistgram.h_exp_lept_sb_isotrk->SetBinError( i_cal+1 , std::sqrt(nevents_lept_exp_SB_MC_isotrk[i_cal])*tmpscale);
-    myBaseHistgram.h_pred_lept_sb->SetBinContent( i_cal+1 , nevents_lept_pred_SB_Normalized[i_cal] );
-    myBaseHistgram.h_pred_lept_sb->SetBinError( i_cal+1 , std::sqrt(nevents_lept_pred_SB_MC[i_cal])*tmpscale );
-    myBaseHistgram.h_pred_lept_sb_isotrk->SetBinContent( i_cal+1 , nevents_lept_pred_SB_MC[i_cal]*scale*isotrackvetoeff );
-    myBaseHistgram.h_pred_lept_sb_isotrk->SetBinError( i_cal+1 , std::sqrt(nevents_lept_pred_SB_MC[i_cal]*isotrackvetoeff)*tmpscale );
-  }
-
-  //cmusCS
-  TCanvas *cmusCS = new TCanvas("cmusCS","A Simple Graph Example",200,10,700,500);
-  gStyle->SetOptStat(0);
-
-  h_cs_mus_sb->SetLineColor(1);
-  h_cs_mus_sb->SetLineWidth(3);
-  h_cs_mus_sb->Draw();
-
-  const std::string titre_musCS="CMS Simulation 2015, 10 fb^{-1}, #sqrt{s} = 13 TeV";
-  TLatex *title_musCS = new TLatex(0.09770115,0.9194915,titre_musCS.c_str());
-  title_musCS->SetNDC();
-  title_musCS->SetTextSize(0.045);
-  title_musCS->Draw("same");
-
-  //TLegend* leg_musCS = new TLegend(0.6,0.75,0.85,0.85);
-  //leg_musCS->SetBorderSize(0);
-  //leg_musCS->SetTextFont(42);
-  //leg_musCS->SetFillColor(0);
-  //leg_musCS->AddEntry(h_cs_mus_sb,"Number of Muon CS","l");
-  //leg_musCS->Draw("same");
-
-  cmusCS->SaveAs( "searchbin_mus_CS.png" );
-  cmusCS->SaveAs( "searchbin_mus_CS.C" );
-}
-*/
 void AccRecoIsoEffs::printAccRecoIsoEffs()
 {
   int i_cal = 0;
   int j_cal = 0;
   std::cout.precision(3);
 
-  std::cout << "mtW correction factor: " << std::endl;
+  std::cout << "mtW correction factor & ";
   for( i_cal=0 ; i_cal < PT_BINS ; i_cal++ )
   {
-    std::cout << mtwcorrfactor[i_cal] << "(" << mtwcorrfactor_err[i_cal] << ")"<< " ";
+    std::cout << mtwcorrfactor[i_cal] << "$\\pm$" << mtwcorrfactor_err[i_cal] << " & ";
     if( i_cal == PT_BINS-1 )
     {
-      std::cout << std::endl;
+      std::cout <<  " \\\\" << std::endl;
     }
   }
 
   std::cout << std::endl << "Muon information: " << std::endl;
 
-  std::cout << "number of muons from top: " << std::endl;
+  std::cout << "number of muons from top (njets bins): " << std::endl;
   for( i_cal=0 ; i_cal < NJETS_BINS ; i_cal++ )
   {
     std::cout << nmus[i_cal] << " ";
@@ -1432,7 +1455,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
     }
   }
 
-  std::cout << "number of muons from top, accepted: " << std::endl;
+  std::cout << "number of muons from top, accepted (njets bins): " << std::endl;
   for( i_cal=0 ; i_cal < NJETS_BINS ; i_cal++ )
   {
     std::cout << nmus_acc[i_cal] << " ";
@@ -1442,7 +1465,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
     }
   }
 
-  std::cout << "number of muons from top, accepted, bins: " << std::endl;
+  std::cout << "number of muons from top, accepted, bins (PT_BINS,AC_BINS): " << std::endl;
   for( i_cal=0 ; i_cal < PT_BINS ; i_cal++ )
   {
     for(j_cal = 0 ; j_cal < AC_BINS ; j_cal++)
@@ -1459,7 +1482,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
     }
   }
 
-  std::cout << "number of muons from top, reconstructed: " << std::endl;
+  std::cout << "number of muons from top, reconstructed (PT_BINS,AC_BINS): " << std::endl;
   for( i_cal=0 ; i_cal < PT_BINS ; i_cal++ )
   {
     for(j_cal = 0 ; j_cal < AC_BINS ; j_cal++)
@@ -1476,7 +1499,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
     }
   }
 
-  std::cout << "number of muons from top, reconstructed (allreco): " << std::endl;
+  std::cout << "number of muons from top, reconstructed (allreco) (PT_BINS,AC_BINS): " << std::endl;
   for( i_cal=0 ; i_cal < PT_BINS ; i_cal++ )
   {
     for(j_cal = 0 ; j_cal < AC_BINS ; j_cal++)
@@ -1493,7 +1516,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
     }
   }
 
-  std::cout << "number of muons from top, isolated: " << std::endl;
+  std::cout << "number of muons from top, isolated (PT_BINS,AC_BINS): " << std::endl;
   for( i_cal=0 ; i_cal < PT_BINS ; i_cal++ )
   {
     for(j_cal = 0 ; j_cal < AC_BINS ; j_cal++)
@@ -1510,7 +1533,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
     }
   }
 
-  std::cout << "number of muons from top, isolated (allreco): " << std::endl;
+  std::cout << "number of muons from top, isolated (allreco) (PT_BINS,AC_BINS): " << std::endl;
 
   for( i_cal=0 ; i_cal < PT_BINS ; i_cal++ )
   {
@@ -1528,7 +1551,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
     }
   }
 
-  std::cout << "muons from top, acceptance: " << std::endl;
+  std::cout << "muons from top, acceptance (NJETS_BINS): " << std::endl;
   for( i_cal=0 ; i_cal < NJETS_BINS ; i_cal++ )
   {
     std::cout << mus_acc[i_cal] << "(" << mus_acc_err[i_cal] << ")"<< " ";
@@ -1538,7 +1561,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
     }
   } 
 
-  std::cout << "muons from top, reconstruction efficiency: " << std::endl;
+  std::cout << "muons from top, reconstruction efficiency (PT_BINS,AC_BINS): " << std::endl;
   for( i_cal=0 ; i_cal < PT_BINS ; i_cal++ )
   {
     for(j_cal = 0 ; j_cal < AC_BINS ; j_cal++)
@@ -1555,7 +1578,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
     }
   }
 
-  std::cout<<"muons from top, isolation efficiency: " << std::endl;
+  std::cout<<"muons from top, isolation efficiency (PT_BINS,AC_BINS): " << std::endl;
   for( i_cal=0 ; i_cal < PT_BINS ; i_cal++ )
   {
     for(j_cal = 0 ; j_cal < AC_BINS ; j_cal++)
@@ -1572,7 +1595,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
     }
   }
 
-  std::cout<<"muons from top, isolation efficiency (allreco): " << std::endl;
+  std::cout<<"muons from top, isolation efficiency (allreco) (PT_BINS,AC_BINS): " << std::endl;
   for( i_cal=0 ; i_cal < PT_BINS ; i_cal++ )
   {
     for(j_cal = 0 ; j_cal < AC_BINS ; j_cal++)
@@ -1593,7 +1616,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
 
   std::cout << std::endl << "Electron information: " << std::endl;
 
-  std::cout << "number of electrons from top: " << std::endl;
+  std::cout << "number of electrons from top (NJETS_BINS): " << std::endl;
   for( i_cal=0 ; i_cal < NJETS_BINS ; i_cal++ )
   {
     std::cout << nels[i_cal] << " ";
@@ -1603,7 +1626,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
     }
   }
 
-  std::cout << "number of electrons from top, accepted: " << std::endl;
+  std::cout << "number of electrons from top, accepted (NJETS_BINS): " << std::endl;
   for( i_cal=0 ; i_cal < NJETS_BINS ; i_cal++ )
   {
     std::cout << nels_acc[i_cal] << " ";
@@ -1614,7 +1637,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
   }
 
 
-  std::cout << "number of electrons from top, accepted, bins: " << std::endl;
+  std::cout << "number of electrons from top, accepted, bins (PT_BINS,AC_BINS): " << std::endl;
   for( i_cal=0 ; i_cal<PT_BINS ; i_cal++ )
   {
     for(j_cal = 0 ; j_cal < AC_BINS ; j_cal++)
@@ -1631,7 +1654,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
     }
   }
 
-  std::cout << "number of electrons from top, reconstructed: " << std::endl;
+  std::cout << "number of electrons from top, reconstructed (PT_BINS,AC_BINS): " << std::endl;
   for( i_cal=0 ; i_cal<PT_BINS ; i_cal++ )
   {
     for(j_cal = 0 ; j_cal < AC_BINS ; j_cal++)
@@ -1648,7 +1671,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
     }
   }
 
-  std::cout << "number of electrons from top, reconstructed (allreco): " << std::endl;
+  std::cout << "number of electrons from top, reconstructed (allreco) (PT_BINS,AC_BINS): " << std::endl;
   for( i_cal=0 ; i_cal<PT_BINS ; i_cal++ )
   {
     for(j_cal = 0 ; j_cal < AC_BINS ; j_cal++)
@@ -1666,7 +1689,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
   }
 
 
-  std::cout << "number of electrons from top, isolated: " << std::endl;
+  std::cout << "number of electrons from top, isolated (PT_BINS,AC_BINS): " << std::endl;
   for( i_cal=0 ; i_cal<PT_BINS ; i_cal++ )
   {
     for(j_cal = 0 ; j_cal < AC_BINS ; j_cal++)
@@ -1683,7 +1706,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
     }
   }
 
-  std::cout << "number of electrons from top, isolated (allreco): " << std::endl;
+  std::cout << "number of electrons from top, isolated (allreco) (PT_BINS,AC_BINS): " << std::endl;
   for( i_cal=0 ; i_cal<PT_BINS ; i_cal++ )
   {
     for(j_cal = 0 ; j_cal < AC_BINS ; j_cal++)
@@ -1700,7 +1723,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
     }
   }
 
-  std::cout << "electrons from top, acceptance: " << std::endl;
+  std::cout << "electrons from top, acceptance (NJETS_BINS): " << std::endl;
   for( i_cal=0 ; i_cal < NJETS_BINS ; i_cal++ )
   {
     std::cout << els_acc[i_cal] << "(" << els_acc_err[i_cal] << ")"<< " ";
@@ -1711,7 +1734,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
   }
 
 
-  std::cout << "electrons from top, reconstruction efficiency: " << std::endl;
+  std::cout << "electrons from top, reconstruction efficiency (PT_BINS,AC_BINS): " << std::endl;
   for( i_cal=0 ; i_cal<PT_BINS ; i_cal++ )
   {
     for(j_cal = 0 ; j_cal < AC_BINS ; j_cal++)
@@ -1728,7 +1751,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
     }
   }
 
-  std::cout << "electrons from top, isolation efficiency: " << std::endl;
+  std::cout << "electrons from top, isolation efficiency (PT_BINS,AC_BINS): " << std::endl;
   for( i_cal=0 ; i_cal<PT_BINS ; i_cal++ )
   {
     for(j_cal = 0 ; j_cal < AC_BINS ; j_cal++)
@@ -1745,7 +1768,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
     }
   }
 
-  std::cout << "electrons from top, isolation efficiency (allreco): " << std::endl;
+  std::cout << "electrons from top, isolation efficiency (allreco) (PT_BINS,AC_BINS): " << std::endl;
   for( i_cal=0 ; i_cal<PT_BINS ; i_cal++ )
   {
     for(j_cal = 0 ; j_cal < AC_BINS ; j_cal++)
