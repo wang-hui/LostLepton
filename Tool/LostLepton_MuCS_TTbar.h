@@ -24,8 +24,6 @@ void mypassBaselineFunc(NTupleReader& tr)
   (*myBaselineVessel)(tr);
 }
 
-class BaseHistgram;
-
 class AccRecoIsoEffs
 {
  public:
@@ -121,50 +119,36 @@ class AccRecoIsoEffs
   double corrfactor_di_els_err = 0;
 
   TFile *Effs2dPlots = new TFile("Effs2dPlots.root", "recreate");
-  //double ptbins[9]={5.0,10.0,20.0,30.0,40.0,50.0,70.0,100.0,120.0};
-  //double acbins[9]={0.0,5.0,10.0,20.0,40.0,60.0,80.0,100.0,120.0};
-  //TH2D *mus_recoeffs2d  = new TH2D("mus_recoeffs","Muon RecoEffs",8,ptbins,8,acbins);
-  //TH2D *mus_isoeffs2d  = new TH2D("mus_isoeffs","Muon IsoEffs",8,ptbins,8,acbins);
-  //TH2D *els_recoeffs2d  = new TH2D("els_recoeffs","Electron RecoEffs",8,ptbins,8,acbins);
-  //TH2D *els_isoeffs2d  = new TH2D("els_isoeffs","Electron IsoEffs",8,ptbins,8,acbins);
+  double ptbins[PT_BINS+1]={10.0,20.0,30.0,40.0,50.0,70.0,100.0,120.0};
+  double acbins[AC_BINS+2]={0.0,0.005,0.02,0.05,0.15,1.0,10.0};
+  TH2D *mus_recoeffs2d  = new TH2D("mus_recoeffs","Muon RecoEffs",PT_BINS,ptbins,AC_BINS+1,acbins);
+  TH2D *mus_isoeffs2d  = new TH2D("mus_isoeffs","Muon IsoEffs",PT_BINS,ptbins,AC_BINS+1,acbins);
+  TH2D *els_recoeffs2d  = new TH2D("els_recoeffs","Electron RecoEffs",PT_BINS,ptbins,AC_BINS+1,acbins);
+  TH2D *els_isoeffs2d  = new TH2D("els_isoeffs","Electron IsoEffs",PT_BINS,ptbins,AC_BINS+1,acbins);
 
-  TH2D *mus_recoeffs2d  = new TH2D("mus_recoeffs","Muon RecoEffs",PT_BINS,0,PT_BINS,AC_BINS,0,AC_BINS);
-  TH2D *mus_isoeffs2d  = new TH2D("mus_isoeffs","Muon IsoEffs",PT_BINS,0,PT_BINS,AC_BINS,0,AC_BINS);
-  TH2D *els_recoeffs2d  = new TH2D("els_recoeffs","Electron RecoEffs",PT_BINS,0,PT_BINS,AC_BINS,0,AC_BINS);
-  TH2D *els_isoeffs2d  = new TH2D("els_isoeffs","Electron IsoEffs",PT_BINS,0,PT_BINS,AC_BINS,0,AC_BINS);
+  //TH2D *mus_recoeffs2d  = new TH2D("mus_recoeffs","Muon RecoEffs",PT_BINS,0,PT_BINS,AC_BINS,0,AC_BINS);
+  //TH2D *mus_isoeffs2d  = new TH2D("mus_isoeffs","Muon IsoEffs",PT_BINS,0,PT_BINS,AC_BINS,0,AC_BINS);
+  //TH2D *els_recoeffs2d  = new TH2D("els_recoeffs","Electron RecoEffs",PT_BINS,0,PT_BINS,AC_BINS,0,AC_BINS);
+  //TH2D *els_isoeffs2d  = new TH2D("els_isoeffs","Electron IsoEffs",PT_BINS,0,PT_BINS,AC_BINS,0,AC_BINS);
 
   void NumberstoEffs();
   void EffsPlotsGen();
   void EffstoWeights();
   void GetDiLeptonFactor();
   void NormalizeFlowNumber();
-  void printSearchBin(BaseHistgram& myBaseHistgram);
+  //void printSearchBin(ClosureHistgram& myClosureHistgram);
 
  private:
-  //define the variables we needed for normalization
-  //double Nevents = 25446993;
-  //double XSec = 806.1;
-  //double Lumi = 10000;
-  //double scale = XSec*Lumi/Nevents;
   double scale = 1;  
-
-  double get_stat_Error(
-                        double a,
-                        double an
-                       );
-  
-  double get_sys_Error(
-                       double r,
-                       double p
-                      );
+  double get_stat_Error(double a, double an);
+  double get_stat_Error_APNOA(double a, double an,double ua, double un);
+  double get_sys_Error(double r, double p);
 };
 
 
-double AccRecoIsoEffs::get_stat_Error(
-                                      double a,
-                                      double an
-                                     )
+double AccRecoIsoEffs::get_stat_Error(double a, double an)
 {
+  // give the uncertainty for R=A/an=A/(A+N)
   double n;
   n = an - a;
 
@@ -184,6 +168,31 @@ double AccRecoIsoEffs::get_stat_Error(
     return -1;
   }
 }
+
+double AccRecoIsoEffs::get_stat_Error_APNOA(double a, double an,double ua, double un)
+{
+  // give the uncertainty for R=an/A=(A+N)/A
+  double n;
+  n = an - a;
+
+  double err;
+  err = 1000;
+
+  double alpha;
+  alpha = 1-0.6827;
+
+  if( a>=0 && n>=0 )
+  {
+    err = std::sqrt(n/(a*a)*n/(a*a)*ua+1.0/(a*a)*un);
+    return err;
+  }
+  else
+  {
+    return -1;
+  }
+}
+
+
 
 double AccRecoIsoEffs::get_sys_Error(
                                      double r,
@@ -215,7 +224,7 @@ class BaseHistgram
   TH1D *h_b_acc_njets, *h_b_acc_nbjetsCSVM, *h_b_acc_MET, *h_b_acc_jetpt2, *h_b_acc_jetpt4, *h_b_acc_jet1_met_phi_diff, *h_b_acc_jet2_met_phi_diff, *h_b_acc_jet3_met_phi_diff;
   TH1D *h_b_reco_nMuons, *h_b_reco_njets, *h_b_reco_nbjetsCSVM, *h_b_reco_MET, *h_b_reco_jetpt2, *h_b_reco_jetpt4, *h_b_reco_jet1_met_phi_diff, *h_b_reco_jet2_met_phi_diff, *h_b_reco_jet3_met_phi_diff;
   TH1D *h_b_deltaR_mus, *h_b_deltaR_els;
-  TH1D *h_b_activity_mus, *h_b_activity_els;
+  TH1D *h_id_genactivity_mus, *h_id_genactivity_els, *h_id_recoactivity_mus, *h_id_recoactivity_els;
   TH1D *h_b_njets_mus, *h_b_njets_els;
   TH1D *h_b_jet_pt;
 
@@ -229,37 +238,6 @@ class BaseHistgram
   TH1D *h_b_njets30_4_ht_mus, *h_b_njets30_5_ht_mus, *h_b_njets30_6_ht_mus, *h_b_njets30_7_ht_mus, *h_b_njets30_8_ht_mus, *h_b_njets30_9_ht_mus;
 
   TH1D *h_mtw_mus;
-
-  //closure plots definition
-  TH1D *h_pred_mu_iso_met, *h_pred_mu_iso_njets, *h_pred_mu_iso_mt2, *h_pred_mu_iso_ht, *h_pred_mu_iso_mht, *h_pred_mu_iso_ntopjets;
-  TH1D *h_pred_mu_id_met, *h_pred_mu_id_njets, *h_pred_mu_id_mt2, *h_pred_mu_id_ht, *h_pred_mu_id_mht, *h_pred_mu_id_ntopjets;
-  TH1D *h_pred_mu_acc_met, *h_pred_mu_acc_njets, *h_pred_mu_acc_mt2, *h_pred_mu_acc_ht, *h_pred_mu_acc_mht, *h_pred_mu_acc_ntopjets;
-  TH1D *h_pred_mu_all_met, *h_pred_mu_all_njets, *h_pred_mu_all_mt2, *h_pred_mu_all_ht, *h_pred_mu_all_mht, *h_pred_mu_all_ntopjets;
-
-  TH1D *h_exp_mu_iso_met, *h_exp_mu_iso_njets, *h_exp_mu_iso_mt2, *h_exp_mu_iso_ht, *h_exp_mu_iso_mht, *h_exp_mu_iso_ntopjets;
-  TH1D *h_exp_mu_id_met, *h_exp_mu_id_njets, *h_exp_mu_id_mt2, *h_exp_mu_id_ht, *h_exp_mu_id_mht, *h_exp_mu_id_ntopjets;
-  TH1D *h_exp_mu_acc_met, *h_exp_mu_acc_njets, *h_exp_mu_acc_mt2, *h_exp_mu_acc_ht, *h_exp_mu_acc_mht, *h_exp_mu_acc_ntopjets;
-  TH1D *h_exp_mu_all_met, *h_exp_mu_all_njets, *h_exp_mu_all_mt2, *h_exp_mu_all_ht, *h_exp_mu_all_mht, *h_exp_mu_all_ntopjets;
-
-  TH1D *h_exp_musingle_all_met, *h_exp_musingle_all_njets, *h_exp_musingle_all_mt2, *h_exp_musingle_all_ht, *h_exp_musingle_all_mht, *h_exp_musingle_all_ntopjets;
-
-  TH1D *h_pred_el_iso_met, *h_pred_el_iso_njets, *h_pred_el_iso_mt2, *h_pred_el_iso_ht, *h_pred_el_iso_mht, *h_pred_el_iso_ntopjets;
-  TH1D *h_pred_el_id_met, *h_pred_el_id_njets, *h_pred_el_id_mt2, *h_pred_el_id_ht, *h_pred_el_id_mht, *h_pred_el_id_ntopjets;
-  TH1D *h_pred_el_acc_met, *h_pred_el_acc_njets, *h_pred_el_acc_mt2, *h_pred_el_acc_ht, *h_pred_el_acc_mht, *h_pred_el_acc_ntopjets;
-  TH1D *h_pred_el_all_met, *h_pred_el_all_njets, *h_pred_el_all_mt2, *h_pred_el_all_ht, *h_pred_el_all_mht, *h_pred_el_all_ntopjets;
-
-  TH1D *h_exp_el_iso_met, *h_exp_el_iso_njets, *h_exp_el_iso_mt2, *h_exp_el_iso_ht, *h_exp_el_iso_mht, *h_exp_el_iso_ntopjets;
-  TH1D *h_exp_el_id_met, *h_exp_el_id_njets, *h_exp_el_id_mt2, *h_exp_el_id_ht, *h_exp_el_id_mht, *h_exp_el_id_ntopjets;
-  TH1D *h_exp_el_acc_met, *h_exp_el_acc_njets, *h_exp_el_acc_mt2, *h_exp_el_acc_ht, *h_exp_el_acc_mht, *h_exp_el_acc_ntopjets;
-  TH1D *h_exp_el_all_met, *h_exp_el_all_njets, *h_exp_el_all_mt2, *h_exp_el_all_ht, *h_exp_el_all_mht, *h_exp_el_all_ntopjets;
-
-  TH1D *h_pred_lept_all_met, *h_pred_lept_all_njets, *h_pred_lept_all_mt2, *h_pred_lept_all_ht, *h_pred_lept_all_mht, *h_pred_lept_all_ntopjets;
-  TH1D *h_exp_lept_all_met, *h_exp_lept_all_njets, *h_exp_lept_all_mt2, *h_exp_lept_all_ht, *h_exp_lept_all_mht, *h_exp_lept_all_ntopjets;
-
-  TH1D *h_exp_elsingle_all_met, *h_exp_elsingle_all_njets, *h_exp_elsingle_all_mt2, *h_exp_elsingle_all_ht, *h_exp_elsingle_all_mht, *h_exp_elsingle_all_ntopjets;
-
-  //closure for search bin
-  TH1D *h_exp_mu_sb, *h_pred_mu_sb, *h_exp_el_sb, *h_pred_el_sb, *h_exp_lept_sb, *h_pred_lept_sb, *h_exp_lept_sb_isotrk, *h_pred_lept_sb_isotrk;
 };
 
 void BaseHistgram::BookHistgram(const char *outFileName)
@@ -348,14 +326,59 @@ void BaseHistgram::BookHistgram(const char *outFileName)
 
   h_mtw_mus = new TH1D("h_mtw_mus","",200,0,200);
 
-  h_b_activity_mus = new TH1D("h_b_activity_mus","",1000,0,200);
-  h_b_activity_els = new TH1D("h_b_activity_els","",1000,0,200);
+  h_id_genactivity_mus = new TH1D("h_id_genactivity_mus","",200,0,1);
+  h_id_genactivity_els = new TH1D("h_id_genactivity_els","",200,0,1);
+  h_id_recoactivity_mus = new TH1D("h_id_recoactivity_mus","",200,0,1);
+  h_id_recoactivity_els = new TH1D("h_id_recoactivity_els","",200,0,1);
 
   h_b_njets_mus = new TH1D("h_b_njets_mus","",40,0,40);
   h_b_njets_els = new TH1D("h_b_njets_els","",40,0,40);
 
   h_b_jet_pt = new TH1D("h_b_jet_pt","",1000,0,200);
+}
 
+
+class ClosureHistgram
+{
+ public:
+  void BookHistgram(const char *);
+
+  TFile *oFile;
+  //closure plots definition
+  TH1D *h_pred_mu_iso_met, *h_pred_mu_iso_njets, *h_pred_mu_iso_mt2, *h_pred_mu_iso_ht, *h_pred_mu_iso_mht, *h_pred_mu_iso_ntopjets;
+  TH1D *h_pred_mu_id_met, *h_pred_mu_id_njets, *h_pred_mu_id_mt2, *h_pred_mu_id_ht, *h_pred_mu_id_mht, *h_pred_mu_id_ntopjets;
+  TH1D *h_pred_mu_acc_met, *h_pred_mu_acc_njets, *h_pred_mu_acc_mt2, *h_pred_mu_acc_ht, *h_pred_mu_acc_mht, *h_pred_mu_acc_ntopjets;
+  TH1D *h_pred_mu_all_met, *h_pred_mu_all_njets, *h_pred_mu_all_mt2, *h_pred_mu_all_ht, *h_pred_mu_all_mht, *h_pred_mu_all_ntopjets;
+
+  TH1D *h_exp_mu_iso_met, *h_exp_mu_iso_njets, *h_exp_mu_iso_mt2, *h_exp_mu_iso_ht, *h_exp_mu_iso_mht, *h_exp_mu_iso_ntopjets;
+  TH1D *h_exp_mu_id_met, *h_exp_mu_id_njets, *h_exp_mu_id_mt2, *h_exp_mu_id_ht, *h_exp_mu_id_mht, *h_exp_mu_id_ntopjets;
+  TH1D *h_exp_mu_acc_met, *h_exp_mu_acc_njets, *h_exp_mu_acc_mt2, *h_exp_mu_acc_ht, *h_exp_mu_acc_mht, *h_exp_mu_acc_ntopjets;
+  TH1D *h_exp_mu_all_met, *h_exp_mu_all_njets, *h_exp_mu_all_mt2, *h_exp_mu_all_ht, *h_exp_mu_all_mht, *h_exp_mu_all_ntopjets;
+
+  TH1D *h_exp_musingle_all_met, *h_exp_musingle_all_njets, *h_exp_musingle_all_mt2, *h_exp_musingle_all_ht, *h_exp_musingle_all_mht, *h_exp_musingle_all_ntopjets;
+
+  TH1D *h_pred_el_iso_met, *h_pred_el_iso_njets, *h_pred_el_iso_mt2, *h_pred_el_iso_ht, *h_pred_el_iso_mht, *h_pred_el_iso_ntopjets;
+  TH1D *h_pred_el_id_met, *h_pred_el_id_njets, *h_pred_el_id_mt2, *h_pred_el_id_ht, *h_pred_el_id_mht, *h_pred_el_id_ntopjets;
+  TH1D *h_pred_el_acc_met, *h_pred_el_acc_njets, *h_pred_el_acc_mt2, *h_pred_el_acc_ht, *h_pred_el_acc_mht, *h_pred_el_acc_ntopjets;
+  TH1D *h_pred_el_all_met, *h_pred_el_all_njets, *h_pred_el_all_mt2, *h_pred_el_all_ht, *h_pred_el_all_mht, *h_pred_el_all_ntopjets;
+
+  TH1D *h_exp_el_iso_met, *h_exp_el_iso_njets, *h_exp_el_iso_mt2, *h_exp_el_iso_ht, *h_exp_el_iso_mht, *h_exp_el_iso_ntopjets;
+  TH1D *h_exp_el_id_met, *h_exp_el_id_njets, *h_exp_el_id_mt2, *h_exp_el_id_ht, *h_exp_el_id_mht, *h_exp_el_id_ntopjets;
+  TH1D *h_exp_el_acc_met, *h_exp_el_acc_njets, *h_exp_el_acc_mt2, *h_exp_el_acc_ht, *h_exp_el_acc_mht, *h_exp_el_acc_ntopjets;
+  TH1D *h_exp_el_all_met, *h_exp_el_all_njets, *h_exp_el_all_mt2, *h_exp_el_all_ht, *h_exp_el_all_mht, *h_exp_el_all_ntopjets;
+
+  TH1D *h_pred_lept_all_met, *h_pred_lept_all_njets, *h_pred_lept_all_mt2, *h_pred_lept_all_ht, *h_pred_lept_all_mht, *h_pred_lept_all_ntopjets;
+  TH1D *h_exp_lept_all_met, *h_exp_lept_all_njets, *h_exp_lept_all_mt2, *h_exp_lept_all_ht, *h_exp_lept_all_mht, *h_exp_lept_all_ntopjets;
+
+  TH1D *h_exp_elsingle_all_met, *h_exp_elsingle_all_njets, *h_exp_elsingle_all_mt2, *h_exp_elsingle_all_ht, *h_exp_elsingle_all_mht, *h_exp_elsingle_all_ntopjets;
+
+  //closure for search bin
+  TH1D *h_exp_mu_sb, *h_pred_mu_sb, *h_exp_el_sb, *h_pred_el_sb, *h_exp_lept_sb, *h_pred_lept_sb, *h_exp_lept_sb_isotrk, *h_pred_lept_sb_isotrk;
+};
+
+void ClosureHistgram::BookHistgram(const char *outFileName)
+{
+  oFile = new TFile(outFileName, "recreate");
   //start closure plots
   h_pred_mu_iso_met = new TH1D("h_pred_mu_iso_met","",100,0,1000);
   h_pred_mu_iso_njets = new TH1D("h_pred_mu_iso_njets","",20,0,20);
@@ -507,6 +530,39 @@ void BaseHistgram::BookHistgram(const char *outFileName)
   h_pred_lept_sb = new TH1D("h_pred_lept_sb","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
   h_pred_lept_sb_isotrk = new TH1D("h_pred_lept_isotrk","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
 }
+
+//Common function that will be used in both calculation and expectation loop
+class LostLeptonObj
+{
+ public:
+  //initialize those variables with some crazy number
+  bool isMu = false, isEl = false;
+  double gen_eta = -10, gen_phi = -10, gen_pt = -10, gen_activity = -10;
+  double reco_eta = -10, reco_phi = -10, reco_pt = -10, reco_activity = -10;
+  bool passAcc = false, passId = false, passIso = false;
+  bool doneAcc = false, doneId = false, doneIso = false;
+  int reco_index = -10;  
+
+  void SetMyLL(
+                //LL variables that will be always useful 
+                int pid,
+                TLorentzVector onegenlept,
+                double genpfActivity,
+                std::vector<int> IdFlag,
+                std::vector<TLorentzVector> recoleptLVec,
+                std::vector<double> recoleptactivityVec,
+                std::vector<double> MiniIso
+              );
+
+ private:
+  void SetFlavor(int pid);
+  void genLeptonSetup(TLorentzVector onegenlept, double activity);
+  void gogoAcc();
+  void gogoId(std::vector<int> IdFlag, std::vector<TLorentzVector> leptLVec);
+  void recoLeptonSetup(TLorentzVector onerecolept, double activity);
+  void gogoIso(std::vector<double> iso);
+};
+
 
 //##########functions to calculate Delta_R and Delta Phi###############
 double DeltaPhi(double phi1, double phi2) 

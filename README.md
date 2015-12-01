@@ -27,8 +27,6 @@ scram b -j9
 
 cd LostLepton/Tool
 
-mkdir obj
-
 make
 
 PS: We have Error like "cannot find libtbb.so.2", to solve this problem, we want to build a soft link to this lib for temporary solution. To do this:
@@ -45,7 +43,7 @@ And it will be involved into make command automatically and we do not have error
 
 4.Run the LostLepton code:
 
-./LostLepton_MuCS_TTbar runList_inputfile.txt outputfile.root
+./LostLepton_MuCS_TTbar runList_cal.txt runList_exppred.txt
 
 5.Make Closure Plots:
 

@@ -1,8 +1,8 @@
 #define PT_BINS 7
-#define AC_BINS 8
+#define AC_BINS 5
 #define NJETS_BINS 6
 
-#define LL_BINS 3
+#define LL_BINS 1
 #define NSEARCH_BINS 45
 //############determine the pt bin number############
 int Set_ptbin_number(
@@ -43,6 +43,11 @@ int Set_ptbin_number(
   {
     ptbin_num = 6;
   }
+  else
+  {
+    ptbin_num = -100;
+    std::cout << "Invalid Pt bin! Please check!" << std::endl;
+  }
 
   return ptbin_num;
 }
@@ -55,37 +60,30 @@ int Set_acbin_number(
 {
   int acbin_num;
 
-  if(activity < 5)
+  if(activity < 0.02)
   {
     acbin_num = 0;
   }
-  else if(activity >= 5 && activity < 10)
+  else if(activity >= 0.02 && activity < 0.05)
   {
     acbin_num = 1;
   }
-  else if(activity >= 10 && activity < 20)
+  else if(activity >= 0.05 && activity < 0.15)
   {
     acbin_num = 2;
   }
-  else if(activity >= 20 && activity < 40)
+  else if(activity >= 0.15 && activity < 1)
   {
     acbin_num = 3;
   }
-  else if(activity >= 40 && activity < 60)
+  else if(activity >= 1)
   {
     acbin_num = 4;
   }
-  else if(activity >= 60 && activity < 80)
+  else
   {
-    acbin_num = 5;
-  }
-  else if(activity >= 80 && activity < 100)
-  {
-    acbin_num = 6;
-  }
-  else if(activity >= 100 )
-  {
-    acbin_num = 7;
+    acbin_num = -100;
+    std::cout << "Invalid Activity bin! Please check!" << std::endl;
   }
 
   return acbin_num;
@@ -122,6 +120,11 @@ int Set_njetsbin_number(
   else if(njets >= 9)
   {
     njetsbin_num = 5;
+  }
+  else
+  {
+    njetsbin_num = -100;
+    std::cout << "Invalid NJet bin! Please check!" << std::endl;
   }
 
   return njetsbin_num;

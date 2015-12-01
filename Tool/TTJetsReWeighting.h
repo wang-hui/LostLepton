@@ -15,7 +15,7 @@
 
 #include "SusyAnaTools/Tools/NTupleReader.h"
 //define lumi in pb-1
-#define LUMI 3000
+#define LUMI 567.945
 //Fill chain from txt file
 bool FillChain(TChain *chain, const TString &inputFileList, std::string tag)
 {
@@ -58,24 +58,8 @@ class TTJetsSampleWeight
 {
  public:
   std::vector<TTJetsSampleInfo> TTJetsSampleInfos;
-  
-  void FillTTJetsSampleInfos( const TString &inputFileList );
- private:
   void TTJetsSampleInfo_push_back( std::string tag, double xsec, double nevents, double lumi, const TString &inputFileList );
 };
-
-void TTJetsSampleWeight::FillTTJetsSampleInfos( const TString &inputFileList )
-{
-  TTJetsSampleInfos.clear();
- 
-  double W_Lept_BR = 0.1086*3;
-  double TTbar_SingleLept_BR = 0.43930872; // 2*W_Lept_BR*(1-W_Lept_BR)
-  double TTbar_DiLept_BR = 0.10614564; // W_Lept_BR^2
-  //TTJets single lepton and di-lepton
-  TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromT_", 831.76*0.5*TTbar_SingleLept_BR, 11327907+46863183 , LUMI, inputFileList );
-  TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromTbar_", 831.76*0.5*TTbar_SingleLept_BR, 11692936+48473419, LUMI, inputFileList );
-  TTJetsSampleInfo_push_back( "TTJets_DiLept_", 831.76*TTbar_SingleLept_BR, 5924706+24501877, LUMI, inputFileList );
-}
 
 void TTJetsSampleWeight::TTJetsSampleInfo_push_back( std::string tag, double xsec, double nevents, double lumi, const TString &inputFileList)
 {

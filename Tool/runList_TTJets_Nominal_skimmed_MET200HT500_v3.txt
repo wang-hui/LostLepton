@@ -1,0 +1,1 @@
+/eos/uscms/store/group/lpcsusyhad/hua/Skimmed_2015Nov15/TTJets_Nominal_MET200HT500_v3/Skimmed_MET200_HT500_TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8stopFlatNtuples.root
