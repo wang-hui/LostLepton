@@ -119,45 +119,36 @@ class AccRecoIsoEffs
   double corrfactor_di_els_err = 0;
 
   TFile *Effs2dPlots = new TFile("Effs2dPlots.root", "recreate");
-  //double ptbins[9]={5.0,10.0,20.0,30.0,40.0,50.0,70.0,100.0,120.0};
-  //double acbins[9]={0.0,5.0,10.0,20.0,40.0,60.0,80.0,100.0,120.0};
-  //TH2D *mus_recoeffs2d  = new TH2D("mus_recoeffs","Muon RecoEffs",8,ptbins,8,acbins);
-  //TH2D *mus_isoeffs2d  = new TH2D("mus_isoeffs","Muon IsoEffs",8,ptbins,8,acbins);
-  //TH2D *els_recoeffs2d  = new TH2D("els_recoeffs","Electron RecoEffs",8,ptbins,8,acbins);
-  //TH2D *els_isoeffs2d  = new TH2D("els_isoeffs","Electron IsoEffs",8,ptbins,8,acbins);
+  double ptbins[PT_BINS+1]={10.0,20.0,30.0,40.0,50.0,70.0,100.0,120.0};
+  double acbins[AC_BINS+2]={0.0,0.005,0.02,0.05,0.15,1.0,10.0};
+  TH2D *mus_recoeffs2d  = new TH2D("mus_recoeffs","Muon RecoEffs",PT_BINS,ptbins,AC_BINS+1,acbins);
+  TH2D *mus_isoeffs2d  = new TH2D("mus_isoeffs","Muon IsoEffs",PT_BINS,ptbins,AC_BINS+1,acbins);
+  TH2D *els_recoeffs2d  = new TH2D("els_recoeffs","Electron RecoEffs",PT_BINS,ptbins,AC_BINS+1,acbins);
+  TH2D *els_isoeffs2d  = new TH2D("els_isoeffs","Electron IsoEffs",PT_BINS,ptbins,AC_BINS+1,acbins);
 
-  TH2D *mus_recoeffs2d  = new TH2D("mus_recoeffs","Muon RecoEffs",PT_BINS,0,PT_BINS,AC_BINS,0,AC_BINS);
-  TH2D *mus_isoeffs2d  = new TH2D("mus_isoeffs","Muon IsoEffs",PT_BINS,0,PT_BINS,AC_BINS,0,AC_BINS);
-  TH2D *els_recoeffs2d  = new TH2D("els_recoeffs","Electron RecoEffs",PT_BINS,0,PT_BINS,AC_BINS,0,AC_BINS);
-  TH2D *els_isoeffs2d  = new TH2D("els_isoeffs","Electron IsoEffs",PT_BINS,0,PT_BINS,AC_BINS,0,AC_BINS);
+  //TH2D *mus_recoeffs2d  = new TH2D("mus_recoeffs","Muon RecoEffs",PT_BINS,0,PT_BINS,AC_BINS,0,AC_BINS);
+  //TH2D *mus_isoeffs2d  = new TH2D("mus_isoeffs","Muon IsoEffs",PT_BINS,0,PT_BINS,AC_BINS,0,AC_BINS);
+  //TH2D *els_recoeffs2d  = new TH2D("els_recoeffs","Electron RecoEffs",PT_BINS,0,PT_BINS,AC_BINS,0,AC_BINS);
+  //TH2D *els_isoeffs2d  = new TH2D("els_isoeffs","Electron IsoEffs",PT_BINS,0,PT_BINS,AC_BINS,0,AC_BINS);
 
   void NumberstoEffs();
   void EffsPlotsGen();
   void EffstoWeights();
   void GetDiLeptonFactor();
   void NormalizeFlowNumber();
-  //void printSearchBin(BaseHistgram& myBaseHistgram);
+  //void printSearchBin(ClosureHistgram& myClosureHistgram);
 
  private:
   double scale = 1;  
-
-  double get_stat_Error(
-                        double a,
-                        double an
-                       );
-  
-  double get_sys_Error(
-                       double r,
-                       double p
-                      );
+  double get_stat_Error(double a, double an);
+  double get_stat_Error_APNOA(double a, double an,double ua, double un);
+  double get_sys_Error(double r, double p);
 };
 
 
-double AccRecoIsoEffs::get_stat_Error(
-                                      double a,
-                                      double an
-                                     )
+double AccRecoIsoEffs::get_stat_Error(double a, double an)
 {
+  // give the uncertainty for R=A/an=A/(A+N)
   double n;
   n = an - a;
 
@@ -177,6 +168,31 @@ double AccRecoIsoEffs::get_stat_Error(
     return -1;
   }
 }
+
+double AccRecoIsoEffs::get_stat_Error_APNOA(double a, double an,double ua, double un)
+{
+  // give the uncertainty for R=an/A=(A+N)/A
+  double n;
+  n = an - a;
+
+  double err;
+  err = 1000;
+
+  double alpha;
+  alpha = 1-0.6827;
+
+  if( a>=0 && n>=0 )
+  {
+    err = std::sqrt(n/(a*a)*n/(a*a)*ua+1.0/(a*a)*un);
+    return err;
+  }
+  else
+  {
+    return -1;
+  }
+}
+
+
 
 double AccRecoIsoEffs::get_sys_Error(
                                      double r,
