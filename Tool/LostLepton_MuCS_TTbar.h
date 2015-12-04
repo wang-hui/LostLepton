@@ -40,8 +40,8 @@ class AccRecoIsoEffs
   int nevents_cs_mus = 0;
 
   //define acceptance, reco eff and iso eff to be calculated
-  double mus_acc[NJETS_BINS] = {0}, els_acc[NJETS_BINS] = {0};
-  double mus_acc_err[NJETS_BINS] = {0}, els_acc_err[NJETS_BINS] = {0};
+  double mus_acc[NJETS_BINS][NHT_BINS] = {{0}}, els_acc[NJETS_BINS] = {0};
+  double mus_acc_err[NJETS_BINS][NHT_BINS] = {{0}}, els_acc_err[NJETS_BINS] = {0};
 
   double mus_recoeff[PT_BINS][AC_BINS] = {{0}}, els_recoeff[PT_BINS][AC_BINS] = {{0}};
   double mus_isoeff[PT_BINS][AC_BINS] = {{0}}, els_isoeff[PT_BINS][AC_BINS] = {{0}};
@@ -54,7 +54,7 @@ class AccRecoIsoEffs
   double mtwcorrfactor[PT_BINS] = {0}, mtwcorrfactor_err[PT_BINS] = {0};
  
   //here we define the muon/electron number we need to count in the loop
-  double nmus_MC[NJETS_BINS] = {0}, nmus_acc_MC[NJETS_BINS] = {0}, nels_MC[NJETS_BINS] = {0}, nels_acc_MC[NJETS_BINS] = {0};
+  double nmus_MC[NJETS_BINS][NHT_BINS] = {{0}}, nmus_acc_MC[NJETS_BINS][NHT_BINS] = {{0}}, nels_MC[NJETS_BINS] = {0}, nels_acc_MC[NJETS_BINS] = {0};
   double nmus_acc_bin_MC[PT_BINS][AC_BINS] = {{0}}, nels_acc_bin_MC[PT_BINS][AC_BINS] = {{0}};
   double nmus_reco_MC[PT_BINS][AC_BINS] = {{0}}, nels_reco_MC[PT_BINS][AC_BINS] = {{0}};
   double nmus_iso_MC[PT_BINS][AC_BINS] = {{0}}, nels_iso_MC[PT_BINS][AC_BINS] = {{0}};
@@ -64,7 +64,7 @@ class AccRecoIsoEffs
 
   double mtwall_MC[PT_BINS] = {0}, mtw100_MC[PT_BINS] = {0};
 
-  double nmus[NJETS_BINS] = {0}, nmus_acc[NJETS_BINS] = {0}, nels[NJETS_BINS] = {0}, nels_acc[NJETS_BINS] = {0};
+  double nmus[NJETS_BINS][NHT_BINS] = {{0}}, nmus_acc[NJETS_BINS][NHT_BINS] = {{0}}, nels[NJETS_BINS] = {0}, nels_acc[NJETS_BINS] = {0};
   double nmus_acc_bin[PT_BINS][AC_BINS] = {{0}}, nels_acc_bin[PT_BINS][AC_BINS] = {{0}};
   double nmus_reco[PT_BINS][AC_BINS] = {{0}}, nels_reco[PT_BINS][AC_BINS] = {{0}};
   double nmus_iso[PT_BINS][AC_BINS] = {{0}}, nels_iso[PT_BINS][AC_BINS] = {{0}};
@@ -121,10 +121,13 @@ class AccRecoIsoEffs
   TFile *Effs2dPlots = new TFile("Effs2dPlots.root", "recreate");
   double ptbins[PT_BINS+1]={10.0,20.0,30.0,40.0,50.0,70.0,100.0,120.0};
   double acbins[AC_BINS+2]={0.0,0.005,0.02,0.05,0.15,1.0,10.0};
+  double njetbins[NJETS_BINS+1]={3.5,4.5,5.5,6.5,7.5,8.5,9.5};
+  double htbins[NHT_BINS+1]={500.0,650.0,900.0,1400.0};
   TH2D *mus_recoeffs2d  = new TH2D("mus_recoeffs","Muon RecoEffs",PT_BINS,ptbins,AC_BINS+1,acbins);
   TH2D *mus_isoeffs2d  = new TH2D("mus_isoeffs","Muon IsoEffs",PT_BINS,ptbins,AC_BINS+1,acbins);
   TH2D *els_recoeffs2d  = new TH2D("els_recoeffs","Electron RecoEffs",PT_BINS,ptbins,AC_BINS+1,acbins);
   TH2D *els_isoeffs2d  = new TH2D("els_isoeffs","Electron IsoEffs",PT_BINS,ptbins,AC_BINS+1,acbins);
+  TH2D *mus_acc2d  = new TH2D("mus_acc","mus_acc",NJETS_BINS,njetbins,NHT_BINS,htbins);
 
   //TH2D *mus_recoeffs2d  = new TH2D("mus_recoeffs","Muon RecoEffs",PT_BINS,0,PT_BINS,AC_BINS,0,AC_BINS);
   //TH2D *mus_isoeffs2d  = new TH2D("mus_isoeffs","Muon IsoEffs",PT_BINS,0,PT_BINS,AC_BINS,0,AC_BINS);
@@ -134,6 +137,7 @@ class AccRecoIsoEffs
   void NumberstoEffs();
   void EffsPlotsGen();
   void EffstoWeights();
+  void EffstoWeights_fromH();
   void GetDiLeptonFactor();
   void NormalizeFlowNumber();
   //void printSearchBin(ClosureHistgram& myClosureHistgram);

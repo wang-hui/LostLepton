@@ -18,7 +18,9 @@ class ClosurePlots
 {
  public:
   TFile * fin;
+  TFile * fin2;
   TList * list;
+  TList * list2;
 
   double scale;
 
@@ -47,8 +49,11 @@ class ClosurePlots
 
 void ClosurePlots::Initialization()
 {
-  fin = TFile::Open("test.root");
+  //fin = TFile::Open("test.root");
+  fin = TFile::Open("v151201_0p5fb_ExpLL.root");
+  fin2 = TFile::Open("v151202_PredLL.root");
   list = fin->GetListOfKeys();
+  list2 = fin2->GetListOfKeys();
 }
 
 void ClosurePlots::PrintPlotsName()
@@ -135,17 +140,21 @@ void ClosurePlots::ClosureTemplate(
   {
     if( TString(list->At(i)->GetName()).Contains( hist_tag ) )
     {
-      if( TString(list->At(i)->GetName()).Contains( "_pred_" ) )
-      {
-        h_pred = (TH1D*)fin->Get(list->At(i)->GetName())->Clone();
-      }
       if( TString(list->At(i)->GetName()).Contains( "_exp_" ) )
       {
         h_exp = (TH1D*)fin->Get(list->At(i)->GetName())->Clone();
       }
     }
-    else
-      continue;
+  }
+  for(int i  = 0 ; i < list2->GetSize() ; i++)
+  {
+    if( TString(list2->At(i)->GetName()).Contains( hist_tag ) )
+    {
+      if( TString(list2->At(i)->GetName()).Contains( "_pred_" ) )
+      {
+        h_pred = (TH1D*)fin2->Get(list2->At(i)->GetName())->Clone();
+      }
+    }
   }
 
   TCanvas *c = new TCanvas("c","A Simple Graph Example",200,10,700,500); 

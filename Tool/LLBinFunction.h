@@ -1,6 +1,7 @@
 #define PT_BINS 7
 #define AC_BINS 5
 #define NJETS_BINS 6
+#define NHT_BINS 3
 
 #define LL_BINS 1
 #define NSEARCH_BINS 45
@@ -90,10 +91,16 @@ int Set_acbin_number(
 }
 
 //############determine the nJets bin number############
+int Set_HTbin_number(int ht)
+{
+  int htbin_num;
+  if (ht<650) htbin_num=0;
+  else if (ht<900) htbin_num=1;
+  else htbin_num=2;
+  return htbin_num;
+}
 
-int Set_njetsbin_number(
-                        int njets
-                       )
+int Set_njetsbin_number(int njets)
 {
   int njetsbin_num;
 
