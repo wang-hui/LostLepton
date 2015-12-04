@@ -16,6 +16,7 @@
 #include "SusyAnaTools/Tools/NTupleReader.h"
 //define lumi in pb-1
 #define LUMI 567.945
+//#define LUMI 2100.0
 //Fill chain from txt file
 bool FillChain(TChain *chain, const TString &inputFileList, std::string tag)
 {
