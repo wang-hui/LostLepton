@@ -50,10 +50,20 @@ class ClosurePlots
 void ClosurePlots::Initialization()
 {
   //fin = TFile::Open("test.root");
-  fin = TFile::Open("v151201_0p5fb_ExpLL.root");
-  fin2 = TFile::Open("v151202_PredLL.root");
+  //fin = TFile::Open("v151201_0p5fb_ExpLL.root");
+  //fin = TFile::Open("v151201_2p1fb_ExpLL.root");
+  //fin = TFile::Open("v151216_ExpLL.root");
+  fin = TFile::Open("v160106_ttbar_ExpLL.root");
+  //fin2 = TFile::Open("v151204_PredLL.root");
+  //fin2 = TFile::Open("v151209_PredLL.root");
+  //fin2 = TFile::Open("v151216_PredLL.root");
+  //fin2 = TFile::Open("ttbar_v151217_PredLL.root");
+  //fin2 = TFile::Open("v160106_ttbar_PredLL.root");
+  //fin2 = TFile::Open("v160106_data_PredLL.root");
+  fin2 = TFile::Open("v160106_data_trigSel_PredLL.root");
   list = fin->GetListOfKeys();
   list2 = fin2->GetListOfKeys();
+  scale=1.0;
 }
 
 void ClosurePlots::PrintPlotsName()
@@ -108,7 +118,7 @@ void ClosurePlots::DiLeptonPlots(
   h_exp_dl->Draw();
   h_exp_sl->Draw("same");
 
-  const std::string titre="CMS Preliminary 2015, 3 fb^{-1}, #sqrt{s} = 13 TeV";
+  const std::string titre="CMS Preliminary 2016, 2.2 fb^{-1}, #sqrt{s} = 13 TeV";
   TLatex *title = new TLatex(0.09770115,0.9194915,titre.c_str());
   title->SetNDC();
   title->SetTextSize(0.045);
@@ -122,8 +132,8 @@ void ClosurePlots::DiLeptonPlots(
   leg->AddEntry(h_exp_sl,"Expectation 1 lepton","l");
   leg->Draw("same");
 
-  c->SaveAs( DLhist + TString("_compare.png") );
-  c->SaveAs( DLhist + TString("_compare.C") );
+  c->SaveAs( TString("Plotsc/") + DLhist + TString("_compare.png") );
+  c->SaveAs( TString("Plotsc/") + DLhist + TString("_compare.C") );
 }
 
 void ClosurePlots::ClosureTemplate(
@@ -191,7 +201,7 @@ void ClosurePlots::ClosureTemplate(
   h_pred->Draw(); 
   h_exp->Draw("same");
 
-  const std::string titre="CMS Preliminary 2015, 3 fb^{-1}, #sqrt{s} = 13 TeV";
+  const std::string titre="CMS Preliminary 2016, 2.2 fb^{-1}, #sqrt{s} = 13 TeV";
   TLatex *title = new TLatex(0.09770115,0.9194915,titre.c_str());
   title->SetNDC();
   title->SetTextSize(0.045);
@@ -247,8 +257,8 @@ void ClosurePlots::ClosureTemplate(
   zero->SetLineColor(kRed); zero->SetLineWidth(1);
   zero->DrawCopy("same");
 
-  c->SaveAs( hist_tag + TString(".png") );
-  c->SaveAs( hist_tag + TString(".C") );
+  c->SaveAs( TString("Plotsc/") + hist_tag + TString(".png") );
+  c->SaveAs( TString("Plotsc/") + hist_tag + TString(".C") );
 }
 
 
