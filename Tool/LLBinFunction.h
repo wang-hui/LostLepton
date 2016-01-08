@@ -55,9 +55,7 @@ int Set_ptbin_number(
 
 //############determine the activity bin number############
 
-int Set_acbin_number(
-                     double activity
-                    )
+int Set_acbin_number(double activity)
 {
   int acbin_num;
 
@@ -96,6 +94,15 @@ int Set_HTbin_number(int ht)
   int htbin_num;
   if (ht<650) htbin_num=0;
   else if (ht<900) htbin_num=1;
+  else htbin_num=2;
+  return htbin_num;
+}
+
+int Set_MT2bin_number(int mt2)
+{
+  int htbin_num;
+  if (mt2<230) htbin_num=0;
+  else if (mt2<300) htbin_num=1;
   else htbin_num=2;
   return htbin_num;
 }
