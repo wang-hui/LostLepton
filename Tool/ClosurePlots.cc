@@ -22,11 +22,7 @@ int main()
 {
   ClosurePlots myClosurePlots;
   myClosurePlots.Initialization();
-  myClosurePlots.SetScale(
-                         11339232, //NEvents
-                         831.76, //Xsec
-                         2100 //Lumi in pb-1
-                         );
+  //myClosurePlots.SetScale(11339232, 831.76, 2154.5);
   //initialize the closure plots parameter we want to investigate
   vector<Plotting_Parameter> myPlotting_Paramete = 
   { 
