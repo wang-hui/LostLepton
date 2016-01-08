@@ -40,12 +40,15 @@
 #include "Activity.h"
 #include "LostLepton_MuCS_TTbar.h"
 #include "TTJetsReWeighting.h"
-#include "v151201_EffsHeader_MuCS.h"
+//#include "v151203_EffsHeader_MuCS.h"
+//#include "v151209_EffsHeader_MuCS.h"
+#include "v160105_EffsHeader_MuCS.h"
+#include "TriggerEff.h"
 
-const double isotrackvetoeff = 0.563499421;
-const bool applyisotrkveto = false;
+//const double isotrackvetoeff = 0.563499421;
+const bool applyisotrkveto = false; // should be false
 //const double isotrackvetoeff = 1;
-
+double isotrkeff[NSEARCH_BINS];
 
 void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSampleWeight )
 {
@@ -60,6 +63,15 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
   std::vector<TTJetsSampleInfo>::iterator iter_TTJetsSampleInfos;
 
   std::cout << "Efficiencies Calculation: " << std::endl;
+
+  double neventsSB[NSEARCH_BINS];
+  double neventsSB_afterITV[NSEARCH_BINS];
+  for( int searchbinc = 0 ; searchbinc < NSEARCH_BINS ; ++searchbinc )
+  {
+    neventsSB[searchbinc]=0.0;
+    neventsSB_afterITV[searchbinc]=0.0;
+    isotrkeff[searchbinc]=0.0;
+  }
 
   for(iter_TTJetsSampleInfos = myTTJetsSampleWeight.TTJetsSampleInfos.begin(); iter_TTJetsSampleInfos != myTTJetsSampleWeight.TTJetsSampleInfos.end(); iter_TTJetsSampleInfos++)
   {  
@@ -163,6 +175,7 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 	      ngenmu++;
               const int njetsbin_number = Set_njetsbin_number(njets30);
 	      const int HTbin_number = Set_HTbin_number(ht);
+	      //const int HTbin_number = Set_MT2bin_number(MT2);
 	      //std::cout << "HTbin_number = " << HTbin_number << std::endl;            
 
               myAccRecoIsoEffs.nmus[njetsbin_number][HTbin_number]+=thisweight;
@@ -390,9 +403,35 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
             myAccRecoIsoEffs.nevents_mus_CS_SB_Normalized[searchbin_id]+=thisweight;
           }
         }
+
+	if (nElectrons == 0 && nMuons == 0 && (ngenmu==1 || ngenmu==2 || ngenel==1 || ngenel==2))
+	{
+          const int searchbin_id = find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+          if( searchbin_id >= 0 )
+          {
+	    neventsSB[searchbin_id]+=thisweight;
+	    if (nIsoTrks==0) neventsSB_afterITV[searchbin_id]+=thisweight;
+	  }
+	}
       }//baseline, nolepveto
     }//TTjets samples class
   }//end of first loop
+
+  // printSearchBin
+  for( int searchbinc = 0 ; searchbinc < NSEARCH_BINS ; ++searchbinc )
+  {
+    if (neventsSB[searchbinc]==0)
+    {
+      std::cout << "neventsSB[" << searchbinc << "]==0, isotrkeff[" << searchbinc << "] set to 0.5." << std::endl;
+      isotrkeff[searchbinc]=0.5;
+    }
+    else
+    {
+      isotrkeff[searchbinc]=neventsSB_afterITV[searchbinc]/neventsSB[searchbinc];
+      //std::cout << "neventsSB[" << searchbinc << "] = " << neventsSB[searchbinc] << " , neventsSB_afterITV = " << neventsSB_afterITV[searchbinc] << " , ratio = " << isotrkeff[searchbinc] << std::endl;
+      std::cout << "isotrackeff_SB[" << searchbinc << "] = " << isotrkeff[searchbinc] << std::endl;
+    }
+  }
 
   myAccRecoIsoEffs.NumberstoEffs();
   myAccRecoIsoEffs.EffsPlotsGen();
@@ -455,7 +494,9 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
         double met = tr.getVar<double>("met");
         double metphi = tr.getVar<double>("metphi");
         int njets30 = tr.getVar<int>("cntNJetsPt30Eta24"+spec);
-        const double ht = tr.getVar<double>("ht");
+        int njets50 = tr.getVar<int>("cntNJetsPt50Eta24"+spec);
+        //const double ht = tr.getVar<double>("ht");
+        const double ht = tr.getVar<double>("HT"+spec);
         int ntopjets = tr.getVar<int>("nTopCandSortedCnt"+spec);
         int nbottomjets = tr.getVar<int>("cntCSVS"+spec);
         double MT2 = tr.getVar<double>("best_had_brJet_MT2"+spec);
@@ -486,9 +527,11 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
         int ngenmu = 0;
         int ngenel = 0;
 
+	const double metEff = QCDGetTriggerEff( "TTJets", met );
+
         if(nElectrons == 0)
         {
-          myAccRecoIsoEffs.nevents_sel_mus+=thisweight;
+          myAccRecoIsoEffs.nevents_sel_mus+=(thisweight*metEff);
 
           //get gen level information of leptons
           std::vector<int> genDecayPdgIdVec = tr.getVec<int>("genDecayPdgIdVec");
@@ -589,48 +632,48 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
         // exp 1 muon not iso
         if ( nElectrons == 0 && nMuons==0 && ( (ngenmu==1 && ngenmunotiso==1) || ( ngenmu==2 && ngenmunotiso==2) ) )
         {
-          myAccRecoIsoEffs.nevents_exp_iso_mus+=thisweight; 
+          myAccRecoIsoEffs.nevents_exp_iso_mus+=(thisweight*metEff); 
     
 	  if (!applyisotrkveto || nIsoTrks==0)
   	  {
-	    (myClosureHistgram.h_exp_mu_iso_met)->Fill(met,thisweight);
-	    (myClosureHistgram.h_exp_mu_iso_njets)->Fill(njets30,thisweight);
-	    (myClosureHistgram.h_exp_mu_iso_mt2)->Fill(MT2,thisweight);
-	    (myClosureHistgram.h_exp_mu_iso_ht)->Fill(ht,thisweight);
-	    (myClosureHistgram.h_exp_mu_iso_mht)->Fill(mht,thisweight);
-	    (myClosureHistgram.h_exp_mu_iso_ntopjets)->Fill(ntopjets,thisweight);
+	    (myClosureHistgram.h_exp_mu_iso_met)->Fill(met,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_mu_iso_njets)->Fill(njets30,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_mu_iso_mt2)->Fill(MT2,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_mu_iso_ht)->Fill(ht,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_mu_iso_mht)->Fill(mht,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_mu_iso_ntopjets)->Fill(ntopjets,(thisweight*metEff));
 	  }
         }
 
         // exp 1 muon not id
         if (nElectrons == 0 && nMuons==0 && ( (ngenmu==1 && ngenmunotid==1) || ( ngenmu==2 && ngenmunotid==2) ) )
         {
-          myAccRecoIsoEffs.nevents_exp_id_mus+=thisweight;
+          myAccRecoIsoEffs.nevents_exp_id_mus+=(thisweight*metEff);
 
 	  if (!applyisotrkveto || nIsoTrks==0)
 	  {
-	    (myClosureHistgram.h_exp_mu_id_met)->Fill(met,thisweight);
-	    (myClosureHistgram.h_exp_mu_id_njets)->Fill(njets30,thisweight);
-	    (myClosureHistgram.h_exp_mu_id_mt2)->Fill(MT2,thisweight);
-	    (myClosureHistgram.h_exp_mu_id_ht)->Fill(ht,thisweight);
-	    (myClosureHistgram.h_exp_mu_id_mht)->Fill(mht,thisweight);
-	    (myClosureHistgram.h_exp_mu_id_ntopjets)->Fill(ntopjets,thisweight);
+	    (myClosureHistgram.h_exp_mu_id_met)->Fill(met,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_mu_id_njets)->Fill(njets30,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_mu_id_mt2)->Fill(MT2,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_mu_id_ht)->Fill(ht,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_mu_id_mht)->Fill(mht,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_mu_id_ntopjets)->Fill(ntopjets,(thisweight*metEff));
 	  }
         }
 
         // exp 1 muon out acc
         if (nElectrons == 0 && nMuons==0 && ( (ngenmu==1 && ngenmuoutacc==1) || ( ngenmu==2 && ngenmuoutacc==2) ) )
         {
-          myAccRecoIsoEffs.nevents_exp_acc_mus+=thisweight;
+          myAccRecoIsoEffs.nevents_exp_acc_mus+=(thisweight*metEff);
 
 	  if (!applyisotrkveto || nIsoTrks==0)
 	  {
-	    (myClosureHistgram.h_exp_mu_acc_met)->Fill(met,thisweight);
-	    (myClosureHistgram.h_exp_mu_acc_njets)->Fill(njets30,thisweight);
-	    (myClosureHistgram.h_exp_mu_acc_mt2)->Fill(MT2,thisweight);
-	    (myClosureHistgram.h_exp_mu_acc_ht)->Fill(ht,thisweight);
-	    (myClosureHistgram.h_exp_mu_acc_mht)->Fill(mht,thisweight);
-	    (myClosureHistgram.h_exp_mu_acc_ntopjets)->Fill(ntopjets,thisweight);
+	    (myClosureHistgram.h_exp_mu_acc_met)->Fill(met,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_mu_acc_njets)->Fill(njets30,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_mu_acc_mt2)->Fill(MT2,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_mu_acc_ht)->Fill(ht,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_mu_acc_mht)->Fill(mht,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_mu_acc_ntopjets)->Fill(ntopjets,(thisweight*metEff));
 	  }
         }
 
@@ -639,32 +682,32 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
         if (nElectrons == 0 && nMuons==0 && ngenmu==1)
         {
 	  if (!(ngenmuoutacc==1 || ngenmunotid==1 || ngenmunotiso==1)) std::cout << "ngenmuoutacc = " << ngenmuoutacc << " , ngenmunotid = " << ngenmunotid << " , ngenmunotiso = " << ngenmunotiso << std::endl;
-          myAccRecoIsoEffs.nevents_exp_all_mus+=thisweight;
-          //myAccRecoIsoEffs.nevents_single_mus+=thisweight;
+          myAccRecoIsoEffs.nevents_exp_all_mus+=(thisweight*metEff);
+          //myAccRecoIsoEffs.nevents_single_mus+=(thisweight*metEff);
 
           int searchbin_id = find_Binning_Index( nbottomjets , ntopjets , MT2, met );
           if( searchbin_id >= 0 )
           {
             //myAccRecoIsoEffs.nevents_mus_exp_SB_MC[searchbin_id]++;
-            myAccRecoIsoEffs.nevents_mus_exp_SB_MC[searchbin_id]+=thisweight*thisweight;
-            myAccRecoIsoEffs.nevents_mus_exp_SB_Normalized[searchbin_id]+=thisweight;
+            myAccRecoIsoEffs.nevents_mus_exp_SB_MC[searchbin_id]+=(thisweight*metEff)*(thisweight*metEff);
+            myAccRecoIsoEffs.nevents_mus_exp_SB_Normalized[searchbin_id]+=(thisweight*metEff);
           }
 	
 	  if (!applyisotrkveto || nIsoTrks==0)
 	  {
-	    (myClosureHistgram.h_exp_musingle_all_met)->Fill(met,thisweight);
-	    (myClosureHistgram.h_exp_musingle_all_njets)->Fill(njets30,thisweight);
-	    (myClosureHistgram.h_exp_musingle_all_mt2)->Fill(MT2,thisweight);
-	    (myClosureHistgram.h_exp_musingle_all_ht)->Fill(ht,thisweight);
-	    (myClosureHistgram.h_exp_musingle_all_mht)->Fill(mht,thisweight);
-	    (myClosureHistgram.h_exp_musingle_all_ntopjets)->Fill(ntopjets,thisweight);
+	    (myClosureHistgram.h_exp_musingle_all_met)->Fill(met,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_musingle_all_njets)->Fill(njets30,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_musingle_all_mt2)->Fill(MT2,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_musingle_all_ht)->Fill(ht,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_musingle_all_mht)->Fill(mht,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_musingle_all_ntopjets)->Fill(ntopjets,(thisweight*metEff));
 
-	    (myClosureHistgram.h_exp_mu_all_met)->Fill(met,thisweight);
-	    (myClosureHistgram.h_exp_mu_all_njets)->Fill(njets30,thisweight);
-	    (myClosureHistgram.h_exp_mu_all_mt2)->Fill(MT2,thisweight);
-	    (myClosureHistgram.h_exp_mu_all_ht)->Fill(ht,thisweight);
-	    (myClosureHistgram.h_exp_mu_all_mht)->Fill(mht,thisweight);
-	    (myClosureHistgram.h_exp_mu_all_ntopjets)->Fill(ntopjets,thisweight);
+	    (myClosureHistgram.h_exp_mu_all_met)->Fill(met,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_mu_all_njets)->Fill(njets30,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_mu_all_mt2)->Fill(MT2,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_mu_all_ht)->Fill(ht,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_mu_all_mht)->Fill(mht,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_mu_all_ntopjets)->Fill(ntopjets,(thisweight*metEff));
 	  }
         }
 
@@ -673,101 +716,112 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
         if ( nElectrons == 0 && nMuons==0 && ngenmu==2 )
         {
 	  if (!( ngenmuoutacc==2 || ngenmunotid==2 || ngenmunotiso==2 || ( ngenmuoutacc==1 && ngenmunotid==1 ) || (ngenmuoutacc==1 && ngenmunotiso==1 ) || ( ngenmunotiso==1 && ngenmunotid==1 ) )) std::cout << "Warning in nElectrons == 0 && nMuons==0 && ngenmu==2" << std::endl;
-          //myAccRecoIsoEffs.nevents_di_mus+=thisweight;
-          myAccRecoIsoEffs.nevents_exp_all_mus+=thisweight;
+          //myAccRecoIsoEffs.nevents_di_mus+=(thisweight*metEff);
+          myAccRecoIsoEffs.nevents_exp_all_mus+=(thisweight*metEff);
 
           int searchbin_id = find_Binning_Index( nbottomjets , ntopjets , MT2, met );
           if( searchbin_id >= 0 )
           {
             //myAccRecoIsoEffs.nevents_mus_exp_SB_MC[searchbin_id]++;
-            myAccRecoIsoEffs.nevents_mus_exp_SB_MC[searchbin_id]+=thisweight*thisweight;
-            myAccRecoIsoEffs.nevents_mus_exp_SB_Normalized[searchbin_id]+=thisweight;
+            myAccRecoIsoEffs.nevents_mus_exp_SB_MC[searchbin_id]+=(thisweight*metEff)*(thisweight*metEff);
+            myAccRecoIsoEffs.nevents_mus_exp_SB_Normalized[searchbin_id]+=(thisweight*metEff);
           }
 
 	  if (!applyisotrkveto || nIsoTrks==0)
 	  {
-	    (myClosureHistgram.h_exp_mu_all_met)->Fill(met,thisweight);
-	    (myClosureHistgram.h_exp_mu_all_njets)->Fill(njets30,thisweight);
-	    (myClosureHistgram.h_exp_mu_all_mt2)->Fill(MT2,thisweight);
-	    (myClosureHistgram.h_exp_mu_all_ht)->Fill(ht,thisweight);
-	    (myClosureHistgram.h_exp_mu_all_mht)->Fill(mht,thisweight);
-	    (myClosureHistgram.h_exp_mu_all_ntopjets)->Fill(ntopjets,thisweight);
+	    (myClosureHistgram.h_exp_mu_all_met)->Fill(met,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_mu_all_njets)->Fill(njets30,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_mu_all_mt2)->Fill(MT2,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_mu_all_ht)->Fill(ht,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_mu_all_mht)->Fill(mht,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_mu_all_ntopjets)->Fill(ntopjets,(thisweight*metEff));
 	  }
         }
 
         // exp mu+ele
         if ( nElectrons == 0 && nMuons==0 && (ngenmu==1 || ngenmu==2 || ngenel==1 || ngenel==2) )
         {
-	  //n_exp_lep_noitv+=thisweight;
+	  //n_exp_lep_noitv+=(thisweight*metEff);
 	  //if (ngenmu==1 || ngenmu==2) ++n_exp_mu_noitv;
 	  //if (ngenel==1 || ngenel==2) ++n_exp_ele_noitv;
-	  //if (nIsoTrks==0) n_exp_lep_itv+=thisweight;
+	  //if (nIsoTrks==0) n_exp_lep_itv+=(thisweight*metEff);
 
           int searchbin_id = find_Binning_Index( nbottomjets , ntopjets , MT2, met );
           if( searchbin_id >= 0 )
           {
             //myAccRecoIsoEffs.nevents_lept_exp_SB_MC[searchbin_id]++;
-            myAccRecoIsoEffs.nevents_lept_exp_SB_MC[searchbin_id]+=thisweight*thisweight;
-            myAccRecoIsoEffs.nevents_lept_exp_SB_Normalized[searchbin_id]+=thisweight;
-            if (nIsoTrks==0) { myAccRecoIsoEffs.nevents_lept_exp_SB_MC_isotrk[searchbin_id]+=thisweight*thisweight; myAccRecoIsoEffs.nevents_lept_exp_SB_Normalized_isotrk[searchbin_id]+=thisweight; }
+            myAccRecoIsoEffs.nevents_lept_exp_SB_MC[searchbin_id]+=(thisweight*metEff)*(thisweight*metEff);
+            myAccRecoIsoEffs.nevents_lept_exp_SB_Normalized[searchbin_id]+=(thisweight*metEff);
+            if (nIsoTrks==0) { myAccRecoIsoEffs.nevents_lept_exp_SB_MC_isotrk[searchbin_id]+=(thisweight*metEff)*(thisweight*metEff); myAccRecoIsoEffs.nevents_lept_exp_SB_Normalized_isotrk[searchbin_id]+=(thisweight*metEff); }
           }
 
 	  if (!applyisotrkveto || nIsoTrks==0)
 	  {
-	    (myClosureHistgram.h_exp_lept_all_met)->Fill(met,thisweight);
-	    (myClosureHistgram.h_exp_lept_all_njets)->Fill(njets30,thisweight);
-	    (myClosureHistgram.h_exp_lept_all_mt2)->Fill(MT2,thisweight);
-	    (myClosureHistgram.h_exp_lept_all_ht)->Fill(ht,thisweight);
-	    (myClosureHistgram.h_exp_lept_all_mht)->Fill(mht,thisweight);
-	    (myClosureHistgram.h_exp_lept_all_ntopjets)->Fill(ntopjets,thisweight);
+	    (myClosureHistgram.h_exp_lept_all_met)->Fill(met,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_lept_all_njets)->Fill(njets30,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_lept_all_mt2)->Fill(MT2,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_lept_all_ht)->Fill(ht,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_lept_all_mht)->Fill(mht,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_lept_all_ntopjets)->Fill(ntopjets,(thisweight*metEff));
+	  }
+	  if (nIsoTrks==0)
+	  {	  
+  	    (myClosureHistgram.h_exp_lept_all_Z_sb)->Fill(searchbin_id,(thisweight*metEff));
+  	    (myClosureHistgram.h_exp_lept_all_Z_njets30)->Fill(njets30,(thisweight*metEff));
+  	    (myClosureHistgram.h_exp_lept_all_Z_njets50)->Fill(njets50,(thisweight*metEff));
+  	    (myClosureHistgram.h_exp_lept_all_Z_ntops)->Fill(ntopjets,(thisweight*metEff));
+  	    (myClosureHistgram.h_exp_lept_all_Z_nbjets)->Fill(nbottomjets,(thisweight*metEff));
+  	    (myClosureHistgram.h_exp_lept_all_Z_MET)->Fill(met,(thisweight*metEff));
+  	    (myClosureHistgram.h_exp_lept_all_Z_MT2)->Fill(MT2,(thisweight*metEff));
+  	    (myClosureHistgram.h_exp_lept_all_Z_HT)->Fill(ht,(thisweight*metEff));
 	  }
         }
 
         // exp 1 electron not iso
         if (nElectrons == 0 && nMuons==0 && ( (ngenel==1 && ngenelnotiso==1) || ( ngenel==2 && ngenelnotiso==2) ) )
         {
-          myAccRecoIsoEffs.nevents_exp_iso_els+=thisweight;
+          myAccRecoIsoEffs.nevents_exp_iso_els+=(thisweight*metEff);
 
 	  if (!applyisotrkveto || nIsoTrks==0)
 	  {
-	    (myClosureHistgram.h_exp_el_iso_met)->Fill(met,thisweight);
-	    (myClosureHistgram.h_exp_el_iso_njets)->Fill(njets30,thisweight);
-	    (myClosureHistgram.h_exp_el_iso_mt2)->Fill(MT2,thisweight);
-	    (myClosureHistgram.h_exp_el_iso_ht)->Fill(ht,thisweight);
-	    (myClosureHistgram.h_exp_el_iso_mht)->Fill(mht,thisweight);
-	    (myClosureHistgram.h_exp_el_iso_ntopjets)->Fill(ntopjets,thisweight);
+	    (myClosureHistgram.h_exp_el_iso_met)->Fill(met,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_el_iso_njets)->Fill(njets30,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_el_iso_mt2)->Fill(MT2,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_el_iso_ht)->Fill(ht,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_el_iso_mht)->Fill(mht,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_el_iso_ntopjets)->Fill(ntopjets,(thisweight*metEff));
 	  }
         }
 
         // exp 1 electron not id
         if (nElectrons == 0 && nMuons==0 && ( (ngenel==1 && ngenelnotid==1) || ( ngenel==2 && ngenelnotid==2) ) )
         {
-          myAccRecoIsoEffs.nevents_exp_id_els+=thisweight;
+          myAccRecoIsoEffs.nevents_exp_id_els+=(thisweight*metEff);
 
 	  if (!applyisotrkveto || nIsoTrks==0)
 	  {
-	    (myClosureHistgram.h_exp_el_id_met)->Fill(met,thisweight);
-	    (myClosureHistgram.h_exp_el_id_njets)->Fill(njets30,thisweight);
-	    (myClosureHistgram.h_exp_el_id_mt2)->Fill(MT2,thisweight);
-	    (myClosureHistgram.h_exp_el_id_ht)->Fill(ht,thisweight);
-	    (myClosureHistgram.h_exp_el_id_mht)->Fill(mht,thisweight);
-	    (myClosureHistgram.h_exp_el_id_ntopjets)->Fill(ntopjets,thisweight);
+	    (myClosureHistgram.h_exp_el_id_met)->Fill(met,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_el_id_njets)->Fill(njets30,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_el_id_mt2)->Fill(MT2,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_el_id_ht)->Fill(ht,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_el_id_mht)->Fill(mht,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_el_id_ntopjets)->Fill(ntopjets,(thisweight*metEff));
 	  }
         }
 
         // exp 1 electron not acc
         if (nElectrons == 0 && nMuons==0 && ( (ngenel==1 && ngeneloutacc==1) || ( ngenel==2 && ngeneloutacc==2) ) )
         {
-          myAccRecoIsoEffs.nevents_exp_acc_els+=thisweight;
+          myAccRecoIsoEffs.nevents_exp_acc_els+=(thisweight*metEff);
 
 	  if (!applyisotrkveto || nIsoTrks==0)
 	  {
-	    (myClosureHistgram.h_exp_el_acc_met)->Fill(met,thisweight);
-	    (myClosureHistgram.h_exp_el_acc_njets)->Fill(njets30,thisweight);
-	    (myClosureHistgram.h_exp_el_acc_mt2)->Fill(MT2,thisweight);
-	    (myClosureHistgram.h_exp_el_acc_ht)->Fill(ht,thisweight);
-	    (myClosureHistgram.h_exp_el_acc_mht)->Fill(mht,thisweight);
-	    (myClosureHistgram.h_exp_el_acc_ntopjets)->Fill(ntopjets,thisweight);
+	    (myClosureHistgram.h_exp_el_acc_met)->Fill(met,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_el_acc_njets)->Fill(njets30,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_el_acc_mt2)->Fill(MT2,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_el_acc_ht)->Fill(ht,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_el_acc_mht)->Fill(mht,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_el_acc_ntopjets)->Fill(ntopjets,(thisweight*metEff));
 	  }
         }
 
@@ -777,57 +831,57 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
         {
 	  if (!(ngeneloutacc==1 || ngenelnotid==1 || ngenelnotiso==1)) std::cout << "FSL: 1 ele tot warning" << std::endl;
 
-          myAccRecoIsoEffs.nevents_exp_all_els+=thisweight;
-          //myAccRecoIsoEffs.nevents_single_els+=thisweight;
+          myAccRecoIsoEffs.nevents_exp_all_els+=(thisweight*metEff);
+          //myAccRecoIsoEffs.nevents_single_els+=(thisweight*metEff);
 
           int searchbin_id = find_Binning_Index( nbottomjets , ntopjets , MT2, met );
           if( searchbin_id >= 0 )
           {
             //myAccRecoIsoEffs.nevents_els_exp_SB_MC[searchbin_id]++;
-            myAccRecoIsoEffs.nevents_els_exp_SB_MC[searchbin_id]+=thisweight*thisweight;
-            myAccRecoIsoEffs.nevents_els_exp_SB_Normalized[searchbin_id]+=thisweight;
+            myAccRecoIsoEffs.nevents_els_exp_SB_MC[searchbin_id]+=(thisweight*metEff)*(thisweight*metEff);
+            myAccRecoIsoEffs.nevents_els_exp_SB_Normalized[searchbin_id]+=(thisweight*metEff);
           }
 
 	  if (!applyisotrkveto || nIsoTrks==0)
 	  {
-	    (myClosureHistgram.h_exp_elsingle_all_met)->Fill(met,thisweight);
-	    (myClosureHistgram.h_exp_elsingle_all_njets)->Fill(njets30,thisweight);
-	    (myClosureHistgram.h_exp_elsingle_all_mt2)->Fill(MT2,thisweight);
-	    (myClosureHistgram.h_exp_elsingle_all_ht)->Fill(ht,thisweight);
-	    (myClosureHistgram.h_exp_elsingle_all_mht)->Fill(mht,thisweight);
-	    (myClosureHistgram.h_exp_elsingle_all_ntopjets)->Fill(ntopjets,thisweight);  
+	    (myClosureHistgram.h_exp_elsingle_all_met)->Fill(met,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_elsingle_all_njets)->Fill(njets30,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_elsingle_all_mt2)->Fill(MT2,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_elsingle_all_ht)->Fill(ht,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_elsingle_all_mht)->Fill(mht,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_elsingle_all_ntopjets)->Fill(ntopjets,(thisweight*metEff));  
 
-	    (myClosureHistgram.h_exp_el_all_met)->Fill(met,thisweight);
-	    (myClosureHistgram.h_exp_el_all_njets)->Fill(njets30,thisweight);
-	    (myClosureHistgram.h_exp_el_all_mt2)->Fill(MT2,thisweight);
-	    (myClosureHistgram.h_exp_el_all_ht)->Fill(ht,thisweight);
-	    (myClosureHistgram.h_exp_el_all_mht)->Fill(mht,thisweight);
-	    (myClosureHistgram.h_exp_el_all_ntopjets)->Fill(ntopjets,thisweight);
+	    (myClosureHistgram.h_exp_el_all_met)->Fill(met,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_el_all_njets)->Fill(njets30,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_el_all_mt2)->Fill(MT2,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_el_all_ht)->Fill(ht,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_el_all_mht)->Fill(mht,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_el_all_ntopjets)->Fill(ntopjets,(thisweight*metEff));
 	  }
         }  
 
         //if ( nElectrons == 0 && nMuons==0 && ngenel==2 && ( ngeneloutacc==2 || ngenelnotid==2 || ngenelnotiso==2 || ( ngeneloutacc==1 && ngenelnotid==1 ) || (ngeneloutacc==1 && ngenelnotiso==1 ) || ( ngenelnotiso==1 && ngenelnotid==1 ) ) )
         if (nElectrons == 0 && nMuons==0 && ngenel==2)
         {
-          myAccRecoIsoEffs.nevents_exp_all_els+=thisweight;
-          //myAccRecoIsoEffs.nevents_di_els+=thisweight;
+          myAccRecoIsoEffs.nevents_exp_all_els+=(thisweight*metEff);
+          //myAccRecoIsoEffs.nevents_di_els+=(thisweight*metEff);
 
           int searchbin_id = find_Binning_Index( nbottomjets , ntopjets , MT2, met );
           if( searchbin_id >= 0 )
           {
             //myAccRecoIsoEffs.nevents_els_exp_SB_MC[searchbin_id]++;
-            myAccRecoIsoEffs.nevents_els_exp_SB_MC[searchbin_id]+=thisweight*thisweight;
-            myAccRecoIsoEffs.nevents_els_exp_SB_Normalized[searchbin_id]+=thisweight;
+            myAccRecoIsoEffs.nevents_els_exp_SB_MC[searchbin_id]+=(thisweight*metEff)*(thisweight*metEff);
+            myAccRecoIsoEffs.nevents_els_exp_SB_Normalized[searchbin_id]+=(thisweight*metEff);
           }
 
 	  if (!applyisotrkveto || nIsoTrks==0)
 	  {
-	    (myClosureHistgram.h_exp_el_all_met)->Fill(met,thisweight);
-	    (myClosureHistgram.h_exp_el_all_njets)->Fill(njets30,thisweight);
-	    (myClosureHistgram.h_exp_el_all_mt2)->Fill(MT2,thisweight);
-	    (myClosureHistgram.h_exp_el_all_ht)->Fill(ht,thisweight);
-	    (myClosureHistgram.h_exp_el_all_mht)->Fill(mht,thisweight);
-	    (myClosureHistgram.h_exp_el_all_ntopjets)->Fill(ntopjets,thisweight);
+	    (myClosureHistgram.h_exp_el_all_met)->Fill(met,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_el_all_njets)->Fill(njets30,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_el_all_mt2)->Fill(MT2,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_el_all_ht)->Fill(ht,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_el_all_mht)->Fill(mht,(thisweight*metEff));
+	    (myClosureHistgram.h_exp_el_all_ntopjets)->Fill(ntopjets,(thisweight*metEff));
 	  }
         }
       }//baseline, nolepveto
@@ -941,6 +995,21 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
 
       bool passBaselinelostlept = trCS.getVar<bool>("passBaseline"+spec);
  
+      std::vector<std::string> TriggerNames = trCS.getVec<std::string>("TriggerNames");
+      std::vector<int> PassTrigger = trCS.getVec<int>("PassTrigger");
+      bool foundTrigger = false;
+
+      for(unsigned it=0; it<TriggerNames.size(); it++)
+      {
+	if( TriggerNames[it].find("HLT_PFHT350_PFMET100_JetIdCleaned_v") || TriggerNames[it].find("HLT_PFHT350_PFMET100_NoiseCleaned_v") || TriggerNames[it].find("HLT_PFHT350_PFMET100_v*") )
+	{
+	  if( PassTrigger[it] ) foundTrigger = true;
+	}
+      }
+
+      if( !foundTrigger ) continue;
+
+
       if(
          passBaselinelostlept
         )
@@ -952,10 +1021,12 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
         double metphi = trCS.getVar<double>("metphi");
 
         int njets30 = trCS.getVar<int>("cntNJetsPt30Eta24"+spec);
+        int njets50 = trCS.getVar<int>("cntNJetsPt50Eta24"+spec);
         int ntopjets = trCS.getVar<int>("nTopCandSortedCnt"+spec);
         int nbottomjets = trCS.getVar<int>("cntCSVS"+spec);
         double MT2 = trCS.getVar<double>("best_had_brJet_MT2"+spec);
-        double ht = trCS.getVar<double>("ht");
+        //double ht = trCS.getVar<double>("ht");
+        double ht = trCS.getVar<double>("HT"+spec);
         double mht = trCS.getVar<double>("mht");
 
         //muon CS
@@ -995,9 +1066,11 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
 	    // prediction computation
 	    //////////////////////////
 	    double EventWeight_mus = thisweight;
-            int njetsbin_number = Set_njetsbin_number(njets30);
-            int ptbin_number = Set_ptbin_number(reco_mus_pt);
-            int acbin_number = Set_acbin_number(activity);
+            const int njetsbin_number = Set_njetsbin_number(njets30);
+            const int ptbin_number = Set_ptbin_number(reco_mus_pt);
+            const int acbin_number = Set_acbin_number(activity);
+	    const int htbin_number = Set_HTbin_number(ht);
+            //const int htbin_number = Set_MT2bin_number(MT2);
             int searchbin_id = find_Binning_Index( nbottomjets , ntopjets , MT2, met );
 	    myAccRecoIsoEffs.EffstoWeights_fromH();
 
@@ -1007,32 +1080,32 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
 	    //dimuon correction factor
             EventWeight_mus = EventWeight_mus * ttbar_corrfactor_di_mus;
 
-	    if (applyisotrkveto) EventWeight_mus *= isotrackvetoeff;
+	    //if (applyisotrkveto) EventWeight_mus *= isotrackvetoeff;
 
             //muon prediction from muon CS
 	    //Fill muon iso closure plots
-	    (myClosureHistgram.h_pred_mu_iso_met)->Fill(met, myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
-	    (myClosureHistgram.h_pred_mu_iso_njets)->Fill(njets30, myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
-	    (myClosureHistgram.h_pred_mu_iso_mt2)->Fill(MT2, myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
-            (myClosureHistgram.h_pred_mu_iso_ht)->Fill(ht, myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
-            (myClosureHistgram.h_pred_mu_iso_mht)->Fill(mht, myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
-            (myClosureHistgram.h_pred_mu_iso_ntopjets)->Fill(ntopjets, myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
+	    (myClosureHistgram.h_pred_mu_iso_met)->Fill(met, myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus);
+	    (myClosureHistgram.h_pred_mu_iso_njets)->Fill(njets30, myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus);
+	    (myClosureHistgram.h_pred_mu_iso_mt2)->Fill(MT2, myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus);
+            (myClosureHistgram.h_pred_mu_iso_ht)->Fill(ht, myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus);
+            (myClosureHistgram.h_pred_mu_iso_mht)->Fill(mht, myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus);
+            (myClosureHistgram.h_pred_mu_iso_ntopjets)->Fill(ntopjets, myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus);
 	    //Fill muon id closure plots
-	    (myClosureHistgram.h_pred_mu_id_met)->Fill(met, myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
-	    (myClosureHistgram.h_pred_mu_id_njets)->Fill(njets30, myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
-	    (myClosureHistgram.h_pred_mu_id_mt2)->Fill(MT2, myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
-            (myClosureHistgram.h_pred_mu_id_ht)->Fill(ht, myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
-            (myClosureHistgram.h_pred_mu_id_mht)->Fill(mht, myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
-            (myClosureHistgram.h_pred_mu_id_ntopjets)->Fill(ntopjets, myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
+	    (myClosureHistgram.h_pred_mu_id_met)->Fill(met, myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus);
+	    (myClosureHistgram.h_pred_mu_id_njets)->Fill(njets30, myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus);
+	    (myClosureHistgram.h_pred_mu_id_mt2)->Fill(MT2, myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus);
+            (myClosureHistgram.h_pred_mu_id_ht)->Fill(ht, myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus);
+            (myClosureHistgram.h_pred_mu_id_mht)->Fill(mht, myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus);
+            (myClosureHistgram.h_pred_mu_id_ntopjets)->Fill(ntopjets, myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus);
 	    //Fill muon acc closure plots
-	    (myClosureHistgram.h_pred_mu_acc_met)->Fill(met, myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
-	    (myClosureHistgram.h_pred_mu_acc_njets)->Fill(njets30, myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
-	    (myClosureHistgram.h_pred_mu_acc_mt2)->Fill(MT2, myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
-            (myClosureHistgram.h_pred_mu_acc_ht)->Fill(ht, myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
-            (myClosureHistgram.h_pred_mu_acc_mht)->Fill(mht, myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
-            (myClosureHistgram.h_pred_mu_acc_ntopjets)->Fill(ntopjets, myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus);
+	    (myClosureHistgram.h_pred_mu_acc_met)->Fill(met, myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus);
+	    (myClosureHistgram.h_pred_mu_acc_njets)->Fill(njets30, myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus);
+	    (myClosureHistgram.h_pred_mu_acc_mt2)->Fill(MT2, myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus);
+            (myClosureHistgram.h_pred_mu_acc_ht)->Fill(ht, myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus);
+            (myClosureHistgram.h_pred_mu_acc_mht)->Fill(mht, myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus);
+            (myClosureHistgram.h_pred_mu_acc_ntopjets)->Fill(ntopjets, myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus);
 	    //Fill all muon closure plots
-	    double EventWeight_all_mus = myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number] + myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number] + myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number];
+	    double EventWeight_all_mus = myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number][htbin_number] + myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number][htbin_number] + myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number][htbin_number];
 
 	    (myClosureHistgram.h_pred_mu_all_met)->Fill(met, EventWeight_all_mus*EventWeight_mus);
 	    (myClosureHistgram.h_pred_mu_all_njets)->Fill(njets30, EventWeight_all_mus*EventWeight_mus);
@@ -1047,12 +1120,22 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
             (myClosureHistgram.h_pred_lept_all_ht)->Fill(ht, EventWeight_all_mus*EventWeight_mus);
             (myClosureHistgram.h_pred_lept_all_mht)->Fill(mht, EventWeight_all_mus*EventWeight_mus);
             (myClosureHistgram.h_pred_lept_all_ntopjets)->Fill(ntopjets, EventWeight_all_mus*EventWeight_mus);
+	  
+  	    (myClosureHistgram.h_exp_lept_all_Z_sb)->Fill(searchbin_id,EventWeight_all_mus*EventWeight_mus);
+  	    (myClosureHistgram.h_exp_lept_all_Z_njets30)->Fill(njets30,EventWeight_all_mus*EventWeight_mus);
+  	    (myClosureHistgram.h_exp_lept_all_Z_njets50)->Fill(njets50,EventWeight_all_mus*EventWeight_mus);
+  	    (myClosureHistgram.h_exp_lept_all_Z_ntops)->Fill(ntopjets,EventWeight_all_mus*EventWeight_mus);
+  	    (myClosureHistgram.h_exp_lept_all_Z_nbjets)->Fill(nbottomjets,EventWeight_all_mus*EventWeight_mus);
+  	    (myClosureHistgram.h_exp_lept_all_Z_MET)->Fill(met,EventWeight_all_mus*EventWeight_mus);
+  	    (myClosureHistgram.h_exp_lept_all_Z_MT2)->Fill(MT2,EventWeight_all_mus*EventWeight_mus);
+  	    (myClosureHistgram.h_exp_lept_all_Z_HT)->Fill(ht,EventWeight_all_mus*EventWeight_mus);
+
 
             //total events flow for muons, prediction
             myAccRecoIsoEffs.nevents_pred_all_mus += EventWeight_all_mus*EventWeight_mus;
-            myAccRecoIsoEffs.nevents_pred_acc_mus += myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus;
-            myAccRecoIsoEffs.nevents_pred_id_mus += myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus;
-            myAccRecoIsoEffs.nevents_pred_iso_mus += myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus;
+            myAccRecoIsoEffs.nevents_pred_acc_mus += myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus;
+            myAccRecoIsoEffs.nevents_pred_id_mus += myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus;
+            myAccRecoIsoEffs.nevents_pred_iso_mus += myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus;
 
             if( searchbin_id >= 0 )
             {
@@ -1062,9 +1145,9 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
             }
             //here the error calculation is wrong...
             myAccRecoIsoEffs.nevents_pred_all_mus_err += EventWeight_all_mus*EventWeight_mus*EventWeight_all_mus*EventWeight_mus;
-            myAccRecoIsoEffs.nevents_pred_acc_mus_err += myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus*myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus;
-            myAccRecoIsoEffs.nevents_pred_id_mus_err += myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus*myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus;
-            myAccRecoIsoEffs.nevents_pred_iso_mus_err += myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus*myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_mus;
+            myAccRecoIsoEffs.nevents_pred_acc_mus_err += myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus*myAccRecoIsoEffs.mus_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus;
+            myAccRecoIsoEffs.nevents_pred_id_mus_err += myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus*myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus;
+            myAccRecoIsoEffs.nevents_pred_iso_mus_err += myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus*myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus;
 
             //begin to predict lost electrons from muon CS
             double EventWeight_els = thisweight;
@@ -1073,32 +1156,32 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
             //dielectron correction factor
             EventWeight_els = EventWeight_els * ttbar_corrfactor_di_els;
   
-	    if (applyisotrkveto) EventWeight_els *= isotrackvetoeff;
+	    //if (applyisotrkveto) EventWeight_els *= isotrackvetoeff;
 
             //electron prediction from muon CS
             //Fill electron iso closure plots
-            (myClosureHistgram.h_pred_el_iso_met)->Fill(met, myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
-            (myClosureHistgram.h_pred_el_iso_njets)->Fill(njets30, myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
-            (myClosureHistgram.h_pred_el_iso_mt2)->Fill(MT2, myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
-            (myClosureHistgram.h_pred_el_iso_ht)->Fill(ht, myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
-            (myClosureHistgram.h_pred_el_iso_mht)->Fill(mht, myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
-            (myClosureHistgram.h_pred_el_iso_ntopjets)->Fill(ntopjets, myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
+            (myClosureHistgram.h_pred_el_iso_met)->Fill(met, myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_els);
+            (myClosureHistgram.h_pred_el_iso_njets)->Fill(njets30, myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_els);
+            (myClosureHistgram.h_pred_el_iso_mt2)->Fill(MT2, myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_els);
+            (myClosureHistgram.h_pred_el_iso_ht)->Fill(ht, myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_els);
+            (myClosureHistgram.h_pred_el_iso_mht)->Fill(mht, myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_els);
+            (myClosureHistgram.h_pred_el_iso_ntopjets)->Fill(ntopjets, myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_els);
             //Fill electron id closure plots
-            (myClosureHistgram.h_pred_el_id_met)->Fill(met, myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
-            (myClosureHistgram.h_pred_el_id_njets)->Fill(njets30, myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
-            (myClosureHistgram.h_pred_el_id_mt2)->Fill(MT2, myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
-            (myClosureHistgram.h_pred_el_id_ht)->Fill(ht, myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
-            (myClosureHistgram.h_pred_el_id_mht)->Fill(mht, myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
-            (myClosureHistgram.h_pred_el_id_ntopjets)->Fill(ntopjets, myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
+            (myClosureHistgram.h_pred_el_id_met)->Fill(met, myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_els);
+            (myClosureHistgram.h_pred_el_id_njets)->Fill(njets30, myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_els);
+            (myClosureHistgram.h_pred_el_id_mt2)->Fill(MT2, myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_els);
+            (myClosureHistgram.h_pred_el_id_ht)->Fill(ht, myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_els);
+            (myClosureHistgram.h_pred_el_id_mht)->Fill(mht, myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_els);
+            (myClosureHistgram.h_pred_el_id_ntopjets)->Fill(ntopjets, myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_els);
             //Fill electron acc closure plots
-            (myClosureHistgram.h_pred_el_acc_met)->Fill(met, myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
-            (myClosureHistgram.h_pred_el_acc_njets)->Fill(njets30, myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
-            (myClosureHistgram.h_pred_el_acc_mt2)->Fill(MT2, myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
-            (myClosureHistgram.h_pred_el_acc_ht)->Fill(ht, myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
-            (myClosureHistgram.h_pred_el_acc_mht)->Fill(mht, myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
-            (myClosureHistgram.h_pred_el_acc_ntopjets)->Fill(ntopjets, myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els);
+            (myClosureHistgram.h_pred_el_acc_met)->Fill(met, myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_els);
+            (myClosureHistgram.h_pred_el_acc_njets)->Fill(njets30, myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_els);
+            (myClosureHistgram.h_pred_el_acc_mt2)->Fill(MT2, myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_els);
+            (myClosureHistgram.h_pred_el_acc_ht)->Fill(ht, myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_els);
+            (myClosureHistgram.h_pred_el_acc_mht)->Fill(mht, myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_els);
+            (myClosureHistgram.h_pred_el_acc_ntopjets)->Fill(ntopjets, myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_els);
             //Fill all electron closure plots
-            double EventWeight_all_els = myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number] + myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number] + myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number];
+            double EventWeight_all_els = myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number][htbin_number] + myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number][htbin_number] + myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number][htbin_number];
 
             (myClosureHistgram.h_pred_el_all_met)->Fill(met, EventWeight_all_els*EventWeight_els);
             (myClosureHistgram.h_pred_el_all_njets)->Fill(njets30, EventWeight_all_els*EventWeight_els);
@@ -1114,11 +1197,20 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
             (myClosureHistgram.h_pred_lept_all_mht)->Fill(mht, EventWeight_all_els*EventWeight_els);
             (myClosureHistgram.h_pred_lept_all_ntopjets)->Fill(ntopjets, EventWeight_all_els*EventWeight_els);
 
+  	    (myClosureHistgram.h_exp_lept_all_Z_sb)->Fill(searchbin_id,EventWeight_all_els*EventWeight_els);
+  	    (myClosureHistgram.h_exp_lept_all_Z_njets30)->Fill(njets30,EventWeight_all_els*EventWeight_els);
+  	    (myClosureHistgram.h_exp_lept_all_Z_njets50)->Fill(njets50,EventWeight_all_els*EventWeight_els);
+  	    (myClosureHistgram.h_exp_lept_all_Z_ntops)->Fill(ntopjets,EventWeight_all_els*EventWeight_els);
+  	    (myClosureHistgram.h_exp_lept_all_Z_nbjets)->Fill(nbottomjets,EventWeight_all_els*EventWeight_els);
+  	    (myClosureHistgram.h_exp_lept_all_Z_MET)->Fill(met,EventWeight_all_els*EventWeight_els);
+  	    (myClosureHistgram.h_exp_lept_all_Z_MT2)->Fill(MT2,EventWeight_all_els*EventWeight_els);
+  	    (myClosureHistgram.h_exp_lept_all_Z_HT)->Fill(ht,EventWeight_all_els*EventWeight_els);
+
             //total events flow for electrons, prediction
             myAccRecoIsoEffs.nevents_pred_all_els += EventWeight_all_els*EventWeight_els;
-            myAccRecoIsoEffs.nevents_pred_acc_els += myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els;
-            myAccRecoIsoEffs.nevents_pred_id_els += myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els;
-            myAccRecoIsoEffs.nevents_pred_iso_els += myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els;
+            myAccRecoIsoEffs.nevents_pred_acc_els += myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_els;
+            myAccRecoIsoEffs.nevents_pred_id_els += myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_els;
+            myAccRecoIsoEffs.nevents_pred_iso_els += myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_els;
 
             if( searchbin_id >= 0 )
             {
@@ -1128,9 +1220,9 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
             }
             //here the error calculation is wrong...
             myAccRecoIsoEffs.nevents_pred_all_els_err += EventWeight_all_els*EventWeight_els*EventWeight_all_els*EventWeight_els;
-            myAccRecoIsoEffs.nevents_pred_acc_els_err += myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els*myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els;
-            myAccRecoIsoEffs.nevents_pred_id_els_err += myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els*myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els;
-            myAccRecoIsoEffs.nevents_pred_iso_els_err += myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els*myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number]*EventWeight_els;
+            myAccRecoIsoEffs.nevents_pred_acc_els_err += myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_els*myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_els;
+            myAccRecoIsoEffs.nevents_pred_id_els_err += myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_els*myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_els;
+            myAccRecoIsoEffs.nevents_pred_iso_els_err += myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_els*myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_els;
           }//mtW5_els<125 (muon CS)
         }//nElectrons == 0 && nMuons == 1 (muon CS)
       }//baseline_nolepveto
@@ -1149,8 +1241,8 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
 
     myClosureHistgram.h_pred_lept_sb->SetBinContent( i_cal+1 , myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal] );
     myClosureHistgram.h_pred_lept_sb->SetBinError( i_cal+1 , std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]));
-    myClosureHistgram.h_pred_lept_sb_isotrk->SetBinContent( i_cal+1 , myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isotrackvetoeff );
-    myClosureHistgram.h_pred_lept_sb_isotrk->SetBinError( i_cal+1 , (std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isotrackvetoeff);
+    myClosureHistgram.h_pred_lept_sb_isotrk->SetBinContent( i_cal+1 , myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal] );
+    myClosureHistgram.h_pred_lept_sb_isotrk->SetBinError( i_cal+1 , (std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isoTrackEff_SB[i_cal]);
   }
 
   (myClosureHistgram.oFile)->Write();
@@ -1185,11 +1277,14 @@ int main(int argc, char* argv[])
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromTbar_", 831.76*0.5*TTbar_SingleLept_BR, 59816364, LUMI, inputFileList_Cal );
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_DiLept_", 831.76*TTbar_DiLept_BR, 30498962, LUMI, inputFileList_Cal );
 
+  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "HTMHT" , 1, 1, LUMI, inputFileList_Cal );
+  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "HTMHT" , 1, 1, 1.0, inputFileList_Cal );
+
   //TTJetsSampleWeight myExpPredSampleWeight;
   //myExpPredSampleWeight.TTJetsSampleInfo_push_back( "TTJets_", 831.76, 11339232, LUMI, inputFileList_Exp_Pred );
 
-  LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
-  //LoopLLExp( myAccRecoIsoEffs, myTTJetsSampleWeight );
+  //LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
+  LoopLLExp( myAccRecoIsoEffs, myTTJetsSampleWeight );
   //LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight );
 
 
@@ -1362,21 +1457,24 @@ void AccRecoIsoEffs::EffstoWeights_fromH()
     {
       for(k_cal = 0 ; k_cal < AC_BINS ; k_cal++)
       {
-        //mus_EventWeight_iso[i_cal][j_cal][k_cal]  = (1.0 - mus_isoeff[j_cal][k_cal])/mus_isoeff[j_cal][k_cal];
-        //mus_EventWeight_reco[i_cal][j_cal][k_cal] = (1.0/mus_isoeff[j_cal][k_cal]) * ( (1.0 - mus_recoeff[j_cal][k_cal])/mus_recoeff[j_cal][k_cal] ); 
-        //mus_EventWeight_acc[i_cal][j_cal][k_cal]  = (1.0/mus_isoeff[j_cal][k_cal]) * (1.0/mus_recoeff[j_cal][k_cal]) * ( (1.0 - mus_acc[i_cal])/mus_acc[i_cal] );
+	for (int htbinc=0;htbinc<NHT_BINS;++htbinc)
+	{
+	  //mus_EventWeight_iso[i_cal][j_cal][k_cal]  = (1.0 - mus_isoeff[j_cal][k_cal])/mus_isoeff[j_cal][k_cal];
+	  //mus_EventWeight_reco[i_cal][j_cal][k_cal] = (1.0/mus_isoeff[j_cal][k_cal]) * ( (1.0 - mus_recoeff[j_cal][k_cal])/mus_recoeff[j_cal][k_cal] ); 
+	  //mus_EventWeight_acc[i_cal][j_cal][k_cal]  = (1.0/mus_isoeff[j_cal][k_cal]) * (1.0/mus_recoeff[j_cal][k_cal]) * ( (1.0 - mus_acc[i_cal])/mus_acc[i_cal] );
     
-        //els_EventWeight_acc[i_cal][j_cal][k_cal]  = (1.0/mus_isoeff[j_cal][k_cal]) * (1.0/mus_recoeff[j_cal][k_cal]) * ( (1.0 - els_acc[i_cal])/mus_acc[i_cal] );
-        //els_EventWeight_reco[i_cal][j_cal][k_cal] = (1.0/mus_isoeff[j_cal][k_cal]) * ( (1 - els_recoeff[j_cal][k_cal])/mus_recoeff[j_cal][k_cal] )* (els_acc[i_cal]/mus_acc[i_cal]); 
-        //els_EventWeight_iso[i_cal][j_cal][k_cal]  = ( (1.0 - els_isoeff[j_cal][k_cal])/mus_isoeff[j_cal][k_cal] ) * (els_recoeff[j_cal][k_cal]/mus_recoeff[j_cal][k_cal])* (els_acc[i_cal]/mus_acc[i_cal]);
+	  //els_EventWeight_acc[i_cal][j_cal][k_cal]  = (1.0/mus_isoeff[j_cal][k_cal]) * (1.0/mus_recoeff[j_cal][k_cal]) * ( (1.0 - els_acc[i_cal])/mus_acc[i_cal] );
+	  //els_EventWeight_reco[i_cal][j_cal][k_cal] = (1.0/mus_isoeff[j_cal][k_cal]) * ( (1 - els_recoeff[j_cal][k_cal])/mus_recoeff[j_cal][k_cal] )* (els_acc[i_cal]/mus_acc[i_cal]); 
+	  //els_EventWeight_iso[i_cal][j_cal][k_cal]  = ( (1.0 - els_isoeff[j_cal][k_cal])/mus_isoeff[j_cal][k_cal] ) * (els_recoeff[j_cal][k_cal]/mus_recoeff[j_cal][k_cal])* (els_acc[i_cal]/mus_acc[i_cal]);
 
-        mus_EventWeight_iso[i_cal][j_cal][k_cal]  = (1.0 - ttbar_mus_isoeff[j_cal][k_cal])/ttbar_mus_isoeff[j_cal][k_cal];
-        mus_EventWeight_reco[i_cal][j_cal][k_cal] = (1.0/ttbar_mus_isoeff[j_cal][k_cal]) * ( (1.0 - ttbar_mus_recoeff[j_cal][k_cal])/ttbar_mus_recoeff[j_cal][k_cal] );
-        mus_EventWeight_acc[i_cal][j_cal][k_cal]  = (1.0/ttbar_mus_isoeff[j_cal][k_cal]) * (1.0/ttbar_mus_recoeff[j_cal][k_cal]) * ( (1.0 - ttbar_mus_acc[i_cal])/ttbar_mus_acc[i_cal] );
+	  mus_EventWeight_iso[i_cal][j_cal][k_cal][htbinc]  = (1.0 - ttbar_mus_isoeff[j_cal][k_cal])/ttbar_mus_isoeff[j_cal][k_cal];
+	  mus_EventWeight_reco[i_cal][j_cal][k_cal][htbinc] = (1.0/ttbar_mus_isoeff[j_cal][k_cal]) * ( (1.0 - ttbar_mus_recoeff[j_cal][k_cal])/ttbar_mus_recoeff[j_cal][k_cal] );
+	  mus_EventWeight_acc[i_cal][j_cal][k_cal][htbinc]  = (1.0/ttbar_mus_isoeff[j_cal][k_cal]) * (1.0/ttbar_mus_recoeff[j_cal][k_cal]) * ( (1.0 - ttbar_mus_acc[i_cal][htbinc])/ttbar_mus_acc[i_cal][htbinc] );
 
-        els_EventWeight_acc[i_cal][j_cal][k_cal]  = (1.0/ttbar_mus_isoeff[j_cal][k_cal]) * (1.0/ttbar_mus_recoeff[j_cal][k_cal]) * ( (1.0 - ttbar_els_acc[i_cal])/ttbar_mus_acc[i_cal] );
-        els_EventWeight_reco[i_cal][j_cal][k_cal] = (1.0/ttbar_mus_isoeff[j_cal][k_cal]) * ( (1 - ttbar_els_recoeff[j_cal][k_cal])/ttbar_mus_recoeff[j_cal][k_cal] )* (ttbar_els_acc[i_cal]/ttbar_mus_acc[i_cal]);
-        els_EventWeight_iso[i_cal][j_cal][k_cal]  = ( (1.0 - ttbar_els_isoeff[j_cal][k_cal])/ttbar_mus_isoeff[j_cal][k_cal] ) * (ttbar_els_recoeff[j_cal][k_cal]/ttbar_mus_recoeff[j_cal][k_cal])* (ttbar_els_acc[i_cal]/ttbar_mus_acc[i_cal]);
+	  els_EventWeight_acc[i_cal][j_cal][k_cal][htbinc]  = (1.0/ttbar_mus_isoeff[j_cal][k_cal]) * (1.0/ttbar_mus_recoeff[j_cal][k_cal]) * ( (1.0 - ttbar_els_acc[i_cal])/ttbar_mus_acc[i_cal][htbinc] );
+	  els_EventWeight_reco[i_cal][j_cal][k_cal][htbinc] = (1.0/ttbar_mus_isoeff[j_cal][k_cal]) * ( (1 - ttbar_els_recoeff[j_cal][k_cal])/ttbar_mus_recoeff[j_cal][k_cal] )* (ttbar_els_acc[i_cal]/ttbar_mus_acc[i_cal][htbinc]);
+	  els_EventWeight_iso[i_cal][j_cal][k_cal][htbinc]  = ( (1.0 - ttbar_els_isoeff[j_cal][k_cal])/ttbar_mus_isoeff[j_cal][k_cal] ) * (ttbar_els_recoeff[j_cal][k_cal]/ttbar_mus_recoeff[j_cal][k_cal])* (ttbar_els_acc[i_cal]/ttbar_mus_acc[i_cal][htbinc]);
+	}
       }
     }
   }
@@ -1979,6 +2077,13 @@ void AccRecoIsoEffs::printEffsHeader()
   EffsHeader << "  const double ttbar_corrfactor_di_mus = " << corrfactor_di_mus << ";" << std::endl;
   EffsHeader << "  const double ttbar_corrfactor_di_els = " << corrfactor_di_els << ";" << std::endl;
 
+  EffsHeader << "  double isoTrackEff_SB[" << NSEARCH_BINS << "] = {" << std::endl;
+  for( int searchbinc = 0 ; searchbinc < NSEARCH_BINS ; ++searchbinc )
+  {
+    EffsHeader << isotrkeff[searchbinc] << "," << std::endl;
+  }
+  EffsHeader << "};" << std::endl;
+ 
   EffsHeader.close();
 }
 

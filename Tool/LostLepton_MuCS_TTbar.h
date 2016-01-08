@@ -75,8 +75,8 @@ class AccRecoIsoEffs
   double mtwall[PT_BINS] = {0}, mtw100[PT_BINS] = {0};
 
   //here we define the event weight we are going to use in the second loop ( muon/electron CS and prediction plots)
-  double mus_EventWeight_iso[NJETS_BINS][PT_BINS][AC_BINS] = {{{0}}}, mus_EventWeight_reco[NJETS_BINS][PT_BINS][AC_BINS] = {{{0}}}, mus_EventWeight_acc[NJETS_BINS][PT_BINS][AC_BINS] = {{{0}}};
-  double els_EventWeight_iso[NJETS_BINS][PT_BINS][AC_BINS] = {{{0}}}, els_EventWeight_reco[NJETS_BINS][PT_BINS][AC_BINS] = {{{0}}}, els_EventWeight_acc[NJETS_BINS][PT_BINS][AC_BINS] = {{{0}}};
+  double mus_EventWeight_iso[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS] = {{{{0}}}}, mus_EventWeight_reco[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS] = {{{{0}}}}, mus_EventWeight_acc[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS] = {{{{0}}}};
+  double els_EventWeight_iso[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS] = {{{{0}}}}, els_EventWeight_reco[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS] = {{{{0}}}}, els_EventWeight_acc[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS] = {{{{0}}}};
 
   //here we define the search bin variables
   double nevents_mus_CS_SB_MC[NSEARCH_BINS] = {0}, nevents_mus_CS_SB_Normalized[NSEARCH_BINS] = {0};
@@ -373,6 +373,7 @@ class ClosureHistgram
 
   TH1D *h_pred_lept_all_met, *h_pred_lept_all_njets, *h_pred_lept_all_mt2, *h_pred_lept_all_ht, *h_pred_lept_all_mht, *h_pred_lept_all_ntopjets;
   TH1D *h_exp_lept_all_met, *h_exp_lept_all_njets, *h_exp_lept_all_mt2, *h_exp_lept_all_ht, *h_exp_lept_all_mht, *h_exp_lept_all_ntopjets;
+  TH1D *h_exp_lept_all_Z_sb, *h_exp_lept_all_Z_njets30, *h_exp_lept_all_Z_njets50, *h_exp_lept_all_Z_ntops, *h_exp_lept_all_Z_nbjets, *h_exp_lept_all_Z_MET, *h_exp_lept_all_Z_MT2, *h_exp_lept_all_Z_HT;
 
   TH1D *h_exp_elsingle_all_met, *h_exp_elsingle_all_njets, *h_exp_elsingle_all_mt2, *h_exp_elsingle_all_ht, *h_exp_elsingle_all_mht, *h_exp_elsingle_all_ntopjets;
 
@@ -446,6 +447,15 @@ void ClosureHistgram::BookHistgram(const char *outFileName)
   h_exp_lept_all_ht = new TH1D("h_exp_lept_all_ht","",300,0,3000);
   h_exp_lept_all_mht = new TH1D("h_exp_lept_all_mht","",100,0,1000);
   h_exp_lept_all_ntopjets = new TH1D("h_exp_lept_all_ntopjets","",20,0,20);
+
+  h_exp_lept_all_Z_sb = new TH1D("hSearchBins"      , "Search Bins;Search Bin;Events"        , 45 , 0 , 45);
+  h_exp_lept_all_Z_njets30 = new TH1D("hNJets30"    , "NJets30;N_{jets} (p_{T} > 30);Events" , 10 , 0    , 10);   // "cntNJetsPt30Eta24"
+  h_exp_lept_all_Z_njets50 = new TH1D("hNJets50"    , "NJets50;N_{jets} (p_{T} > 50);Events" , 10 , 0    , 10);   // "cntNJetsPt50Eta24"
+  h_exp_lept_all_Z_ntops = new TH1D("hNTops"        , "NTops;N_{tops};Events"                , 5  , 0    , 5);    // "nTopCandSortedCnt"
+  h_exp_lept_all_Z_nbjets = new TH1D("hNbJets"      , "NbJets;N_{bjets};Events"              , 5  , 0    , 5);    // "cntCSVS"
+  h_exp_lept_all_Z_MET = new TH1D("hMET"            , "MET;#slash{E}_{T} [GeV];Events"       , 24 , 200  , 800);  // "met"
+  h_exp_lept_all_Z_MT2 = new TH1D("hMT2"            , "MT2;M_{T2} [GeV];Events"              , 24 , 200  , 800);  // "best_had_brJet_MT2"
+  h_exp_lept_all_Z_HT = new TH1D("hHT"              , "HT;H_{T} [GeV];Events"                , 20 , 500  , 1000); // "HT"
 
   h_exp_musingle_all_met = new TH1D("h_exp_musingle_all_met","",100,0,1000);
   h_exp_musingle_all_njets = new TH1D("h_exp_musingle_all_njets","",20,0,20);
