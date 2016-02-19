@@ -5,7 +5,7 @@ SDIR       = ../../SusyAnaTools/Tools/
 #CXX       = ~/.vim/bundle/ClangComplete/bin/cc_args.py g++
 CXX        = g++
 
-CXXFLAGS  += -Iinc -std=c++0x -I${CMSSW_BASE}/src/
+CXXFLAGS  += -Iinc -std=c++0x -I${CMSSW_BASE}/src/ -I$(LHAPDF_DATA_PATH)/../../include
 ## Optimization flag
 CXXFLAGS += -g #-O3
 ## Enable the maximun warning
@@ -20,6 +20,8 @@ LD         = g++
 LDFLAGS    =
 
 LIBS       = $(shell root-config --glibs)
+
+LHAPDFLIB = -L$(LHAPDF_DATA_PATH)/../../lib -lLHAPDF
 
 PROGRAMS = tupleTest LostLepton_MuCS_TTbar ClosurePlots TagAndProbeAnalysis MtW
 
@@ -47,7 +49,7 @@ tupleTest: $(ODIR)/NTupleReader.o $(ODIR)/tupleReadTest.o
 #	$(LD) $^ $(LIBS) -L .TupleDict_h.so -o $@
 
 LostLepton_MuCS_TTbar: $(ODIR)/LostLepton_MuCS_TTbar.o $(ODIR)/NTupleReader.o
-	$(LD) $^ $(LIBS) -L${CMSSW_BASE}/lib/${SCRAM_ARCH}/ -lrecipeAUXOxbridgeMT2 -o $@
+	$(LD) $^ $(LIBS) -L${CMSSW_BASE}/lib/${SCRAM_ARCH}/ -lrecipeAUXOxbridgeMT2 $(LHAPDFLIB) -o $@
 
 ClosurePlots: $(ODIR)/ClosurePlots.o
 	$(LD) $^ $(LIBS)  -o $@

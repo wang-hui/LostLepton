@@ -4,7 +4,7 @@
 #define NHT_BINS 3
 
 #define LL_BINS 1
-#define NSEARCH_BINS 45
+#define NSEARCH_BINS 37
 //############determine the pt bin number############
 int Set_ptbin_number(
                      double lep_pt

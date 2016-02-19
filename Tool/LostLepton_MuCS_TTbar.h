@@ -17,6 +17,17 @@
 
 #include "LLBinFunction.h"
 
+#include "SusyAnaTools/Tools/PDFUncertainty.h"
+
+//using namespace std;
+
+//static PDFUncertainty pdf;
+//void mypdf(NTupleReader& tr)
+//{
+//  pdf(tr);
+//}
+
+
 //############################begin to defin class AccRecoIsoEffs###################
 static BaselineVessel *myBaselineVessel;
 void mypassBaselineFunc(NTupleReader& tr)
@@ -38,10 +49,11 @@ class AccRecoIsoEffs
   int nevents_sel_mus = 0;
   int nevents_sel_els = 0;
   int nevents_cs_mus = 0;
+  int nevents_cs_mus_sb[NSEARCH_BINS] = {0};
 
   //define acceptance, reco eff and iso eff to be calculated
-  double mus_acc[NJETS_BINS][NHT_BINS] = {{0}}, els_acc[NJETS_BINS] = {0};
-  double mus_acc_err[NJETS_BINS][NHT_BINS] = {{0}}, els_acc_err[NJETS_BINS] = {0};
+  double mus_acc[NJETS_BINS][NHT_BINS] = {{0}}, els_acc[NSEARCH_BINS] = {0};
+  double mus_acc_err[NJETS_BINS][NHT_BINS] = {{0}}, els_acc_err[NSEARCH_BINS] = {0};
 
   double mus_recoeff[PT_BINS][AC_BINS] = {{0}}, els_recoeff[PT_BINS][AC_BINS] = {{0}};
   double mus_isoeff[PT_BINS][AC_BINS] = {{0}}, els_isoeff[PT_BINS][AC_BINS] = {{0}};
@@ -54,17 +66,22 @@ class AccRecoIsoEffs
   double mtwcorrfactor[PT_BINS] = {0}, mtwcorrfactor_err[PT_BINS] = {0};
  
   //here we define the muon/electron number we need to count in the loop
-  double nmus_MC[NJETS_BINS][NHT_BINS] = {{0}}, nmus_acc_MC[NJETS_BINS][NHT_BINS] = {{0}}, nels_MC[NJETS_BINS] = {0}, nels_acc_MC[NJETS_BINS] = {0};
+  double nmus_MC[NJETS_BINS][NHT_BINS] = {{0}}, nmus_acc_MC[NJETS_BINS][NHT_BINS] = {{0}}, nels_MC[NSEARCH_BINS] = {0}, nels_acc_MC[NSEARCH_BINS] = {0};
   double nmus_acc_bin_MC[PT_BINS][AC_BINS] = {{0}}, nels_acc_bin_MC[PT_BINS][AC_BINS] = {{0}};
   double nmus_reco_MC[PT_BINS][AC_BINS] = {{0}}, nels_reco_MC[PT_BINS][AC_BINS] = {{0}};
   double nmus_iso_MC[PT_BINS][AC_BINS] = {{0}}, nels_iso_MC[PT_BINS][AC_BINS] = {{0}};
+
+  double nmus_MC_sb[NSEARCH_BINS] = {0};
+  double nmus_sb[NSEARCH_BINS] = {0};
+  double nmus_acc_MC_sb[NSEARCH_BINS] = {0};
+  double nmus_acc_sb[NSEARCH_BINS] = {0};
 
   double nmus_reco_MC_allreco[PT_BINS][AC_BINS] = {{0}}, nels_reco_MC_allreco[PT_BINS][AC_BINS] = {{0}};
   double nmus_iso_MC_allreco[PT_BINS][AC_BINS] = {{0}}, nels_iso_MC_allreco[PT_BINS][AC_BINS] = {{0}};
 
   double mtwall_MC[PT_BINS] = {0}, mtw100_MC[PT_BINS] = {0};
 
-  double nmus[NJETS_BINS][NHT_BINS] = {{0}}, nmus_acc[NJETS_BINS][NHT_BINS] = {{0}}, nels[NJETS_BINS] = {0}, nels_acc[NJETS_BINS] = {0};
+  double nmus[NJETS_BINS][NHT_BINS] = {{0}}, nmus_acc[NJETS_BINS][NHT_BINS] = {{0}}, nels[NSEARCH_BINS] = {0}, nels_acc[NSEARCH_BINS] = {0};
   double nmus_acc_bin[PT_BINS][AC_BINS] = {{0}}, nels_acc_bin[PT_BINS][AC_BINS] = {{0}};
   double nmus_reco[PT_BINS][AC_BINS] = {{0}}, nels_reco[PT_BINS][AC_BINS] = {{0}};
   double nmus_iso[PT_BINS][AC_BINS] = {{0}}, nels_iso[PT_BINS][AC_BINS] = {{0}};
@@ -75,8 +92,8 @@ class AccRecoIsoEffs
   double mtwall[PT_BINS] = {0}, mtw100[PT_BINS] = {0};
 
   //here we define the event weight we are going to use in the second loop ( muon/electron CS and prediction plots)
-  double mus_EventWeight_iso[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS] = {{{{0}}}}, mus_EventWeight_reco[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS] = {{{{0}}}}, mus_EventWeight_acc[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS] = {{{{0}}}};
-  double els_EventWeight_iso[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS] = {{{{0}}}}, els_EventWeight_reco[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS] = {{{{0}}}}, els_EventWeight_acc[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS] = {{{{0}}}};
+  double mus_EventWeight_iso[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS] = {{{{0}}}}, mus_EventWeight_reco[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS] = {{{{0}}}}, mus_EventWeight_acc[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS][NSEARCH_BINS] = {{{{{0}}}}};
+  double els_EventWeight_iso[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS][NSEARCH_BINS] = {{{{{0}}}}}, els_EventWeight_reco[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS][NSEARCH_BINS] = {{{{{0}}}}}, els_EventWeight_acc[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS][NSEARCH_BINS] = {{{{{0}}}}};
 
   //here we define the search bin variables
   double nevents_mus_CS_SB_MC[NSEARCH_BINS] = {0}, nevents_mus_CS_SB_Normalized[NSEARCH_BINS] = {0};
@@ -88,6 +105,12 @@ class AccRecoIsoEffs
   double nevents_lept_pred_SB_MC[NSEARCH_BINS] = {0}, nevents_lept_pred_SB_Normalized[NSEARCH_BINS] = {0};
   double nevents_lept_exp_SB_MC[NSEARCH_BINS] = {0}, nevents_lept_exp_SB_Normalized[NSEARCH_BINS] = {0};
   double nevents_lept_exp_SB_MC_isotrk[NSEARCH_BINS] = {0}, nevents_lept_exp_SB_Normalized_isotrk[NSEARCH_BINS] = {0};
+  double nevents_mus_pred_iso_SB_Normalized[NSEARCH_BINS] = {0}, nevents_mus_pred_reco_SB_Normalized[NSEARCH_BINS] = {0}, nevents_mus_pred_acc_SB_Normalized[NSEARCH_BINS] = {0};
+  double nevents_mus_exp_iso_SB_Normalized[NSEARCH_BINS] = {0}, nevents_mus_exp_reco_SB_Normalized[NSEARCH_BINS] = {0}, nevents_mus_exp_acc_SB_Normalized[NSEARCH_BINS] = {0};
+  double nevents_mus_exp_iso_SB_Normalized_isotrk[NSEARCH_BINS] = {0}, nevents_mus_exp_reco_SB_Normalized_isotrk[NSEARCH_BINS] = {0}, nevents_mus_exp_acc_SB_Normalized_isotrk[NSEARCH_BINS] = {0};
+  double w2_mus_exp_iso_SB_Normalized_isotrk[NSEARCH_BINS] = {0}, w2_mus_exp_reco_SB_Normalized_isotrk[NSEARCH_BINS] = {0}, w2_mus_exp_acc_SB_Normalized_isotrk[NSEARCH_BINS] = {0};
+  double nevents_els_exp_iso_SB_Normalized_isotrk[NSEARCH_BINS] = {0}, nevents_els_exp_reco_SB_Normalized_isotrk[NSEARCH_BINS] = {0}, nevents_els_exp_acc_SB_Normalized_isotrk[NSEARCH_BINS] = {0};
+  double w2_els_exp_iso_SB_Normalized_isotrk[NSEARCH_BINS] = {0}, w2_els_exp_reco_SB_Normalized_isotrk[NSEARCH_BINS] = {0}, w2_els_exp_acc_SB_Normalized_isotrk[NSEARCH_BINS] = {0};
 
   //di-lepton correction
   double nevents_single_mus = 0, nevents_di_mus = 0;
@@ -141,10 +164,10 @@ class AccRecoIsoEffs
   void GetDiLeptonFactor();
   void NormalizeFlowNumber();
   //void printSearchBin(ClosureHistgram& myClosureHistgram);
+  double get_stat_Error(double a, double an);
 
  private:
   double scale = 1;  
-  double get_stat_Error(double a, double an);
   double get_stat_Error_APNOA(double a, double an,double ua, double un);
   double get_sys_Error(double r, double p);
 };
@@ -379,6 +402,7 @@ class ClosureHistgram
 
   //closure for search bin
   TH1D *h_exp_mu_sb, *h_pred_mu_sb, *h_exp_el_sb, *h_pred_el_sb, *h_exp_lept_sb, *h_pred_lept_sb, *h_exp_lept_sb_isotrk, *h_pred_lept_sb_isotrk;
+  TH1D * h_pred_mu_iso_sb, *h_pred_mu_reco_sb, *h_pred_mu_acc_sb, *h_exp_iso_mu_sb, *h_exp_reco_mu_sb, *h_exp_acc_mu_sb;
 };
 
 void ClosureHistgram::BookHistgram(const char *outFileName)
@@ -543,6 +567,15 @@ void ClosureHistgram::BookHistgram(const char *outFileName)
   h_exp_lept_sb_isotrk = new TH1D("h_exp_lept_isotrk","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
   h_pred_lept_sb = new TH1D("h_pred_lept_sb","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
   h_pred_lept_sb_isotrk = new TH1D("h_pred_lept_isotrk","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
+
+  h_pred_mu_iso_sb = new TH1D("h_pred_mu_iso_sb","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
+  h_pred_mu_reco_sb = new TH1D("h_pred_mu_reco_sb","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
+  h_pred_mu_acc_sb = new TH1D("h_pred_mu_acc_sb","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
+
+  h_exp_iso_mu_sb = new TH1D("h_exp_mu_iso_sb","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
+  h_exp_reco_mu_sb = new TH1D("h_exp_mu_reco_sb","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
+  h_exp_acc_mu_sb = new TH1D("h_exp_mu_acc_sb","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
+
 }
 
 //Common function that will be used in both calculation and expectation loop

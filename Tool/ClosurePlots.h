@@ -53,14 +53,33 @@ void ClosurePlots::Initialization()
   //fin = TFile::Open("v151201_0p5fb_ExpLL.root");
   //fin = TFile::Open("v151201_2p1fb_ExpLL.root");
   //fin = TFile::Open("v151216_ExpLL.root");
-  fin = TFile::Open("v160106_ttbar_ExpLL.root");
+  //fin = TFile::Open("v160106_ttbar_ExpLL.root");
+  //fin = TFile::Open("v160112_notrigeff_ExpLL.root");
+  //fin = TFile::Open("v160113_notrigeff_ExpLL.root");
+  //fin = TFile::Open("v160217_ttbar_ExpLL.root");
+  //fin = TFile::Open("v160217_ttbar_v3_ExpLL.root");
+  fin = TFile::Open("v160217_ttbar_v3_invertedDPhi_ExpLL.root");
+  //fin = TFile::Open("v160120_invertedDPhi_ttbar_ExpLL.root");
+  //fin = TFile::Open("v160113_nodilepton_ExpLL.root");
   //fin2 = TFile::Open("v151204_PredLL.root");
   //fin2 = TFile::Open("v151209_PredLL.root");
   //fin2 = TFile::Open("v151216_PredLL.root");
   //fin2 = TFile::Open("ttbar_v151217_PredLL.root");
   //fin2 = TFile::Open("v160106_ttbar_PredLL.root");
   //fin2 = TFile::Open("v160106_data_PredLL.root");
-  fin2 = TFile::Open("v160106_data_trigSel_PredLL.root");
+  //fin2 = TFile::Open("v160106_data_trigSel_PredLL.root");
+  //fin2 = TFile::Open("v160112_PredLL.root");
+  //fin2 = TFile::Open("v160112_nomtw_PredLL.root");
+  //fin2 = TFile::Open("v160112_nodilepton_PredLL.root");
+  //fin2 = TFile::Open("v160114_accSB_PredLL.root");
+  //fin2 = TFile::Open("v160114_ttbar_PredLL.root");
+  //fin2 = TFile::Open("v160116_data_PredLL.root");
+  //fin2 = TFile::Open("v160217_ttbar_PredLL.root");
+  //fin2 = TFile::Open("v160217_ttbar_v3_PredLL.root");
+  fin2 = TFile::Open("v160217_ttbar_v3_invertedDPhi_PredLL.root");
+  //fin2 = TFile::Open("v160120_invertedDPhi_ttbar_PredLL.root");
+  //fin2 = TFile::Open("v160122_accfromInvertedDPhi_PredLL.root");
+  //fin2 = TFile::Open("v160122_efffromInvertedDPhi_PredLL.root");
   list = fin->GetListOfKeys();
   list2 = fin2->GetListOfKeys();
   scale=1.0;
@@ -118,7 +137,7 @@ void ClosurePlots::DiLeptonPlots(
   h_exp_dl->Draw();
   h_exp_sl->Draw("same");
 
-  const std::string titre="CMS Preliminary 2016, 2.2 fb^{-1}, #sqrt{s} = 13 TeV";
+  const std::string titre="CMS Preliminary 2016, 2.3 fb^{-1}, #sqrt{s} = 13 TeV";
   TLatex *title = new TLatex(0.09770115,0.9194915,titre.c_str());
   title->SetNDC();
   title->SetTextSize(0.045);
@@ -188,20 +207,20 @@ void ClosurePlots::ClosureTemplate(
   h_pred->GetXaxis()->SetTitle(XTitle);
   h_pred->SetLineColor(1);
   h_pred->SetLineWidth(3);
-  h_pred->Sumw2();
+  //h_pred->Sumw2();
   h_pred->Scale(scale);
 
   h_exp->GetXaxis()->SetRangeUser(min,max);
   h_exp->GetXaxis()->SetTitle(XTitle);
   h_exp->SetLineColor(2);
   h_exp->SetLineWidth(3);
-  h_exp->Sumw2();
+  //h_exp->Sumw2();
   h_exp->Scale(scale);
 
   h_pred->Draw(); 
   h_exp->Draw("same");
 
-  const std::string titre="CMS Preliminary 2016, 2.2 fb^{-1}, #sqrt{s} = 13 TeV";
+  const std::string titre="CMS Preliminary 2016, 2.3 fb^{-1}, #sqrt{s} = 13 TeV";
   TLatex *title = new TLatex(0.09770115,0.9194915,titre.c_str());
   title->SetNDC();
   title->SetTextSize(0.045);
@@ -248,7 +267,7 @@ void ClosurePlots::ClosureTemplate(
   ratio->SetTitleSize(0.15);
   ratio->SetStats(kFALSE);
   ratio->SetMarkerStyle(kFullDotMedium);
-  ratio->Sumw2();
+  //ratio->Sumw2();
   ratio->DrawCopy();
 
   TH1D *zero = (TH1D*)ratio->Clone(); 

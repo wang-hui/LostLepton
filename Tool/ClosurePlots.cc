@@ -85,6 +85,9 @@ int main()
     {"_el_iso_ntopjets", "Number of Top jets"    ,0   , 5    },
     //search bin closure plots
     {"_mu_sb"          , "Search Bins"           ,0   , 65  },
+    {"_mu_iso_sb"          , "Search Bins"           ,0   , 65  },
+    {"_mu_reco_sb"          , "Search Bins"           ,0   , 65  },
+    {"_mu_acc_sb"          , "Search Bins"           ,0   , 65  },
     {"_el_sb"          , "Search Bins"           ,0   , 65  },
     {"_lept_sb"        , "Search Bins"           ,0   , 65  },
     {"_lept_isotrk" , "Search Bins"           ,0   , 65  },
@@ -184,7 +187,6 @@ int main()
                               100,
                               500
                               );
-
 
   return 0;
 }
