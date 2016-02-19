@@ -1,0 +1,3 @@
+/afs/cern.ch/work/l/lacroix/SUSY/stop_2015/flat_ntuples/data_v5/Skimmed_MET175_Spring15_74X_Jan_2016_Ntp_v5p0_HTMHT-Run2015C-25ns-05Oct2015stopFlatNtuples.root
+/afs/cern.ch/work/l/lacroix/SUSY/stop_2015/flat_ntuples/data_v5/Skimmed_MET175_Spring15_74X_Jan_2016_Ntp_v5p0_HTMHT-Run2015D-05Oct2015stopFlatNtuples.root
+/afs/cern.ch/work/l/lacroix/SUSY/stop_2015/flat_ntuples/data_v5/Skimmed_MET175_Spring15_74X_Jan_2016_Ntp_v5p0_reTry_HTMHT-Run2015D-PromptRecostopFlatNtuples.root
