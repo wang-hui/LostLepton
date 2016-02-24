@@ -119,8 +119,8 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
     double thisweight = (*iter_TTJetsSampleInfos).weight;
     std::cout << "Weight " << thisweight << std::endl;
     int neventc=0;
-    while(tr.getNextEvent())
-    //while(tr.getNextEvent() && neventc<10000)
+    //while(tr.getNextEvent())
+    while(tr.getNextEvent() && neventc<10000)
     {
       ++neventc;
       if(tr.getEvtNum()%20000 == 0) std::cout << tr.getEvtNum() << "\t" << ((clock() - t0)/1000000.0) << std::endl;
@@ -479,6 +479,9 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
           {
 	    neventsSB[searchbin_id]+=thisweight;
 	    if (nIsoTrks==0) neventsSB_afterITV[searchbin_id]+=thisweight;
+
+	    if (neventsSB_afterITV[searchbin_id]>neventsSB[searchbin_id]) std::cout << "neventsSB_afterITV[searchbin_id]>neventsSB[searchbin_id]" << std::endl;
+
 	    ++neventsSB_MC[searchbin_id];
 	    if (nIsoTrks==0) ++neventsSB_afterITV_MC[searchbin_id];
 
@@ -583,8 +586,8 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 
 
       if ( 
-          //passBaselinelostlept 
-	  passInvertedBaseline
+          passBaselinelostlept 
+	  //passInvertedBaseline
          )
       {
         myAccRecoIsoEffs.nevents_sel_base+=thisweight;
@@ -1519,7 +1522,7 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
 
   //std::cout << "sidebandLowMT2 = " << sidebandLowMT2 << std::endl;
   //std::cout << "sidebandHighMT2 = " << sidebandHighMT2 << std::endl;
-  //std::cout.precision(3);
+  std::cout.precision(3);
   for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
   {
 //    h_cs_mus_sb->SetBinContent( i_cal+1 , nevents_mus_CS_SB_Normalized[i_cal] );
@@ -1579,41 +1582,40 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
     if (i_cal == 8) std::cout << "8 & 1 & 1 & 400+ & 200-350 & ";
     if (i_cal == 9) std::cout << "9 & 1 & 1 & 400+ & 350-450 & ";
     if (i_cal == 10) std::cout << "10 & 1 & 1 & 400+ & 450+ & ";
-    if (i_cal == 11) std::cout << "11 & 1 & 2 & 200-300 & 200-275 & ";
-    if (i_cal == 12) std::cout << "12 & 1 & 2 & 200-300 & 275-350 & ";
-    if (i_cal == 13) std::cout << "13 & 1 & 2 & 200-300 & 350-450 & ";
-    if (i_cal == 14) std::cout << "14 & 1 & 2 & 200-300 & 450+ & ";
-    if (i_cal == 15) std::cout << "15 & 1 & 2 & 300-400 & 200-275 & ";
-    if (i_cal == 16) std::cout << "16 & 1 & 2 & 300-400 & 275-350 & ";
-    if (i_cal == 17) std::cout << "17 & 1 & 2 & 300-400 & 350-450 & ";
-    if (i_cal == 18) std::cout << "18 & 1 & 2 & 300-400 & 450+ & ";
-    if (i_cal == 19) std::cout << "19 & 1 & 2 & 400+ & 200-450 & ";
-    if (i_cal == 20) std::cout << "20 & 1 & 2 & 400+ & 450+ & ";
-    if (i_cal == 21) std::cout << "21 & 1 & 3+ & 200+ & 200-300 & ";
-    if (i_cal == 22) std::cout << "22 & 1 & 3+ & 200+ & 300-400 & ";
-    if (i_cal == 23) std::cout << "23 & 1 & 3+ & 200+ & 400+ & ";
-    if (i_cal == 24) std::cout << "24 & 2 & 1 & 200-300 & 200-275 & ";
-    if (i_cal == 25) std::cout << "25 & 2 & 1 & 200-300 & 275-350 & ";
-    if (i_cal == 26) std::cout << "26 & 2 & 1 & 200-300 & 350+ & ";
-    if (i_cal == 27) std::cout << "27 & 2 & 1 & 300-400 & 200-275 & ";
-    if (i_cal == 28) std::cout << "28 & 2 & 1 & 300-400 & 275-350 & ";
-    if (i_cal == 29) std::cout << "29 & 2 & 1 & 300-400 & 350+ & ";
-    if (i_cal == 30) std::cout << "30 & 2 & 1 & 400+ & 200-350 & ";
-    if (i_cal == 31) std::cout << "31 & 2 & 1 & 400+ & 350+ & ";
-    if (i_cal == 32) std::cout << "32 & 2 & 2 & 200-300 & 200-275 & ";
-    if (i_cal == 33) std::cout << "33 & 2 & 2 & 200-300 & 275-350 & ";
-    if (i_cal == 34) std::cout << "34 & 2 & 2 & 200-300 & 350+ & ";
-    if (i_cal == 35) std::cout << "35 & 2 & 2 & 300-400 & 200-275 & ";
-    if (i_cal == 36) std::cout << "36 & 2 & 2 & 300-400 & 275-350 & ";
-    if (i_cal == 37) std::cout << "37 & 2 & 2 & 300-400 & 350+ & ";
-    if (i_cal == 38) std::cout << "38 & 2 & 2 & 400+ & 200-350 & ";
-    if (i_cal == 39) std::cout << "39 & 2 & 2 & 400+ & 350+ & ";
-    if (i_cal == 40) std::cout << "40 & 2 & 3+ & 200+ & 200-300 & ";
-    if (i_cal == 41) std::cout << "41 & 2 & 3+ & 200+ & 300+ & ";
-    if (i_cal == 42) std::cout << "42 & 3+ & 1 & 200+ & 200+ & ";
-    if (i_cal == 43) std::cout << "43 & 3+ & 2 & 200+ & 200+ & ";
-    if (i_cal == 44) std::cout << "44 & 3+ & 3+ & 200+ & 200+ & ";
-    std::cout << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal] << " $^{+" << (std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isoTrackEff_SB[i_cal]+1.84*aveTFfromMC[i_cal] << "}_{-" << (std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isoTrackEff_SB[i_cal] << //"}$ $^{+" << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]*psystup[i_cal] << "}_{-" << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]*psystdown[i_cal] << "}$" << " \\\\ " << 
+    if (i_cal == 11) std::cout << "11 & 1 & 2+ & 200-300 & 200-275 & ";
+    if (i_cal == 12) std::cout << "12 & 1 & 2+ & 200-300 & 275-350 & ";
+    if (i_cal == 13) std::cout << "13 & 1 & 2+ & 200-300 & 350-450 & ";
+    if (i_cal == 14) std::cout << "14 & 1 & 2+ & 200-300 & 450+ & ";
+    if (i_cal == 15) std::cout << "15 & 1 & 2+ & 300-400 & 200-275 & ";
+    if (i_cal == 16) std::cout << "16 & 1 & 2+ & 300-400 & 275-350 & ";
+    if (i_cal == 17) std::cout << "17 & 1 & 2+ & 300-400 & 350-450 & ";
+    if (i_cal == 18) std::cout << "18 & 1 & 2+ & 300-400 & 450+ & ";
+    if (i_cal == 19) std::cout << "19 & 1 & 2+ & 400+ & 200-450 & ";
+    if (i_cal == 20) std::cout << "20 & 1 & 2+ & 400+ & 450+ & ";
+    if (i_cal == 21) std::cout << "21 & 2+ & 1 & 200-300 & 200-275 & ";
+    if (i_cal == 22) std::cout << "22 & 2+ & 1 & 200-300 & 275-350 & ";
+    if (i_cal == 23) std::cout << "23 & 2+ & 1 & 200-300 & 350+ & ";
+    if (i_cal == 24) std::cout << "24 & 2+ & 1 & 300-400 & 200-275 & ";
+    if (i_cal == 25) std::cout << "25 & 2+ & 1 & 300-400 & 275-350 & ";
+    if (i_cal == 26) std::cout << "26 & 2+ & 1 & 300-400 & 350+ & ";
+    if (i_cal == 27) std::cout << "27 & 2+ & 1 & 400+ & 200-350 & ";
+    if (i_cal == 28) std::cout << "28 & 2+ & 1 & 400+ & 350+ & ";
+    if (i_cal == 29) std::cout << "29 & 2+ & 2+ & 200-300 & 200-275 & ";
+    if (i_cal == 30) std::cout << "30 & 2+ & 2+ & 200-300 & 275-350 & ";
+    if (i_cal == 31) std::cout << "31 & 2+ & 2+ & 200-300 & 350+ & ";
+    if (i_cal == 32) std::cout << "32 & 2+ & 2+ & 300-400 & 200-275 & ";
+    if (i_cal == 33) std::cout << "33 & 2+ & 2+ & 300-400 & 275-350 & ";
+    if (i_cal == 34) std::cout << "34 & 2+ & 2+ & 300-400 & 350+ & ";
+    if (i_cal == 35) std::cout << "35 & 2+ & 2+ & 400+ & 200-350 & ";
+    if (i_cal == 36) std::cout << "36 & 2+ & 2+ & 400+ & 350+ & ";
+
+ double psystup[37]={0.14848 ,  0.158316 ,  0.154823 ,  0.41314 ,  0.152658 ,  0.15117 ,  0.175568 ,  0.2631 ,  0.186885 ,  0.161813 ,  0.168363 , 0.152417 ,  0.14394 ,  0.180893 ,  0.437944 ,  0.161904 , 0.159689 ,  0.187568 ,  0.204685 ,  0.199489 ,  0.219285 ,  0.209392 ,  0.249874 , 0.207769 ,  0.156308 ,  0.163295 ,  0.19332 ,  0.190468 , 0.214129 ,  0.217883 ,  0.271701 ,  0.217039 ,  0.165323 , 0.166308 ,  0.263491 ,  0.277745 ,  0.176534 };
+
+
+ double psystdown[37]={0.145218 ,  0.155848 ,  0.152678 ,  0.411676 ,  0.14857 , 0.148569 ,  0.173637 ,  0.262096 ,  0.18222 ,  0.160059 , 0.166594 ,  0.149468 ,  0.141355 ,  0.179862 ,  0.437247 , 0.158582 ,  0.15801 ,  0.187019 ,  0.204137 ,  0.196229 ,  0.21818 ,  0.203649 ,  0.245428 , 0.198991 ,  0.152822 ,  0.160374 ,  0.190185 ,  0.188317 , 0.213119 ,  0.212592 ,  0.267872 ,  0.20698 ,  0.1624 ,  0.163489 ,  0.260377 ,  0.274315 ,  0.174331 };
+
+
+ std::cout << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal] << " $^{+" << std::sqrt(((std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isoTrackEff_SB[i_cal])*((std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isoTrackEff_SB[i_cal])+1.84*aveTFfromMC[i_cal]*1.84*aveTFfromMC[i_cal]) << "}_{-" << (std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isoTrackEff_SB[i_cal] << "}$ $^{+" << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]*psystup[i_cal] << "}_{-" << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]*psystdown[i_cal] << "}$" << " \\\\ " << 
 std::endl;
     std::cout << "\\hline" << std::endl;
     }
@@ -1646,23 +1648,30 @@ int main(int argc, char* argv[])
   double W_Lept_BR = 0.1086*3;
   double TTbar_SingleLept_BR = 0.43930872; // 2*W_Lept_BR*(1-W_Lept_BR)
   double TTbar_DiLept_BR = 0.10614564; // W_Lept_BR^2
+  // https://github.com/susy2015/SusyAnaTools/blob/master/Tools/samples.cc
   //TTJets nominal
   //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_", 831.76, 11339232, LUMI, inputFileList_Cal );
   //TTJets single lepton and di-lepton
-  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromT_", 831.76*0.5*TTbar_SingleLept_BR, 60144642, LUMI, inputFileList_Cal );
-  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromTbar_", 831.76*0.5*TTbar_SingleLept_BR, 59816364, LUMI, inputFileList_Cal );
-  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_DiLept_", 831.76*TTbar_DiLept_BR, 30498962, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromT_", 831.76*0.5*TTbar_SingleLept_BR, 60144642, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromTbar_", 831.76*0.5*TTbar_SingleLept_BR, 59816364, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_DiLept_", 831.76*TTbar_DiLept_BR, 30498962, LUMI, inputFileList_Cal );
 
   //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "stop", 0.0189612, 240685, LUMI, inputFileList_Cal ); // 850,100
   //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "HTMHT" , 1, 1, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "HTMHT" , 1, 1, 1.0, inputFileList_Cal );
+  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "HTMHT" , 1, 1, 1.0, inputFileList_Cal );
+
+  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_top" , 35.6, 995600, LUMI, inputFileList_Cal );
+  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_antitop" , 35.6, 988500, LUMI, inputFileList_Cal );
+
+  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-400To600" , 48.91, 1745914, LUMI, inputFileList_Cal );
+  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-600ToInf" , 18.77, 1039152, LUMI, inputFileList_Cal );
 
   //TTJetsSampleWeight myExpPredSampleWeight;
   //myExpPredSampleWeight.TTJetsSampleInfo_push_back( "TTJets_", 831.76, 11339232, LUMI, inputFileList_Exp_Pred );
 
-  //LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
+  LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
   //LoopLLExp( myAccRecoIsoEffs, myTTJetsSampleWeight );
-  LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight );
+  //LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight );
 
 
   //std::cout << "main: printOverview" << std::endl;
