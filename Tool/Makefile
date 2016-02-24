@@ -43,7 +43,7 @@ $(ODIR)/%.o : $(IDIR)/%.cc
 	$(CXX) $(CXXFLAGS) $(CXXDEPFLAGS) -o $@ -c $<
 
 tupleTest: $(ODIR)/NTupleReader.o $(ODIR)/tupleReadTest.o
-	$(LD) $^ $(LIBS)  -o $@
+	$(LD) $^ $(LIBS) $(LHAPDFLIB) -o $@
 
 #makePlots: $(ODIR)/NTupleReader.o $(ODIR)/Plotter.o $(ODIR)/MakePlots.o
 #	$(LD) $^ $(LIBS) -L .TupleDict_h.so -o $@
