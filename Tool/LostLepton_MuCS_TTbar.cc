@@ -69,8 +69,30 @@
 //#include "v160122_accfromInvertedDPhi_EffsHeader_MuCS.h"
 //#include "v160122_invertedDPhi_EffsHeader_MuCS.h"
 //#include "v160217_ttbar_EffsHeader_MuCS.h"
-#include "v160217_ttbar_v3_EffsHeader_MuCS.h"
+//#include "v160217_ttbar_v3_EffsHeader_MuCS.h"
 //#include "v160217_ttbar_v3_invertedDPhi_EffsHeader_MuCS.h"
+//#include "v160224_ttbarSingleTopWjets_EffsHeader_MuCS.h"
+//#include "v160302_ttbarv6_EffsHeader_MuCS.h"
+//#include "v160302_ttbarSTWv6_EffsHeader_MuCS.h"
+//#include "v160302_muIsoStatUp_EffsHeader_MuCS.h"
+//#include "v160302_muIsoStatDown_EffsHeader_MuCS.h"
+//#include "v160302_muIsoSystUp_EffsHeader_MuCS.h"
+//#include "v160302_muIsoSystDown_EffsHeader_MuCS.h"
+//#include "v160302_eIsoStatUp_EffsHeader_MuCS.h"
+//#include "v160302_eIsoStatDown_EffsHeader_MuCS.h"
+//#include "v160302_eIsoSystUp_EffsHeader_MuCS.h"
+//#include "v160302_eIsoSystDown_EffsHeader_MuCS.h"
+//#include "v160302_muIDStatUp_EffsHeader_MuCS.h"
+//#include "v160302_muIDStatDown_EffsHeader_MuCS.h"
+//#include "v160302_muIDSystUp_EffsHeader_MuCS.h"
+//#include "v160302_muIDSystDown_EffsHeader_MuCS.h"
+//#include "v160302_eIDStatUp_EffsHeader_MuCS.h"
+//#include "v160302_eIDStatDown_EffsHeader_MuCS.h"
+//#include "v160302_eIDSystUp_EffsHeader_MuCS.h"
+//#include "v160302_eIDSystDown_EffsHeader_MuCS.h"
+//#include "v160302_istrkUp_EffsHeader_MuCS.h"
+#include "v160309_ttbarSingletopW_45bins_EffsHeader_MuCS.h"
+//#include "v160309_ttbarSingletopW_45bins_invertedDphi_EffsHeader_MuCS.h"
 #include "TriggerEff.h"
 
 //#include "SusyAnaTools/Tools/PDFUncertainty.h"
@@ -152,7 +174,7 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
       bool passBaselinelostlept = tr.getVar<bool>("passBaseline"+spec);
 
       if (passBaselinelostlept)
-      //if (passInvertedBaseline)
+	//if (passInvertedBaseline)
       {
         myAccRecoIsoEffs.nevents_sel_base+=thisweight;
 
@@ -586,8 +608,8 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 
 
       if ( 
-          passBaselinelostlept 
-	  //passInvertedBaseline
+          //passBaselinelostlept 
+	  passInvertedBaseline
          )
       {
         myAccRecoIsoEffs.nevents_sel_base+=thisweight;
@@ -631,8 +653,8 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
         int ngenmu = 0;
         int ngenel = 0;
 
-	const double metEff = QCDGetTriggerEff( "TTJets", met );
-	//const double metEff = 1.0;
+	//const double metEff = QCDGetTriggerEff( "TTJets", met );
+	const double metEff = 1.0;
 
         if(nElectrons == 0)
         {
@@ -1174,6 +1196,7 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
   //use class BaselineVessel in the SusyAnaTools/Tools/baselineDef.h file
   std::string spec = "lostlept";
   myBaselineVessel = new BaselineVessel(spec);
+  //myBaselineVessel = new BaselineVessel(spec, "fastsim");
 
   size_t t0 = clock();
   std::vector<TTJetsSampleInfo>::iterator iter_TTJetsSampleInfos;
@@ -1181,6 +1204,8 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
   std::cout << "Prediction: " << std::endl;
   int sidebandLowMT2=0;
   int sidebandHighMT2=0;
+  std::vector< std::pair<int, int> > viMP;
+  std::map<std::pair<int, int>, std::pair<std::array<double,NSEARCH_BINS>, std::array<double,NSEARCH_BINS> > > mapSignalpred;
 
   for(iter_TTJetsSampleInfos = myTTJetsSampleWeight.TTJetsSampleInfos.begin(); iter_TTJetsSampleInfos != myTTJetsSampleWeight.TTJetsSampleInfos.end(); iter_TTJetsSampleInfos++)
   { 
@@ -1195,7 +1220,7 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
     std::cout << "Weight " << thisweight << std::endl;
     int neventc=0;
 
-    //while(trCS.getNextEvent() && neventc<10000)
+    //while(trCS.getNextEvent() && neventc<100000)
     while(trCS.getNextEvent())
     {
       ++neventc;
@@ -1203,6 +1228,9 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
 
       bool passBaselinelostlept = trCS.getVar<bool>("passBaseline"+spec);
  
+      //const double& SusyMotherMass  = trCS.getVar<double>("SusyMotherMass");
+      //const double& SusyLSPMass     = trCS.getVar<double>("SusyLSPMass");
+
       std::vector<std::string> TriggerNames = trCS.getVec<std::string>("TriggerNames");
       std::vector<int> PassTrigger = trCS.getVec<int>("PassTrigger");
       bool foundTrigger = false;
@@ -1339,6 +1367,14 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
             //const int htbin_number = Set_MT2bin_number(MT2);
             int searchbin_id = find_Binning_Index( nbottomjets , ntopjets , MT2, met );
 
+	    //// for signal scan
+	    ////std::cout << "SusyMotherMass = " << SusyMotherMass << std::endl;
+	    ////std::cout << "SusyLSPMass = " << SusyLSPMass << std::endl;
+	    //std::pair<int, int> iMP((int)SusyMotherMass, (int)SusyLSPMass);
+	    //std::vector<std::pair<int, int> >::iterator it;
+	    //it = find (viMP.begin(), viMP.end(), iMP);
+	    //if (it == viMP.end()) viMP.push_back(iMP);
+
 	    //if (met<200.0) std::cout << "searchbin_id = " << searchbin_id << std::endl;
 
 	    myAccRecoIsoEffs.EffstoWeights_fromH();
@@ -1386,6 +1422,7 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
             (myClosureHistgram.h_pred_mu_all_ntopjets)->Fill(ntopjets, EventWeight_all_mus*EventWeight_mus);
 
 	    (myClosureHistgram.h_pred_lept_all_met)->Fill(met, EventWeight_all_mus*EventWeight_mus);
+	    (myClosureHistgram.h_pred_lept_all_2d_met_mupt)->Fill(deltaphi_mus, reco_mus_pt, EventWeight_all_mus*EventWeight_mus);
 	    (myClosureHistgram.h_pred_lept_all_njets)->Fill(njets30, EventWeight_all_mus*EventWeight_mus);
 	    (myClosureHistgram.h_pred_lept_all_mt2)->Fill(MT2, EventWeight_all_mus*EventWeight_mus);
             (myClosureHistgram.h_pred_lept_all_ht)->Fill(ht, EventWeight_all_mus*EventWeight_mus);
@@ -1411,6 +1448,15 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
             if( searchbin_id >= 0 )
             {
               myAccRecoIsoEffs.nevents_mus_pred_SB_Normalized[searchbin_id] += EventWeight_all_mus*EventWeight_mus;
+
+	      //// signal scan
+	      //std::array<double,NSEARCH_BINS> vspred;
+	      //std::array<double,NSEARCH_BINS> vsuncprec; 
+	      //std::pair<std::array<double,NSEARCH_BINS>, std::array<double,NSEARCH_BINS> > signalPredAndUnc(vspred,vsuncprec);
+	      //auto iter = mapSignalpred.find(iMP);
+	      //if(iter == mapSignalpred.end()) iter = mapSignalpred.emplace(iMP, signalPredAndUnc).first;
+	      //((iter->second).first)[searchbin_id]+=EventWeight_all_mus*EventWeight_mus;
+	      //((iter->second).second)[searchbin_id]+=EventWeight_all_mus*EventWeight_mus*EventWeight_all_mus*EventWeight_mus;
 
               myAccRecoIsoEffs.nevents_mus_pred_iso_SB_Normalized[searchbin_id] += myAccRecoIsoEffs.mus_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus;
               myAccRecoIsoEffs.nevents_mus_pred_reco_SB_Normalized[searchbin_id] += myAccRecoIsoEffs.mus_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number][htbin_number]*EventWeight_mus;
@@ -1475,6 +1521,7 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
             (myClosureHistgram.h_pred_el_all_ntopjets)->Fill(ntopjets, EventWeight_all_els*EventWeight_els);
 
             (myClosureHistgram.h_pred_lept_all_met)->Fill(met, EventWeight_all_els*EventWeight_els);
+            (myClosureHistgram.h_pred_lept_all_2d_met_mupt)->Fill(deltaphi_mus, reco_mus_pt, EventWeight_all_els*EventWeight_els);
             (myClosureHistgram.h_pred_lept_all_njets)->Fill(njets30, EventWeight_all_els*EventWeight_els);
             (myClosureHistgram.h_pred_lept_all_mt2)->Fill(MT2, EventWeight_all_els*EventWeight_els);
             (myClosureHistgram.h_pred_lept_all_ht)->Fill(ht, EventWeight_all_els*EventWeight_els);
@@ -1508,6 +1555,16 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
               myAccRecoIsoEffs.nevents_els_pred_SB_Normalized[searchbin_id] += EventWeight_all_els*EventWeight_els;
               //myAccRecoIsoEffs.nevents_els_pred_SB_MC[searchbin_id] += EventWeight_all_els*EventWeight_els/thisweight/thisweight;
               myAccRecoIsoEffs.nevents_els_pred_SB_MC[searchbin_id] += EventWeight_all_els*EventWeight_els*EventWeight_all_els*EventWeight_els;
+
+	      // signal scan
+	      //auto iter = mapSignalpred.find(iMP);
+	      //if(iter == mapSignalpred.end()) std::cout << "Error: iter == mapSignalpred.end()" << std::endl;
+	      //else
+	      //{
+	      //	((iter->second).first)[searchbin_id]+=EventWeight_all_els*EventWeight_els;
+	      //	((iter->second).second)[searchbin_id]+=EventWeight_all_els*EventWeight_els*EventWeight_all_els*EventWeight_els;
+	      //}
+
             }
             //here the error calculation is wrong...
             myAccRecoIsoEffs.nevents_pred_all_els_err += EventWeight_all_els*EventWeight_els*EventWeight_all_els*EventWeight_els;
@@ -1522,7 +1579,14 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
 
   //std::cout << "sidebandLowMT2 = " << sidebandLowMT2 << std::endl;
   //std::cout << "sidebandHighMT2 = " << sidebandHighMT2 << std::endl;
-  std::cout.precision(3);
+
+  double aveTFfromMC[37]={0.50938294641, 0.54479857283, 0.55589368664, 0.47562009798, 0.47313954851, 0.55585283862, 0.63137075827, 0.49694571031, 0.45654695127, 0.73899860882, 0.77450214989, 0.51858315555, 0.58676123185, 0.61502503663, 0.65623508004, 0.49805541749, 0.62407702117, 0.6823095162, 0.61661615032, 0.60866461656, 0.91230657595, 0.30047597469, 0.31295993515, 0.26905854413, 0.45670624417, 0.47015903259, 0.35177654579, 0.50399066718, 0.44055971649, 0.32361672859, 0.3155307976, 0.30018569397, 0.45286988726, 0.50602656801, 0.41621381186, 0.44509945257, 0.61782010353};
+
+ double psystup[37]={0.149294 ,  0.156028 ,  0.170782 ,  0.251557 ,  0.157696 ,  0.159797 ,  0.196816 ,  0.269567 ,  0.217605 ,  0.188411 ,  0.205831 ,  0.152414 ,  0.1556 ,  0.184521 ,  0.271894 ,  0.184819 ,  0.173421 ,  0.191517 ,  0.278766 ,  0.245826 ,  0.296231 ,  0.176127 ,  0.235712 ,  0.228626 ,  0.16598 ,  0.177104 ,  0.222109 ,  0.251645 ,  0.208664 ,  0.210948 ,  0.279213 ,  0.231705 ,  0.175164 ,  0.186562 ,  0.28631 ,  0.260183 ,  0.239561};
+
+ double psystdown[37]={0.146536 ,  0.154 ,  0.168976 ,  0.249199 ,  0.153894 ,  0.157871 ,  0.195473 ,  0.26838 ,  0.213521 ,  0.187269 ,  0.204796 ,  0.15015 ,  0.153952 ,  0.183137 ,  0.270346 ,  0.182874 ,  0.172492 ,  0.190701 ,  0.278411 ,  0.244047 ,  0.295598 ,  0.169856 ,  0.231512 ,  0.219935 ,  0.162314 ,  0.173871 ,  0.218384 ,  0.249355 ,  0.206481 ,  0.205355 ,  0.274888 ,  0.223034 ,  0.170817 ,  0.182979 ,  0.282588 ,  0.257035 ,  0.236604 };
+
+ //std::cout.precision(3);
   for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
   {
 //    h_cs_mus_sb->SetBinContent( i_cal+1 , nevents_mus_CS_SB_Normalized[i_cal] );
@@ -1551,6 +1615,8 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
     //std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal];
     //std::cout << " " << myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal];
     //std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]/myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal]*1.8*(60144642+59816364+30498962)/2262.946/831.76;
+    //std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]/myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal]*(60144642/(0.5*0.43930872)+59816364/(0.5*0.43930872)+30498962/0.10614564)/2262.946/831.76;
+    //std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]/myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal];
     //std::cout << " " << (std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isoTrackEff_SB[i_cal];
     //if (myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]==0.0) std::cout << " 0";
     //else std::cout << " " << (std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))/myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal];
@@ -1566,10 +1632,15 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
     //std::cout << "PredSystUp[" << i_cal << "] = " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal] << ";" << std::endl;
     //std::cout << "PredEUp[" << i_cal << "] = " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal] << ";" << std::endl;
     //std::cout << "PredESystUp[" << i_cal << "] = " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal] << ";" << std::endl;
-    double aveTFfromMC[37]={
-      0.49665137068, 0.52215114087, 0.57569432868, 0.43405764211, 0.49992304157, 0.55025695911, 0.49211993365, 0.51603655064, 0.40625586014, 0.64168267578, 0.6480512852, 0.51492839632, 0.57952831223, 0.62471239226, 0.58795003214, 0.52126534838, 0.56836867717, 0.7115667077, 0.62370847186, 0.53062840886, 0.69074832273, 0.303072607, 0.31889453062, 0.27608268511, 0.46030772642, 0.4475487933, 0.35490318101, 0.5251216135, 0.57242563974, 0.31938575732, 0.30747912559, 0.2809832812, 0.47658720291, 0.48826751599, 0.4269860352, 0.44567553742, 0.63543925005};
 
-    if (true)
+    //std::cout << "uncUpPred[" << i_cal << "] = " << std::sqrt(((std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isoTrackEff_SB[i_cal])*((std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isoTrackEff_SB[i_cal])+1.84*aveTFfromMC[i_cal]*1.84*aveTFfromMC[i_cal]) << ";" << std::endl;
+    //std::cout << "uncDownPred[" << i_cal << "] = " << (std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isoTrackEff_SB[i_cal] << ";" << std::endl;
+
+    //std::cout << "aveTFErr[" << i_cal << "] = " << (std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isoTrackEff_SB[i_cal]/myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal]*1.8*(60144642+59816364+30498962)/2262.946/831.76 << ";" << std::endl;
+
+
+
+    if (false)
     {
     if (i_cal == 0) std::cout << "0 & 1 & 1 & 200-300 & 200-275 & ";
     if (i_cal == 1) std::cout << "1 & 1 & 1 & 200-300 & 275-350 & ";
@@ -1609,12 +1680,6 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
     if (i_cal == 35) std::cout << "35 & 2+ & 2+ & 400+ & 200-350 & ";
     if (i_cal == 36) std::cout << "36 & 2+ & 2+ & 400+ & 350+ & ";
 
- double psystup[37]={0.14848 ,  0.158316 ,  0.154823 ,  0.41314 ,  0.152658 ,  0.15117 ,  0.175568 ,  0.2631 ,  0.186885 ,  0.161813 ,  0.168363 , 0.152417 ,  0.14394 ,  0.180893 ,  0.437944 ,  0.161904 , 0.159689 ,  0.187568 ,  0.204685 ,  0.199489 ,  0.219285 ,  0.209392 ,  0.249874 , 0.207769 ,  0.156308 ,  0.163295 ,  0.19332 ,  0.190468 , 0.214129 ,  0.217883 ,  0.271701 ,  0.217039 ,  0.165323 , 0.166308 ,  0.263491 ,  0.277745 ,  0.176534 };
-
-
- double psystdown[37]={0.145218 ,  0.155848 ,  0.152678 ,  0.411676 ,  0.14857 , 0.148569 ,  0.173637 ,  0.262096 ,  0.18222 ,  0.160059 , 0.166594 ,  0.149468 ,  0.141355 ,  0.179862 ,  0.437247 , 0.158582 ,  0.15801 ,  0.187019 ,  0.204137 ,  0.196229 ,  0.21818 ,  0.203649 ,  0.245428 , 0.198991 ,  0.152822 ,  0.160374 ,  0.190185 ,  0.188317 , 0.213119 ,  0.212592 ,  0.267872 ,  0.20698 ,  0.1624 ,  0.163489 ,  0.260377 ,  0.274315 ,  0.174331 };
-
-
  std::cout << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal] << " $^{+" << std::sqrt(((std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isoTrackEff_SB[i_cal])*((std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isoTrackEff_SB[i_cal])+1.84*aveTFfromMC[i_cal]*1.84*aveTFfromMC[i_cal]) << "}_{-" << (std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isoTrackEff_SB[i_cal] << "}$ $^{+" << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]*psystup[i_cal] << "}_{-" << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]*psystdown[i_cal] << "}$" << " \\\\ " << 
 std::endl;
     std::cout << "\\hline" << std::endl;
@@ -1623,8 +1688,29 @@ std::endl;
   }
   std::cout  << std::endl;
 
+//  // signal scan
+//  for (int signalPointc=0;signalPointc<viMP.size();++signalPointc)
+//  {
+//    char hname[128];
+//    sprintf(hname, "%s_%d_%d", "h_signal_pred", viMP[signalPointc].first, viMP[signalPointc].second);
+//
+//    //std::cout << "viMP[signalPointc].first = " << viMP[signalPointc].first << " , viMP[signalPointc].second = " << viMP[signalPointc].second << std::endl;
+//
+//    TH1D *h_signal_pred_100_0;
+//    h_signal_pred_100_0 = new TH1D(hname,hname,NSEARCH_BINS+1,0,NSEARCH_BINS+1);
+//
+//    auto iter = mapSignalpred.find(viMP[signalPointc]);
+//    for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
+//    {
+//      h_signal_pred_100_0->SetBinContent( i_cal+1 , ((iter->second).first)[i_cal]*isoTrackEff_SB[i_cal] );
+//      h_signal_pred_100_0->SetBinError( i_cal+1 , ((iter->second).second)[i_cal]*isoTrackEff_SB[i_cal]);
+//    }
+//  }
+  std::cout << "pred is done" << std::endl;
   (myClosureHistgram.oFile)->Write();
+  std::cout << "write is done" << std::endl;
   (myClosureHistgram.oFile)->Close();
+  std::cout << "close is done" << std::endl;
   return ;
 }
 
@@ -1666,14 +1752,16 @@ int main(int argc, char* argv[])
   //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-400To600" , 48.91, 1745914, LUMI, inputFileList_Cal );
   //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-600ToInf" , 18.77, 1039152, LUMI, inputFileList_Cal );
 
+  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "SMS-T2tt_mStop" , 1.0, 1.0, 1.0, inputFileList_Cal );
+
   //TTJetsSampleWeight myExpPredSampleWeight;
   //myExpPredSampleWeight.TTJetsSampleInfo_push_back( "TTJets_", 831.76, 11339232, LUMI, inputFileList_Exp_Pred );
 
-  LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
+  //LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
   //LoopLLExp( myAccRecoIsoEffs, myTTJetsSampleWeight );
-  //LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight );
+  LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight );
 
-
+  std::cout << "done" << std::endl;
   //std::cout << "main: printOverview" << std::endl;
   //myAccRecoIsoEffs.printOverview();
   //myAccRecoIsoEffs.NormalizeFlowNumber();

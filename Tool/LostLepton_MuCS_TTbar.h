@@ -398,15 +398,20 @@ class ClosureHistgram
   TH1D *h_exp_lept_all_met, *h_exp_lept_all_njets, *h_exp_lept_all_mt2, *h_exp_lept_all_ht, *h_exp_lept_all_mht, *h_exp_lept_all_ntopjets;
   TH1D *h_exp_lept_all_Z_sb, *h_exp_lept_all_Z_njets30, *h_exp_lept_all_Z_njets50, *h_exp_lept_all_Z_ntops, *h_exp_lept_all_Z_nbjets, *h_exp_lept_all_Z_MET, *h_exp_lept_all_Z_MT2, *h_exp_lept_all_Z_HT;
 
+  TH2D *h_pred_lept_all_2d_met_mupt;
+
   TH1D *h_exp_elsingle_all_met, *h_exp_elsingle_all_njets, *h_exp_elsingle_all_mt2, *h_exp_elsingle_all_ht, *h_exp_elsingle_all_mht, *h_exp_elsingle_all_ntopjets;
 
   //closure for search bin
   TH1D *h_exp_mu_sb, *h_pred_mu_sb, *h_exp_el_sb, *h_pred_el_sb, *h_exp_lept_sb, *h_pred_lept_sb, *h_exp_lept_sb_isotrk, *h_pred_lept_sb_isotrk;
   TH1D * h_pred_mu_iso_sb, *h_pred_mu_reco_sb, *h_pred_mu_acc_sb, *h_exp_iso_mu_sb, *h_exp_reco_mu_sb, *h_exp_acc_mu_sb;
+
+
 };
 
 void ClosureHistgram::BookHistgram(const char *outFileName)
 {
+
   oFile = new TFile(outFileName, "recreate");
   //start closure plots
   h_pred_mu_iso_met = new TH1D("h_pred_mu_iso_met","",100,0,1000);
@@ -517,6 +522,7 @@ void ClosureHistgram::BookHistgram(const char *outFileName)
   h_pred_el_all_ntopjets = new TH1D("h_pred_el_all_ntopjets","",20,0,20);
 
   h_pred_lept_all_met = new TH1D("h_pred_lept_all_met","",100,0,1000);
+  h_pred_lept_all_2d_met_mupt = new TH2D("h_pred_lept_all_2d_met_mupt","",100,-10,10,100,0,100);
   h_pred_lept_all_njets = new TH1D("h_pred_lept_all_njets","",20,0,20);
   h_pred_lept_all_mt2 = new TH1D("h_pred_lept_all_mt2","",100,0,1000);
   h_pred_lept_all_ht = new TH1D("h_pred_lept_all_ht","",300,0,3000);
