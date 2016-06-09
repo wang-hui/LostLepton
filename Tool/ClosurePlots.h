@@ -13,6 +13,7 @@
 #include "TLatex.h"
 #include "TStyle.h"
 #include "TExec.h"
+#include "TLine.h"
 
 #include "SusyAnaTools/Tools/searchBins.h"
 
@@ -331,7 +332,8 @@ void ClosurePlots::ClosureTemplate(
 	h_pred->SetFillStyle(3001);
 	h_pred->Draw("E2 same");
 
-  if( hist_tag.Contains("_sb") ){ drawSBregionDef(0.0, 75.0, true); }
+  SearchBins theSearchBins("SB_69_2016");
+  if( hist_tag.Contains("_sb") ){ theSearchBins.drawSBregionDef(0.0, 75.0, true); }
   title->Draw("same");
   leg->Draw("same");
 
