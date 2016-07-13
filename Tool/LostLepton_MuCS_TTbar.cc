@@ -93,7 +93,15 @@
 //#include "v160302_istrkUp_EffsHeader_MuCS.h"
 //#include "v160309_ttbarSingletopW_45bins_EffsHeader_MuCS.h"
 //#include "v160309_ttbarSingletopW_45bins_invertedDphi_EffsHeader_MuCS.h"
-#include "v2_EffsHeader_MuCS.h"
+//#include "v2_EffsHeader_MuCS.h"
+//#include "v4_59_EffsHeader_MuCS.h"
+//#include "v5_59_EffsHeader_MuCS.h"
+//#include "v4_59_ttbarW_EffsHeader_MuCS.h"
+//#include "v7_EffsHeader_MuCS.h"
+//#include "invertedDPhi_v160706_EffsHeader_MuCS.h"
+//#include "v160707_invertedDPhi_EffsHeader_MuCS.h"
+#include "v160707c_EffsHeader_MuCS.h"
+// v7 is ttbar+Wjets after bug fix
 #include "TriggerEff.h"
 
 //#include "SusyAnaTools/Tools/PDFUncertainty.h"
@@ -115,7 +123,7 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
   size_t t0 = clock();
   std::vector<TTJetsSampleInfo>::iterator iter_TTJetsSampleInfos;
 
-  SearchBins theSearchBins("SB_69_2016");
+  SearchBins theSearchBins("SB_59_2016");
 
   std::cout << "Efficiencies Calculation: " << std::endl;
 
@@ -177,7 +185,7 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
       bool passBaselinelostlept = tr.getVar<bool>("passBaseline"+spec);
 
       if (passBaselinelostlept)
-	//if (passInvertedBaseline)
+      //if (passInvertedBaseline)
       {
         myAccRecoIsoEffs.nevents_sel_base+=thisweight;
 
@@ -267,6 +275,9 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 	      myAccRecoIsoEffs.nmus_sb[searchbin_id]+=thisweight;
 	      myAccRecoIsoEffs.nmus_MC_sb[searchbin_id]++;
 
+	      //debug
+	      //if (searchbin_id==21) std::cout << "thisweight = " << thisweight << std::endl;
+
               if( myLostMuonObj.passAcc )
               {
                 myAccRecoIsoEffs.nmus_acc[njetsbin_number][HTbin_number]+=thisweight;
@@ -278,6 +289,9 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 
 		myAccRecoIsoEffs.nmus_acc_sb[searchbin_id]+=thisweight;
 		myAccRecoIsoEffs.nmus_acc_MC_sb[searchbin_id]++;
+
+		//debug
+		//if (searchbin_id==21) std::cout << "acc thisweight = " << thisweight << std::endl;
 
                 myAccRecoIsoEffs.nmus_acc_bin[ptbin_number][acbin_number]+=thisweight;
                 myAccRecoIsoEffs.nmus_acc_bin_MC[ptbin_number][acbin_number]++;
@@ -537,6 +551,23 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
   {
     std::cout << "isoTrackErr[" << searchbinc << "] = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[searchbinc],neventsSB_MC[searchbinc]) << ";" << std::endl;
   }
+
+//  // debug
+//  for( int searchbinc = 0 ; searchbinc < NSEARCH_BINS ; ++searchbinc )
+//  {
+//    std::cout << "nmus_acc_sb[" << searchbinc << "] = " << myAccRecoIsoEffs.nmus_acc_sb[searchbinc] << std::endl;
+//    std::cout << "nmus_acc_MC_sb[" << searchbinc << "] = " << myAccRecoIsoEffs.nmus_acc_MC_sb[searchbinc] << std::endl;
+//    std::cout << "nmus_sb[" << searchbinc << "] = " << myAccRecoIsoEffs.nmus_sb[searchbinc] << std::endl;
+//    std::cout << "nmus_MC_sb[" << searchbinc << "] = " << myAccRecoIsoEffs.nmus_MC_sb[searchbinc] << std::endl;
+//  }
+//  for( int searchbinc = 0 ; searchbinc < NSEARCH_BINS ; ++searchbinc )
+//  {
+//    std::cout << "nels_acc[" << searchbinc << "] = " << myAccRecoIsoEffs.nels_acc[searchbinc] << std::endl;
+//    std::cout << "nels_acc_MC[" << searchbinc << "] = " << myAccRecoIsoEffs.nels_acc_MC[searchbinc] << std::endl;
+//    std::cout << "nels[" << searchbinc << "] = " << myAccRecoIsoEffs.nels[searchbinc] << std::endl;
+//    std::cout << "nels_MC[" << searchbinc << "] = " << myAccRecoIsoEffs.nels_MC[searchbinc] << std::endl;
+//  }
+
   myAccRecoIsoEffs.NumberstoEffs();
   myAccRecoIsoEffs.EffsPlotsGen();
   //myAccRecoIsoEffs.EffstoWeights();
@@ -561,7 +592,7 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
   size_t t0 = clock();
   std::vector<TTJetsSampleInfo>::iterator iter_TTJetsSampleInfos;
 
-  SearchBins theSearchBins("SB_69_2016");
+  SearchBins theSearchBins("SB_59_2016");
 
   std::cout << "Expectation: " << std::endl;
   for(iter_TTJetsSampleInfos = myTTJetsSampleWeight.TTJetsSampleInfos.begin(); iter_TTJetsSampleInfos != myTTJetsSampleWeight.TTJetsSampleInfos.end(); iter_TTJetsSampleInfos++)
@@ -1206,7 +1237,7 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
   size_t t0 = clock();
   std::vector<TTJetsSampleInfo>::iterator iter_TTJetsSampleInfos;
 
-  SearchBins theSearchBins("SB_69_2016");
+  SearchBins theSearchBins("SB_59_2016");
    
   std::cout << "Prediction: " << std::endl;
   int sidebandLowMT2=0;
@@ -1249,6 +1280,8 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
 	  if( PassTrigger[it] ) foundTrigger = true;
 	}
       }
+
+      //HLT_PFHT300_PFMET100_v
       //if( !foundTrigger ) std::cout << "FL: trigger not found" << std::endl;
       //FSLICHEP//if( !foundTrigger ) continue;
 
@@ -1590,20 +1623,32 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
   //double aveTFfromMC[37]={0.50938294641, 0.54479857283, 0.55589368664, 0.47562009798, 0.47313954851, 0.55585283862, 0.63137075827, 0.49694571031, 0.45654695127, 0.73899860882, 0.77450214989, 0.51858315555, 0.58676123185, 0.61502503663, 0.65623508004, 0.49805541749, 0.62407702117, 0.6823095162, 0.61661615032, 0.60866461656, 0.91230657595, 0.30047597469, 0.31295993515, 0.26905854413, 0.45670624417, 0.47015903259, 0.35177654579, 0.50399066718, 0.44055971649, 0.32361672859, 0.3155307976, 0.30018569397, 0.45286988726, 0.50602656801, 0.41621381186, 0.44509945257, 0.61782010353};
 
 
-  double aveTFfromMC[45]={0.50938294641, 0.54479857283, 0.55589368664, 0.47562009798, 0.47313954851, 0.55585283862, 0.63137075827, 0.49694571031, 0.45654695127, 0.73899860882, 0.77450214989, 0.52104365541, 0.60239121649, 0.61841946255, 0.68602977735, 0.47571369344, 0.61390093265, 0.70282326462, 0.59551049235, 0.62121857692, 0.79823741008, 0.52378337381, 0.54342635586, 0.70728870479, 0.29863341115, 0.30230795586, 0.25385280375, 0.45733333925, 0.46685659786, 0.35692544256, 0.50504359785, 0.43853793836, 0.32081313052, 0.30348002588, 0.28963527215, 0.44438981801, 0.51552256953, 0.40326995862, 0.36276343558, 0.64257071159, 0.39887754975, 0.38596378496, 0.42245089568, 0.38479498238, 0.37833687369};
+  //double aveTFfromMC[45]={0.50938294641, 0.54479857283, 0.55589368664, 0.47562009798, 0.47313954851, 0.55585283862, 0.63137075827, 0.49694571031, 0.45654695127, 0.73899860882, 0.77450214989, 0.52104365541, 0.60239121649, 0.61841946255, 0.68602977735, 0.47571369344, 0.61390093265, 0.70282326462, 0.59551049235, 0.62121857692, 0.79823741008, 0.52378337381, 0.54342635586, 0.70728870479, 0.29863341115, 0.30230795586, 0.25385280375, 0.45733333925, 0.46685659786, 0.35692544256, 0.50504359785, 0.43853793836, 0.32081313052, 0.30348002588, 0.28963527215, 0.44438981801, 0.51552256953, 0.40326995862, 0.36276343558, 0.64257071159, 0.39887754975, 0.38596378496, 0.42245089568, 0.38479498238, 0.37833687369};
 
+  //double aveTFfromMC[59]={0.55347, 0.67387, 0.61141, 0.54937, 0.54725, 0.63727, 0.55182, 0.62907, 0.30486, 0.58223, 0.57274, 0.71943, 0.57290, 0.72634, 0.72020, 0.33790, 0.53360, 0.72222, 1.21865, 1.02533, 0.74698, 0.71353, 0.66977, 0.52476, 0.50922, 0.89214, 0.74934, 0.68842, 0.36153, 0.34438, 0.52775, 0.56833, 0.60254, 0.60309, 0.76332, 0.46730, 0.46887, 0.45869, 0.62370, 0.54502, 0.34302, 0.37405, 0.40613, 0.58999, 0.55086, 0.59882, 0.39324, 0.90137, 0.90115, 0.37601, 0.24105, 0.57766, 0.34594, 0.42217, 0.33566, 0.37051, 0.19585, 0.36191, 0.49791};
+
+  double aveTFfromMC[59]={0.521, 0.689, 0.644, 0.717, 0.504, 0.613, 0.561, 0.871, 0.238, 0.574, 0.505, 0.715, 0.533, 0.652, 0.697, 0.259, 0.467, 0.469, 0.851, 0.779, 0.615, 0.878, 0.335, 0.532, 0.624, 0.737, 0.703, 0.838, 0.352, 0.334, 0.373, 0.246, 0.582, 0.573, 0.758, 0.523, 0.476, 0.452, 0.464, 0.900, 0.326, 0.318, 0.431, 0.541, 0.498, 0.558, 0.460, 0.692, 0.730, 0.387, 0.269, 0.596, 0.493, 0.366, 0.358, 0.374, 0.248, 0.439, 0.178};
 
   //double psystup[37]={0.149294 ,  0.156028 ,  0.170782 ,  0.251557 ,  0.157696 ,  0.159797 ,  0.196816 ,  0.269567 ,  0.217605 ,  0.188411 ,  0.205831 ,  0.152414 ,  0.1556 ,  0.184521 ,  0.271894 ,  0.184819 ,  0.173421 ,  0.191517 ,  0.278766 ,  0.245826 ,  0.296231 ,  0.176127 ,  0.235712 ,  0.228626 ,  0.16598 ,  0.177104 ,  0.222109 ,  0.251645 ,  0.208664 ,  0.210948 ,  0.279213 ,  0.231705 ,  0.175164 ,  0.186562 ,  0.28631 ,  0.260183 ,  0.239561};
 
- double psystup[45]={0.149706 ,  0.156635 ,  0.170685 ,  0.251444 ,  0.157666 ,  0.160303 ,  0.197513 ,  0.268814 ,  0.217869 ,  0.188927 ,  0.206648 ,  0.149137 ,  0.146228 ,  0.161018 ,  0.300102 ,  0.192106 ,  0.174856 ,  0.191143 ,  0.265615 ,  0.273642 ,  0.333063 ,  0.160709 ,  0.186936 ,  0.281573 ,  0.17605 ,  0.233689 ,  0.221836 ,  0.159932 ,  0.169461 ,  0.220388 ,  0.246237 ,  0.200758 ,  0.211591 ,  0.27611 ,  0.232983 ,  0.162081 ,  0.173356 ,  0.31402 ,  0.281801 ,  0.235023 ,  0.172506 ,  0.211313 ,  0.210235 ,  0.21777 ,  0.430502};
+  //double psystup[45]={0.149706 ,  0.156635 ,  0.170685 ,  0.251444 ,  0.157666 ,  0.160303 ,  0.197513 ,  0.268814 ,  0.217869 ,  0.188927 ,  0.206648 ,  0.149137 ,  0.146228 ,  0.161018 ,  0.300102 ,  0.192106 ,  0.174856 ,  0.191143 ,  0.265615 ,  0.273642 ,  0.333063 ,  0.160709 ,  0.186936 ,  0.281573 ,  0.17605 ,  0.233689 ,  0.221836 ,  0.159932 ,  0.169461 ,  0.220388 ,  0.246237 ,  0.200758 ,  0.211591 ,  0.27611 ,  0.232983 ,  0.162081 ,  0.173356 ,  0.31402 ,  0.281801 ,  0.235023 ,  0.172506 ,  0.211313 ,  0.210235 ,  0.21777 ,  0.430502};
 
+// double psystup[59]={0.153826 ,  0.165889 ,  0.247046 ,  1.66503 ,  0.178513 ,  0.177058 ,  0.318357 ,  0.554478 ,  0.332809 ,  0.243916 ,  0.249555 ,  0.661046 ,  0.15448 ,  0.172 ,  0.428146 ,  1.32462 ,  0.209322 ,  0.360871 ,  0.371814 ,  1.03167 ,  0.257624 ,  0.355837 ,  0.763525 ,  0.172662 ,  0.434775 ,  0.677375 ,  0.273899 ,  0.470478 ,  0.155295 ,  0.205738 ,  0.372261 ,  1.64157 ,  0.174096 ,  0.212279 ,  0.705538 ,  0.555891 ,  0.347277 ,  0.29998 ,  0.377704 ,  0.873694 ,  0.158215 ,  0.211727 ,  0.355306 ,  0.186035 ,  0.294232 ,  0.363652 ,  0.696344 ,  0.430562 ,  0.47057 ,  0.189598 ,  0.388406 ,  0.322059 ,  0.437904 ,  0.207241 ,  0.359394 ,  0.246785 ,  0.386214 ,  0.545055 ,  0.605631};
+
+ double psystup[59]={0.153892 ,  0.164843 ,  0.222729 ,  0.407309 ,  0.173378 ,  0.177311 ,  0.265726 ,  0.328192 ,  0.387449 ,  0.210767 ,  0.247455 ,  0.261955 ,  0.153933 ,  0.166551 ,  0.285281 ,  1.83659 ,  0.183942 ,  0.20439 ,  0.286498 ,  0.486872 ,  0.222592 ,  0.338231 ,  0.422755 ,  0.162146 ,  0.210147 ,  0.368106 ,  0.207237 ,  0.24439 ,  0.157696 ,  0.232213 ,  0.408331 ,  3.73454 ,  0.175242 ,  0.215195 ,  0.425469 ,  0.694079 ,  0.344309 ,  0.253567 ,  0.442248 ,  0.449888 ,  0.156293 ,  0.184127 ,  0.289806 ,  0.177576 ,  0.260624 ,  0.334429 ,  0.511034 ,  0.253931 ,  0.336598 ,  0.176379 ,  0.291908 ,  0.231118 ,  0.312253 ,  0.224609 ,  0.422877 ,  0.219063 ,  0.366674 ,  0.367327 ,  0.616121};
 
  //double psystdown[37]={0.146536 ,  0.154 ,  0.168976 ,  0.249199 ,  0.153894 ,  0.157871 ,  0.195473 ,  0.26838 ,  0.213521 ,  0.187269 ,  0.204796 ,  0.15015 ,  0.153952 ,  0.183137 ,  0.270346 ,  0.182874 ,  0.172492 ,  0.190701 ,  0.278411 ,  0.244047 ,  0.295598 ,  0.169856 ,  0.231512 ,  0.219935 ,  0.162314 ,  0.173871 ,  0.218384 ,  0.249355 ,  0.206481 ,  0.205355 ,  0.274888 ,  0.223034 ,  0.170817 ,  0.182979 ,  0.282588 ,  0.257035 ,  0.236604 };
 
- double psystdown[45]={0.146472 ,  0.154139 ,  0.168741 ,  0.249032 ,  0.153711 ,  0.157852 ,  0.195798 ,  0.267831 ,  0.213881 ,  0.187428 ,  0.205209 ,  0.146121 ,  0.143684 ,  0.15986 ,  0.299084 ,  0.189316 ,  0.173324 ,  0.190605 ,  0.265193 ,  0.271275 ,  0.332337 ,  0.158828 ,  0.18535 ,  0.280073 ,  0.169179 ,  0.228928 ,  0.213637 ,  0.156528 ,  0.166648 ,  0.217643 ,  0.244577 ,  0.19968 ,  0.206139 ,  0.272343 ,  0.223643 ,  0.159098 ,  0.170654 ,  0.311411 ,  0.278421 ,  0.233373 ,  0.169348 ,  0.207698 ,  0.205487 ,  0.211313 ,  0.427667};
+ // double psystdown[45]={0.146472 ,  0.154139 ,  0.168741 ,  0.249032 ,  0.153711 ,  0.157852 ,  0.195798 ,  0.267831 ,  0.213881 ,  0.187428 ,  0.205209 ,  0.146121 ,  0.143684 ,  0.15986 ,  0.299084 ,  0.189316 ,  0.173324 ,  0.190605 ,  0.265193 ,  0.271275 ,  0.332337 ,  0.158828 ,  0.18535 ,  0.280073 ,  0.169179 ,  0.228928 ,  0.213637 ,  0.156528 ,  0.166648 ,  0.217643 ,  0.244577 ,  0.19968 ,  0.206139 ,  0.272343 ,  0.223643 ,  0.159098 ,  0.170654 ,  0.311411 ,  0.278421 ,  0.233373 ,  0.169348 ,  0.207698 ,  0.205487 ,  0.211313 ,  0.427667};
 
+// double psystdown[59]={0.155121 ,  0.167091 ,  0.247854 ,  1.66515 ,  0.17963 ,  0.178184 ,  0.318984 ,  0.554839 ,  0.33341 ,  0.244734 ,  0.250356 ,  0.661349 ,  0.155769 ,  0.173159 ,  0.428613 ,  1.32477 ,  0.210275 ,  0.361425 ,  0.372352 ,  1.03187 ,  0.258399 ,  0.356399 ,  0.763787 ,  0.173817 ,  0.435234 ,  0.67767 ,  0.274628 ,  0.470903 ,  0.156577 ,  0.206708 ,  0.372798 ,  1.64169 ,  0.175241 ,  0.213219 ,  0.705822 ,  0.556251 ,  0.347852 ,  0.300646 ,  0.378233 ,  0.873923 ,  0.159474 ,  0.21267 ,  0.355868 ,  0.187107 ,  0.294911 ,  0.364202 ,  0.696631 ,  0.431027 ,  0.470995 ,  0.19065 ,  0.38892 ,  0.322679 ,  0.438361 ,  0.208204 ,  0.35995 ,  0.247594 ,  0.386731 ,  0.545422 ,  0.605961};
 
-  std::cout.precision(3);
+ double psystdown[59]={0.155186 ,  0.166052 ,  0.223625 ,  0.4078 ,  0.174528 ,  0.178435 ,  0.266478 ,  0.328801 ,  0.387965 ,  0.211713 ,  0.248262 ,  0.262718 ,  0.155227 ,  0.167747 ,  0.285981 ,  1.8367 ,  0.185026 ,  0.205367 ,  0.287195 ,  0.487282 ,  0.223489 ,  0.338821 ,  0.423228 ,  0.163374 ,  0.211096 ,  0.368649 ,  0.2082 ,  0.245207 ,  0.158959 ,  0.233073 ,  0.40882 ,  3.7346 ,  0.176379 ,  0.216122 ,  0.425939 ,  0.694367 ,  0.34489 ,  0.254355 ,  0.4427 ,  0.450332 ,  0.157567 ,  0.18521 ,  0.290495 ,  0.178699 ,  0.26139 ,  0.335027 ,  0.511425 ,  0.254717 ,  0.337191 ,  0.177509 ,  0.292592 ,  0.231981 ,  0.312893 ,  0.225498 ,  0.42335 ,  0.219974 ,  0.367219 ,  0.367871 ,  0.616445};
+
+ std::cout.precision(1);
+ //std::cout.precision(3);
+ //std::cout.precision(5);
+ std::cout << std::fixed;
   for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
   {
 //    h_cs_mus_sb->SetBinContent( i_cal+1 , nevents_mus_CS_SB_Normalized[i_cal] );
@@ -1632,7 +1677,9 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
     //std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal];
     //std::cout << " " << myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal];
     //std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]/myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal]*1.8*(60144642+59816364+30498962)/2262.946/831.76;
-    //std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]/myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal]*(60144642/(0.5*0.43930872)+59816364/(0.5*0.43930872)+30498962/0.10614564)/2262.946/831.76;
+    //std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]/myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal]*1.83333*(59654914+51873969+30587326)/4004.345/831.76;
+    //std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]/myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal]*1.83333*(59654914+51873969+30587326)/8000.0/831.76;
+    // 1.83333 c'est 1/(0.43930872+0.10614564)
     //std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]/myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal];
     //std::cout << " " << (std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isoTrackEff_SB[i_cal];
     //if (myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]==0.0) std::cout << " 0";
@@ -1654,56 +1701,81 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
     //std::cout << "uncDownPred[" << i_cal << "] = " << (std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isoTrackEff_SB[i_cal] << ";" << std::endl;
 
     //std::cout << "aveTFErr[" << i_cal << "] = " << (std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isoTrackEff_SB[i_cal]/myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal]*1.8*(60144642+59816364+30498962)/2262.946/831.76 << ";" << std::endl;
+    //std::cout << "aveTFErr[" << i_cal << "] = " << (std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isoTrackEff_SB[i_cal]/myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal]*1.8*(59654914+51873969+30587326)/2262.946/831.76 << ";" << std::endl;
+    //std::cout << "aveTFErr[" << i_cal << "] = " << (std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isoTrackEff_SB[i_cal]/myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal]*1.83333*(59654914+51873969+30587326)/8000.0/831.76 << ";" << std::endl;
 
 
 
-    if (false)
+
+    if (true)
     {
-    if (i_cal == 0) std::cout << "0 & 1 & 1 & 200-300 & 200-275 & ";
-    if (i_cal == 1) std::cout << "1 & 1 & 1 & 200-300 & 275-350 & ";
-    if (i_cal == 2) std::cout << "2 & 1 & 1 & 200-300 & 350-450 & ";
-    if (i_cal == 3) std::cout << "3 & 1 & 1 & 200-300 & 450+ & ";
-    if (i_cal == 4) std::cout << "4 & 1 & 1 & 300-400 & 200-275 & ";
-    if (i_cal == 5) std::cout << "5 & 1 & 1 & 300-400 & 275-350 & ";
-    if (i_cal == 6) std::cout << "6 & 1 & 1 & 300-400 & 350-450 & ";
-    if (i_cal == 7) std::cout << "7 & 1 & 1 & 300-400 & 450+ & ";
-    if (i_cal == 8) std::cout << "8 & 1 & 1 & 400+ & 200-350 & ";
-    if (i_cal == 9) std::cout << "9 & 1 & 1 & 400+ & 350-450 & ";
-    if (i_cal == 10) std::cout << "10 & 1 & 1 & 400+ & 450+ & ";
-    if (i_cal == 11) std::cout << "11 & 1 & 2 & 200-300 & 200-275 & ";
-    if (i_cal == 12) std::cout << "12 & 1 & 2 & 200-300 & 275-350 & ";
-    if (i_cal == 13) std::cout << "13 & 1 & 2 & 200-300 & 350-450 & ";
-    if (i_cal == 14) std::cout << "14 & 1 & 2 & 200-300 & 450+ & ";
-    if (i_cal == 15) std::cout << "15 & 1 & 2 & 300-400 & 200-275 & ";
-    if (i_cal == 16) std::cout << "16 & 1 & 2 & 300-400 & 275-350 & ";
-    if (i_cal == 17) std::cout << "17 & 1 & 2 & 300-400 & 350-450 & ";
-    if (i_cal == 18) std::cout << "18 & 1 & 2 & 300-400 & 450+ & ";
-    if (i_cal == 19) std::cout << "19 & 1 & 2 & 400+ & 200-450 & ";
-    if (i_cal == 20) std::cout << "20 & 1 & 2 & 400+ & 450+ & ";
-    if (i_cal == 21) std::cout << "21 & 1 & 3+ & 200+ & 200-300 & ";
-    if (i_cal == 22) std::cout << "22 & 1 & 3+ & 200+ & 300-400 & ";
-    if (i_cal == 23) std::cout << "23 & 1 & 3+ & 200+ & 400+ & ";
-    if (i_cal == 24) std::cout << "24 & 2 & 1 & 200-300 & 200-275 & ";
-    if (i_cal == 25) std::cout << "25 & 2 & 1 & 200-300 & 275-350 & ";
-    if (i_cal == 26) std::cout << "26 & 2 & 1 & 200-300 & 350+ & ";
-    if (i_cal == 27) std::cout << "27 & 2 & 1 & 300-400 & 200-275 & ";
-    if (i_cal == 28) std::cout << "28 & 2 & 1 & 300-400 & 275-350 & ";
-    if (i_cal == 29) std::cout << "29 & 2 & 1 & 300-400 & 350+ & ";
-    if (i_cal == 30) std::cout << "30 & 2 & 1 & 400+ & 200-350 & ";
-    if (i_cal == 31) std::cout << "31 & 2 & 1 & 400+ & 350+ & ";
-    if (i_cal == 32) std::cout << "32 & 2 & 2 & 200-300 & 200-275 & ";
-    if (i_cal == 33) std::cout << "33 & 2 & 2 & 200-300 & 275-350 & ";
-    if (i_cal == 34) std::cout << "34 & 2 & 2 & 200-300 & 350+ & ";
-    if (i_cal == 35) std::cout << "35 & 2 & 2 & 300-400 & 200-275 & ";
-    if (i_cal == 36) std::cout << "36 & 2 & 2 & 300-400 & 275-350 & ";
-    if (i_cal == 37) std::cout << "37 & 2 & 2 & 300-400 & 350+ & ";
-    if (i_cal == 38) std::cout << "38 & 2 & 2 & 400+ & 200-350 & ";
-    if (i_cal == 39) std::cout << "39 & 2 & 2 & 400+ & 350+ & ";
-    if (i_cal == 40) std::cout << "40 & 2 & 3+ & 200+ & 200-300 & ";
-    if (i_cal == 41) std::cout << "41 & 2 & 3+ & 200+ & 300+ & ";
-    if (i_cal == 42) std::cout << "42 & 3+ & 1 & 200+ & 200+ & ";
-    if (i_cal == 43) std::cout << "43 & 3+ & 2 & 200+ & 200+ & ";
-    if (i_cal == 44) std::cout << "44 & 3+ & 3+ & 200+ & 200+ & ";
+    if (i_cal == 0) std::cout  <<  "0 & 1 & 1 & 200-350 & 200-350 & ";
+    if (i_cal == 1) std::cout  <<  "1 & 1 & 1 & 200-350 & 350-500 & ";
+    if (i_cal == 2) std::cout  <<  "2 & 1 & 1 & 200-350 & 500-650 & ";
+    if (i_cal == 3) std::cout  <<  "3 & 1 & 1 & 200-350 & 650+ & ";
+    if (i_cal == 4) std::cout  <<  "4 & 1 & 1 & 350-450 & 200-350 & ";
+    if (i_cal == 5) std::cout  <<  "5 & 1 & 1 & 350-450 & 350-500 & ";
+    if (i_cal == 6) std::cout  <<  "6 & 1 & 1 & 350-450 & 500-650 & ";
+    if (i_cal == 7) std::cout  <<  "7 & 1 & 1 & 350-450 & 650+ & ";
+    if (i_cal == 8) std::cout  <<  "8 & 1 & 1 & 450+ & 200-350 & ";
+    if (i_cal == 9) std::cout  <<  "9 & 1 & 1 & 450+ & 350-500 & ";
+    if (i_cal == 10) std::cout << "10 & 1 & 1 & 450+ & 500-650 & ";
+    if (i_cal == 11) std::cout << "11 & 1 & 1 & 450+ & 650+ & ";
+
+    if (i_cal == 12) std::cout << "12 & 1 & 2 & 200-350 & 200-350 & ";
+    if (i_cal == 13) std::cout << "13 & 1 & 2 & 200-350 & 350-500 & ";
+    if (i_cal == 14) std::cout << "14 & 1 & 2 & 200-350 & 500-650 & ";
+    if (i_cal == 15) std::cout << "15 & 1 & 2 & 200-350 & 650+ & ";
+    if (i_cal == 16) std::cout << "16 & 1 & 2 & 350-450 & 200-350 & ";
+    if (i_cal == 17) std::cout << "17 & 1 & 2 & 350-450 & 350-500 & ";
+    if (i_cal == 18) std::cout << "18 & 1 & 2 & 350-450 & 500-650 & ";
+    if (i_cal == 19) std::cout << "19 & 1 & 2 & 350-450 & 650+ & ";
+    if (i_cal == 20) std::cout << "20 & 1 & 2 & 450+ & 200-500 & ";
+    if (i_cal == 21) std::cout << "21 & 1 & 2 & 450+ & 500-650 & ";
+    if (i_cal == 22) std::cout << "22 & 1 & 2 & 450+ & 650+ & ";
+
+    if (i_cal == 23) std::cout << "23 & 1 & 3+ & 200-350 & 200-350 & ";
+    if (i_cal == 24) std::cout << "24 & 1 & 3+ & 200-350 & 350-500 & ";
+    if (i_cal == 25) std::cout << "25 & 1 & 3+ & 200-350 & 500+ & ";
+    if (i_cal == 26) std::cout << "26 & 1 & 3+ & 350+ & 200-350 & ";
+    if (i_cal == 27) std::cout << "27 & 1 & 3+ & 350+ & 350+ & ";
+
+    if (i_cal == 28) std::cout << "28 & 2 & 1 & 200-350 & 200-350 & ";
+    if (i_cal == 29) std::cout << "29 & 2 & 1 & 200-350 & 350-500 & ";
+    if (i_cal == 30) std::cout << "30 & 2 & 1 & 200-350 & 500-650 & ";
+    if (i_cal == 31) std::cout << "31 & 2 & 1 & 200-350 & 650+ & ";
+    if (i_cal == 32) std::cout << "32 & 2 & 1 & 350-450 & 200-350 & ";
+    if (i_cal == 33) std::cout << "33 & 2 & 1 & 350-450 & 350-500 & ";
+    if (i_cal == 34) std::cout << "34 & 2 & 1 & 350-450 & 500-650 & ";
+    if (i_cal == 35) std::cout << "35 & 2 & 1 & 350-450 & 650+ & ";
+    if (i_cal == 36) std::cout << "36 & 2 & 1 & 450+ & 200-350 & ";
+    if (i_cal == 37) std::cout << "37 & 2 & 1 & 450+ & 350-500 & ";
+    if (i_cal == 38) std::cout << "38 & 2 & 1 & 450+ & 500-650 & ";
+    if (i_cal == 39) std::cout << "39 & 2 & 1 & 450+ & 650+ & ";
+
+    if (i_cal == 40) std::cout << "40 & 2 & 2 & 200-350 & 200-350 & ";
+    if (i_cal == 41) std::cout << "41 & 2 & 2 & 200-350 & 350-500 & ";
+    if (i_cal == 42) std::cout << "42 & 2 & 2 & 200-350 & 500+ & ";
+    if (i_cal == 43) std::cout << "43 & 2 & 2 & 350-450 & 200-350 & ";
+    if (i_cal == 44) std::cout << "44 & 2 & 2 & 350-450 & 350-500 & ";
+    if (i_cal == 45) std::cout << "45 & 2 & 2 & 350-450 & 500+ & ";
+    if (i_cal == 46) std::cout << "46 & 2 & 2 & 450+ & 200-350 & ";
+    if (i_cal == 47) std::cout << "47 & 2 & 2 & 450+ & 350-500 & ";
+    if (i_cal == 48) std::cout << "48 & 2 & 2 & 450+ & 500+ & ";
+
+    if (i_cal == 49) std::cout << "49 & 2 & 3+ & 200-350 & 200-350 & ";
+    if (i_cal == 50) std::cout << "50 & 2 & 3+ & 200-350 & 350+ & ";
+    if (i_cal == 51) std::cout << "51 & 2 & 3+ & 350+ & 200-350 & ";
+    if (i_cal == 52) std::cout << "52 & 2 & 3+ & 350+ & 350+ & ";
+
+    if (i_cal == 53) std::cout << "53 & 3+ & 1 & 200+ & 200-350 & ";
+    if (i_cal == 54) std::cout << "54 & 3+ & 1 & 200+ & 350+ & ";
+
+    if (i_cal == 55) std::cout << "55 & 3+ & 2 & 200+ & 200-350 & ";
+    if (i_cal == 56) std::cout << "56 & 3+ & 2 & 200+ & 350+ & ";
+
+    if (i_cal == 57) std::cout << "57 & 3+ & 3+ & 200+ & 200-350 & ";
+    if (i_cal == 58) std::cout << "58 & 3+ & 3+ & 200+ & 350+ & ";
 
 //    if (i_cal == 11) std::cout << "11 & 1 & 2+ & 200-300 & 200-275 & ";
 //    if (i_cal == 12) std::cout << "12 & 1 & 2+ & 200-300 & 275-350 & ";
@@ -1732,8 +1804,6 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
 //    if (i_cal == 35) std::cout << "35 & 2+ & 2+ & 400+ & 200-350 & ";
 //    if (i_cal == 36) std::cout << "36 & 2+ & 2+ & 400+ & 350+ & ";
 
-
-
     std::cout << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal] << " $^{+" << std::sqrt(((std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isoTrackEff_SB[i_cal])*((std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isoTrackEff_SB[i_cal])+1.84*aveTFfromMC[i_cal]*1.84*aveTFfromMC[i_cal]) << "}_{-" << (std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isoTrackEff_SB[i_cal] << "}$ $^{+" << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]*psystup[i_cal] << "}_{-" << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]*psystdown[i_cal] << "}$" << " \\\\ " << 
 std::endl;
     std::cout << "\\hline" << std::endl;
@@ -1741,6 +1811,25 @@ std::endl;
 
   }
   std::cout  << std::endl;
+
+//  for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
+//  {
+//    std::cout << " " << myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal];
+//  }
+//  std::cout  << std::endl;
+//
+//  for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
+//  {
+//    std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]/myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal]*1.83333*(59654914+51873969+30587326)/4004.345/831.76;
+//  }
+//  std::cout  << std::endl;
+//  for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
+//  {
+//    std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]/myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal];
+//  }
+//  std::cout  << std::endl;
+
+
 
 //  // signal scan
 //  for (int signalPointc=0;signalPointc<viMP.size();++signalPointc)
@@ -1792,22 +1881,22 @@ int main(int argc, char* argv[])
   //TTJets nominal
   //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_", 831.76, 11339232, LUMI, inputFileList_Cal );
   //TTJets single lepton and di-lepton
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromT_", 831.76*0.5*TTbar_SingleLept_BR, 59654914, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromTbar", 831.76*0.5*TTbar_SingleLept_BR, 51873969, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_DiLept", 831.76*TTbar_DiLept_BR, 30587326, LUMI, inputFileList_Cal );
+  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromT_", 831.76*0.5*TTbar_SingleLept_BR, 59654914, LUMI, inputFileList_Cal );
+  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromTbar", 831.76*0.5*TTbar_SingleLept_BR, 51873969, LUMI, inputFileList_Cal );
+  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_DiLept", 831.76*TTbar_DiLept_BR, 30587326, LUMI, inputFileList_Cal );
 
   //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "stop", 0.0189612, 240685, LUMI, inputFileList_Cal ); // 850,100
   //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "HTMHT" , 1, 1, LUMI, inputFileList_Cal );
-  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "HTMHT" , 1, 1, 1.0, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "HTMHT" , 1, 1, 1.0, inputFileList_Cal );
 
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_top" , 35.6, 998400, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_antitop" , 35.6, 967600, LUMI, inputFileList_Cal );
+  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_top" , 35.6, 998400, LUMI, inputFileList_Cal );
+  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_antitop" , 35.6, 967600, LUMI, inputFileList_Cal );
 
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-400To600" , 48.91, 7299788, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-600To800" , 12.05, 3723054, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-800To1200" , 5.501, 7480017, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-1200To2500" , 1.329, 7042924, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-2500ToInf" , 0.03216, 252809, LUMI, inputFileList_Cal );
+  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-400To600" , 48.91, 7299788, LUMI, inputFileList_Cal );
+  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-600To800" , 12.05, 3723054, LUMI, inputFileList_Cal );
+  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-800To1200" , 5.501, 7480017, LUMI, inputFileList_Cal );
+  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-1200To2500" , 1.329, 7042924, LUMI, inputFileList_Cal );
+  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-2500ToInf" , 0.03216, 252809, LUMI, inputFileList_Cal );
 
   //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "SMS-T2tt_mStop" , 1.0, 1.0, 1.0, inputFileList_Cal );
 
