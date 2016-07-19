@@ -19,6 +19,8 @@
 
 #include "SusyAnaTools/Tools/PDFUncertainty.h"
 
+#include "ConstantsSnippet.h"
+
 //using namespace std;
 
 //static PDFUncertainty pdf;

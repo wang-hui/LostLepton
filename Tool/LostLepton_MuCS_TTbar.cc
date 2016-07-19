@@ -114,7 +114,7 @@ double isotrkeff[NSEARCH_BINS];
 void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSampleWeight )
 {
   BaseHistgram myBaseHistgram;
-  myBaseHistgram.BookHistgram("test.root");
+  myBaseHistgram.BookHistgram("RootForPlotting/test.root");
 
   //use class BaselineVessel in the SusyAnaTools/Tools/baselineDef.h file
   std::string spec = "lostlept";
@@ -584,7 +584,7 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSampleWeight )
 {
   ClosureHistgram myClosureHistgram;
-  myClosureHistgram.BookHistgram("ExpLL.root");
+  myClosureHistgram.BookHistgram("RootForPlotting/ExpLL.root");
   //use class BaselineVessel in the SusyAnaTools/Tools/baselineDef.h file
   std::string spec = "lostlept";
   myBaselineVessel = new BaselineVessel(spec);
@@ -1228,7 +1228,7 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSampleWeight )
 {
   ClosureHistgram myClosureHistgram;
-  myClosureHistgram.BookHistgram("PredLL.root");
+  myClosureHistgram.BookHistgram("RootForPlotting/PredLL.root");
   //use class BaselineVessel in the SusyAnaTools/Tools/baselineDef.h file
   std::string spec = "lostlept";
   myBaselineVessel = new BaselineVessel(spec);

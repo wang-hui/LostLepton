@@ -2,7 +2,7 @@
 
 void Plot_eff()
 {
-  TFile f_eff("v160302_ttbarSTWv6_Effs2dPlots.root");
+  TFile f_eff("RootForPlotting/v160302_ttbarSTWv6_Effs2dPlots.root");
 
   const std::string titre="CMS Supplementary";
 

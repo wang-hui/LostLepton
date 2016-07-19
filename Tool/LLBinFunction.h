@@ -1,10 +1,4 @@
-#define PT_BINS 7
-#define AC_BINS 5
-#define NJETS_BINS 6
-#define NHT_BINS 3
-
-#define LL_BINS 1
-#define NSEARCH_BINS 59
+#include "ConstantsSnippet.h"
 //############determine the pt bin number############
 int Set_ptbin_number(
                      double lep_pt

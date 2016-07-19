@@ -1,5 +1,5 @@
 { 
-  TFile *f = new TFile("123.root"); 
+  TFile *f = new TFile("RootForPlotting/123.root"); 
 
   //f.ls();
   TCanvas *c = new TCanvas("c","A Simple Graph Example",200,10,700,500); 
