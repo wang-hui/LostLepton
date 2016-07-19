@@ -64,7 +64,7 @@ void ClosurePlots::Initialization()
   //fin = TFile::Open("RootForPlotting/v160217_ttbar_v3_invertedDPhi_ExpLL.root");
   //fin = TFile::Open("RootForPlotting/v160120_invertedDPhi_ttbar_ExpLL.root");
   //fin = TFile::Open("RootForPlotting/v160113_nodilepton_ExpLL.root");
-	fin = TFile::Open("RootForPlotting/v160309_ttbarSingletopW_45bins_ExpLL.root");
+  fin = TFile::Open("RootForPlotting/v160309_ttbarSingletopW_45bins_ExpLL.root");
   //fin2 = TFile::Open("RootForPlotting/v151204_PredLL.root");
   //fin2 = TFile::Open("RootForPlotting/v151209_PredLL.root");
   //fin2 = TFile::Open("RootForPlotting/v151216_PredLL.root");
@@ -80,7 +80,7 @@ void ClosurePlots::Initialization()
   //fin2 = TFile::Open("RootForPlotting/v160116_data_PredLL.root");
   //fin2 = TFile::Open("RootForPlotting/v160217_ttbar_PredLL.root");
   //fin2 = TFile::Open("RootForPlotting/v160217_ttbar_v3_PredLL.root");
-	fin2 = TFile::Open("RootForPlotting/v160309_ttbarSingletopW_45bins_PredLL.root");
+  fin2 = TFile::Open("RootForPlotting/v160309_ttbarSingletopW_45bins_PredLL.root");
   //fin2 = TFile::Open("RootForPlotting/v160217_ttbar_v3_invertedDPhi_PredLL.root");
   //fin2 = TFile::Open("RootForPlotting/v160120_invertedDPhi_ttbar_PredLL.root");
   //fin2 = TFile::Open("RootForPlotting/v160122_accfromInvertedDPhi_PredLL.root");
@@ -230,7 +230,7 @@ void ClosurePlots::ClosureTemplate(
     
   h_ratio = static_cast<TH1*>(h_exp->Clone("Ratio"));
   h_ratio->Divide(h_pred);
-	h_ratio->SetMarkerSize(1);
+  h_ratio->SetMarkerSize(1);
   h_ratio->GetYaxis()->SetTitle("#frac{Direct}{Prediction}");
   //h_ratio->GetYaxis()->SetRangeUser(0.0,5.1);
   h_ratio->SetTitle("");
@@ -262,7 +262,7 @@ void ClosurePlots::ClosureTemplate(
   title->SetTextSize(0.045);
 
   //Create Legend
-	TLegend* leg = new TLegend(0.55,0.75,0.90,0.90);
+  TLegend* leg = new TLegend(0.55,0.75,0.90,0.90);
   leg->SetBorderSize(1);
   leg->SetLineColor(1);
   leg->SetLineWidth(2);
@@ -275,10 +275,10 @@ void ClosurePlots::ClosureTemplate(
   //leg->AddEntry(hPred[0],"Treat simulation like data","L");
   leg->AddEntry(h_pred,"Treat simulation like data");
 
-	//Draw plots on Canvas
+  //Draw plots on Canvas
   TCanvas *c = new TCanvas("c","",50,50,800,600); 
-	//HistStyle::init();
-	gStyle->SetOptStat(0);
+  //HistStyle::init();
+  gStyle->SetOptStat(0);
 
   TPad *pad = (TPad*) c->GetPad(0); 
   pad->Clear();
@@ -294,16 +294,16 @@ void ClosurePlots::ClosureTemplate(
   pad1->SetBottomMargin(0.005);
   pad1->SetBorderMode(0);
   
-	TExec *setex = new TExec("setex", "gStyle->SetErrorX(0.0)");
+  TExec *setex = new TExec("setex", "gStyle->SetErrorX(0.0)");
 
-	if( hist_tag.Contains("_sb") )
-	{ 
-	  pad1->SetLogy(); 
+  if( hist_tag.Contains("_sb") )
+  { 
+    pad1->SetLogy(); 
     h_exp->GetXaxis()->SetRangeUser(0.,45);
-	  //h_exp->GetYaxis()->SetRangeUser(0.,100);
+    //h_exp->GetYaxis()->SetRangeUser(0.,100);
 
-		Double_t pred,exp,pred_err,exp_err;
-		double non_closure_unc[45] ={-10};
+    Double_t pred,exp,pred_err,exp_err;
+    double non_closure_unc[45] ={-10};
     for (Int_t i = 1; i < h_pred->GetNbinsX(); i++)
     {
       pred = h_pred->GetBinContent(i);
@@ -323,14 +323,14 @@ void ClosurePlots::ClosureTemplate(
         //std::cout << "i: " << i << " Pred: "<< pred << " Exp: "<< exp << " Ratio: " << r-1 << " Error: " << e << std::endl;
       }
     }
-	}
-	  
-	setex->Draw();
-	h_exp->Draw("PE1");
+  }
+  
+  setex->Draw();
+  h_exp->Draw("PE1");
   h_pred->DrawCopy("hist same");
-	h_pred->SetFillColor(kBlue-4);
-	h_pred->SetFillStyle(3001);
-	h_pred->Draw("E2 same");
+  h_pred->SetFillColor(kBlue-4);
+  h_pred->SetFillStyle(3001);
+  h_pred->Draw("E2 same");
 
   SearchBins theSearchBins("SB_69_2016");
   if( hist_tag.Contains("_sb") ){ theSearchBins.drawSBregionDef(0.0, 75.0, true); }
@@ -339,7 +339,7 @@ void ClosurePlots::ClosureTemplate(
 
   c->Update(); 
   
-	pad->cd(2);
+  pad->cd(2);
   TPad *pad2 = (TPad*) pad->GetPad(2);
   pad2->SetPad("ratio", "", 0, 0, 1.0, divRatio, kWhite);
   pad2->SetBottomMargin(0.3);
@@ -367,7 +367,7 @@ void ClosurePlots::ClosureTemplate(
   c->SaveAs( TString("Plotsc/") + hist_tag + TString(".pdf") );
   c->SaveAs( TString("Plotsc/") + hist_tag + TString(".C") );
 
-	/*
+  /*
   TCanvas *c = new TCanvas("c","A Simple Graph Example",200,10,700,500); 
   gStyle->SetOptStat(0);
 
@@ -460,7 +460,7 @@ void ClosurePlots::ClosureTemplate(
   
   c->SaveAs( TString("Plotsc/") + hist_tag + TString(".png") );
   c->SaveAs( TString("Plotsc/") + hist_tag + TString(".C") );
-	*/
+  */
 }
 
 

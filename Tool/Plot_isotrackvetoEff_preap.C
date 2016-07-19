@@ -2,9 +2,7 @@
 
 void Plot_isotrackvetoEff_preap()
 {
-
   double isoTrackEff_SB[37] = {0.61438, 0.596249, 0.621453, 0.62781, 0.608466, 0.610716, 0.662686, 0.661158, 0.628881, 0.667907, 0.675414, 0.608604, 0.636072, 0.620656, 0.664064, 0.628216, 0.648727, 0.607444, 0.597922, 0.689885, 0.798671, 0.548954, 0.539646, 0.575433, 0.599655, 0.60492, 0.577339, 0.641311, 0.523065, 0.587981, 0.583319, 0.679883, 0.582554, 0.605587, 0.606145, 0.532442, 0.681606};
-
 
 double isoTrackErr[37];
 isoTrackErr[0] = 0.0065161768148;
@@ -44,6 +42,7 @@ isoTrackErr[33] = 0.026187526589;
 isoTrackErr[34] = 0.040168741147;
 isoTrackErr[35] = 0.051369476129;
 isoTrackErr[36] = 0.040775186172;
+
   const std::string titre="CMS Supplementary";
 
   TCanvas *c1 = new TCanvas("c1", "c1",0,51,1920,1004);
@@ -58,7 +57,8 @@ isoTrackErr[36] = 0.040775186172;
   h_mu_iso_eff->SetLineWidth(3);
   h_mu_iso_eff->SetMinimum(0.0);
 
-  for (Int_t sbc=1;sbc<=37;++sbc) {
+  for (Int_t sbc=1;sbc<=37;++sbc)
+  {
     h_mu_iso_eff->SetBinContent(sbc,isoTrackEff_SB[sbc-1]);
     h_mu_iso_eff->SetBinError(sbc,isoTrackErr[sbc-1]);
   }
@@ -70,16 +70,12 @@ isoTrackErr[36] = 0.040775186172;
 //  title->SetNDC();
 //  title->SetTextSize(0.045);
 //  title->Draw("same");
-//
-//   TLatex *   tex2 = new TLatex(0.8127615,0.9178645,"(13 TeV)");
-//tex2->SetNDC();
-//   tex2->SetTextSize(0.045);
-//   tex2->SetLineWidth(2);
-//   tex2->Draw();
+//  TLatex *   tex2 = new TLatex(0.8127615,0.9178645,"(13 TeV)");
+//  tex2->SetNDC();
+//  tex2->SetTextSize(0.045);
+//  tex2->SetLineWidth(2);
+//  tex2->Draw();
 
   CMSStylePlot::CMS_lumi( c1, 0, 0 );
-
-
   c1->SaveAs( "h_isotrackvetoEff.png" );
-
 }

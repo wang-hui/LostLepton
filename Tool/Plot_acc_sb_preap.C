@@ -2,14 +2,11 @@
 
 void Plot_acc_sb_preap()
 {
- double err_acc[37];
- double err_acc_el[37];
-
-
+  double err_acc[37];
+  double err_acc_el[37];
   const double ttbar_mus_acc[37] = {0.833188,0.813335,0.830735,0.839931,0.846007,0.808412,0.791037,0.863016,0.856822,0.745926,0.741275,0.837696,0.819089,0.811669,0.83177,0.8392,0.802207,0.759466,0.838426,0.839024,0.78539,0.907118,0.898193,0.945786,0.849418,0.840731,0.897796,0.809444,0.850811,0.910869,0.910453,0.948242,0.857614,0.842478,0.902275,0.830653,0.836152};
 
   const double ttbar_els_acc[37] = {0.847301,0.81815,0.823032,0.849582,0.847771,0.797805,0.818129,0.855029,0.870859,0.814914,0.759492,0.831736,0.821877,0.799215,0.751261,0.844663,0.811157,0.792653,0.765419,0.820682,0.701654,0.91088,0.905967,0.931121,0.843057,0.848582,0.895733,0.882179,0.828121,0.903091,0.921523,0.930069,0.844546,0.839703,0.863359,0.875123,0.788378};
-
 
 err_acc[0] = 0.0033252876063;
 err_acc[1] = 0.0067599878464;
@@ -100,7 +97,8 @@ err_acc_el[36] = 0.025125889231;
   h_mu_iso_eff->SetLineWidth(3);
   h_mu_iso_eff->SetMinimum(0.0);
 
-  for (Int_t sbc=1;sbc<=37;++sbc) {
+  for (Int_t sbc=1;sbc<=37;++sbc)
+  {
     h_mu_iso_eff->SetBinContent(sbc,ttbar_mus_acc[sbc-1]);
     h_mu_iso_eff->SetBinError(sbc,err_acc[sbc-1]);
     //h_mu_iso_eff->SetBinContent(sbc,sbc);
@@ -113,25 +111,24 @@ err_acc_el[36] = 0.025125889231;
   h_e_iso_eff->SetLineColor(2);
   h_e_iso_eff->SetLineWidth(3);
 
-  for (Int_t sbc=1;sbc<=37;++sbc) {
+  for (Int_t sbc=1;sbc<=37;++sbc) 
+  {
     h_e_iso_eff->SetBinContent(sbc,ttbar_els_acc[sbc-1]);
     h_e_iso_eff->SetBinError(sbc,err_acc_el[sbc-1]);
     //h_mu_iso_eff->SetBinContent(sbc,sbc);
   }
   h_e_iso_eff->Draw("same");
 
-
 //  TLatex *title = new TLatex(0.09770115,0.9194915,titre.c_str());
 //  title->SetNDC();
 //  title->SetTextSize(0.045);
 //  title->Draw("same");
-//
-//   TLatex *   tex2 = new TLatex(0.8127615,0.9178645,"(13 TeV)");
-//tex2->SetNDC();
-//   tex2->SetTextSize(0.045);
-//   tex2->SetLineWidth(2);
-//   tex2->Draw();
-   CMSStylePlot::CMS_lumi( c1, 0, 0 );
+//  TLatex *tex2 = new TLatex(0.8127615,0.9178645,"(13 TeV)");
+//  tex2->SetNDC();
+//  tex2->SetTextSize(0.045);
+//  tex2->SetLineWidth(2);
+//  tex2->Draw();
+  CMSStylePlot::CMS_lumi( c1, 0, 0 );
 
 
   TLegend* leg = new TLegend(0.6,0.15,0.9,0.27);
@@ -140,9 +137,7 @@ err_acc_el[36] = 0.025125889231;
   leg->SetFillColor(0);
   leg->AddEntry(h_mu_iso_eff,"Muons","l");
   leg->AddEntry(h_e_iso_eff,"Electrons","l");
- leg->Draw("same");
-
+  leg->Draw("same");
 
   c1->SaveAs( "h_isotrackvetoEff.png" );
-
 }

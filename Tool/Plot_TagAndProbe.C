@@ -17,7 +17,8 @@
   h_mu_iso_eff->SetYTitle("activity [GeV]");
   h_mu_iso_eff->SetStats(0);
 
-  for (Int_t muonptc=1;muonptc<9;++muonptc) {
+  for (Int_t muonptc=1;muonptc<9;++muonptc) 
+  {
     for (int activityc=1;activityc<9;++activityc)
     {
       h_mu_iso_eff->SetBinContent(muonptc,activityc,h_mu_iso_eff_ori->GetBinContent(muonptc,activityc));
@@ -26,7 +27,6 @@
   }
   gStyle->SetPaintTextFormat("1.2f");
   h_mu_iso_eff->Draw("colztexte");
-
 
   ///////////////////
   //     c2
@@ -48,7 +48,8 @@
   h_mus_nreco->SetYTitle("activity [GeV]");
   h_mus_nreco->SetStats(0);
 
-  for (Int_t elsonptc=1;elsonptc<9;++elsonptc) {
+  for (Int_t elsonptc=1;elsonptc<9;++elsonptc)
+  {
     for (int activityc=1;activityc<9;++activityc)
     {
       h_els_iso_eff->SetBinContent(elsonptc,activityc,h_els_iso_eff_ori->GetBinContent(elsonptc,activityc));
@@ -78,7 +79,8 @@
   h_mus_reco_eff->SetYTitle("activity [GeV]");
   h_mus_reco_eff->SetStats(0);
 
-  for (Int_t musonptc=1;musonptc<9;++musonptc) {
+  for (Int_t musonptc=1;musonptc<9;++musonptc) 
+  {
     for (int activityc=1;activityc<9;++activityc)
     {
       h_mus_reco_eff->SetBinContent(musonptc,activityc,h_mus_reco_eff_ori->GetBinContent(musonptc,activityc));
