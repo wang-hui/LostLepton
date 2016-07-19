@@ -37,7 +37,6 @@ int main()
     {"_mu_acc_met"     , "MET [GeV]"             ,200 , 600  },
     {"_mu_acc_njets"   , "Number of 30 GeV jets" ,2   , 17   },
     {"_mu_acc_mt2"     , "MT2 [GeV]"             ,100 , 600  },
-    //{"_mu_acc_ht"      , "HT [GeV]"              ,100 , 1100 },
     {"_mu_acc_ht"      , "HT [GeV]"              ,400 , 2000 },
     {"_mu_acc_mht"     , "MHT [GeV]"             ,100 , 500  },
     {"_mu_acc_ntopjets", "Number of Top jets"    ,0   , 5    },
@@ -84,13 +83,13 @@ int main()
     {"_el_iso_mht"     , "MHT [GeV]"             ,100 , 500  },
     {"_el_iso_ntopjets", "Number of Top jets"    ,0   , 5    },
     //search bin closure plots
-    {"_mu_sb"          , "Search Bins"           ,0   , 45  },
-    {"_mu_iso_sb"          , "Search Bins"           ,0   , 45  },
-    {"_mu_reco_sb"          , "Search Bins"           ,0   , 45  },
-    {"_mu_acc_sb"          , "Search Bins"           ,0   , 45  },
-    {"_el_sb"          , "Search Bins"           ,0   , 45  },
-    {"_lept_sb"        , "Search Bins"           ,0   , 45  },
-    {"_lept_isotrk" , "Search Bins"           ,0   , 45  },
+    //{"_mu_sb"          , "Search Bins"           ,0   , 59  },
+    //{"_mu_iso_sb"      , "Search Bins"           ,0   , 59  },
+    //{"_mu_reco_sb"     , "Search Bins"           ,0   , 59  },
+    //{"_mu_acc_sb"      , "Search Bins"           ,0   , 59  },
+    //{"_el_sb"          , "Search Bins"           ,0   , 59  },
+    //{"_lept_sb"        , "Search Bins"           ,0   , 59  },
+    {"_lept_isotrk"    , "Search Bins"           ,0   , 59  },
     // mu+ele all closure plots
     {"_lept_all_met"     , "MET [GeV]"             ,200 , 600  },
     {"_lept_all_njets"   , "Number of 30 GeV jets" ,2   , 17   }, 
@@ -98,7 +97,6 @@ int main()
     {"_lept_all_ht"      , "HT [GeV]"              ,400 , 2000 },
     {"_lept_all_mht"     , "MHT [GeV]"             ,100 , 500  },
     {"_lept_all_ntopjets", "Number of Top jets"    ,0   , 5    },
-
   };
 
   

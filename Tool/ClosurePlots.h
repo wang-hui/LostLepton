@@ -64,7 +64,8 @@ void ClosurePlots::Initialization()
   //fin = TFile::Open("RootForPlotting/v160217_ttbar_v3_invertedDPhi_ExpLL.root");
   //fin = TFile::Open("RootForPlotting/v160120_invertedDPhi_ttbar_ExpLL.root");
   //fin = TFile::Open("RootForPlotting/v160113_nodilepton_ExpLL.root");
-  fin = TFile::Open("RootForPlotting/v160309_ttbarSingletopW_45bins_ExpLL.root");
+  //fin = TFile::Open("RootForPlotting/v160309_ttbarSingletopW_45bins_ExpLL.root");
+  fin = TFile::Open("RootForPlotting/v20160719_HuaTest_ExpLL.root");
   //fin2 = TFile::Open("RootForPlotting/v151204_PredLL.root");
   //fin2 = TFile::Open("RootForPlotting/v151209_PredLL.root");
   //fin2 = TFile::Open("RootForPlotting/v151216_PredLL.root");
@@ -80,7 +81,8 @@ void ClosurePlots::Initialization()
   //fin2 = TFile::Open("RootForPlotting/v160116_data_PredLL.root");
   //fin2 = TFile::Open("RootForPlotting/v160217_ttbar_PredLL.root");
   //fin2 = TFile::Open("RootForPlotting/v160217_ttbar_v3_PredLL.root");
-  fin2 = TFile::Open("RootForPlotting/v160309_ttbarSingletopW_45bins_PredLL.root");
+  //fin2 = TFile::Open("RootForPlotting/v160309_ttbarSingletopW_45bins_PredLL.root");
+  fin2 = TFile::Open("RootForPlotting/v20160719_HuaTest_PredLL.root");
   //fin2 = TFile::Open("RootForPlotting/v160217_ttbar_v3_invertedDPhi_PredLL.root");
   //fin2 = TFile::Open("RootForPlotting/v160120_invertedDPhi_ttbar_PredLL.root");
   //fin2 = TFile::Open("RootForPlotting/v160122_accfromInvertedDPhi_PredLL.root");

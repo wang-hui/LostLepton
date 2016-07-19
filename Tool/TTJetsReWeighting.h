@@ -28,7 +28,7 @@ class TTJetsSampleWeight
 {
  public:
   std::vector<TTJetsSampleInfo> TTJetsSampleInfos;
-  void TTJetsSampleInfo_push_back( std::string tag, double xsec, double nevents, double lumi, const TString &inputFileList );
+  void TTJetsSampleInfo_push_back( std::string tag, double xsec, double nevents, double lumi, double kf, const TString &inputFileList );
  private:
   bool FillChain(TChain *chain, const TString &inputFileList, std::string tag);
 };

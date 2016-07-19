@@ -96,7 +96,9 @@
 //#include "v7_EffsHeader_MuCS.h"
 //#include "invertedDPhi_v160706_EffsHeader_MuCS.h"
 //#include "v160707_invertedDPhi_EffsHeader_MuCS.h"
-#include "v160707c_EffsHeader_MuCS.h"
+//#include "v160707c_EffsHeader_MuCS.h"
+#include "EffsHeader_MuCS.h"
+
 
 //const double isotrackvetoeff = 0.563499421;
 const bool applyisotrkveto = false; // should be false
@@ -1223,17 +1225,17 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
       bool passBaselinelostlept = trCS.getVar<bool>("passBaseline"+spec);
       //const double& SusyMotherMass  = trCS.getVar<double>("SusyMotherMass");
       //const double& SusyLSPMass     = trCS.getVar<double>("SusyLSPMass");
-      std::vector<std::string> TriggerNames = trCS.getVec<std::string>("TriggerNames");
-      std::vector<int> PassTrigger = trCS.getVec<int>("PassTrigger");
-      bool foundTrigger = false;
-
-      for(unsigned it=0; it<TriggerNames.size(); it++)
-      {
-        if( TriggerNames[it].find("HLT_PFHT350_PFMET100_JetIdCleaned_v") || TriggerNames[it].find("HLT_PFHT350_PFMET100_NoiseCleaned_v") || TriggerNames[it].find("HLT_PFHT350_PFMET100_v*") )
-        {
-          if( PassTrigger[it] ) foundTrigger = true;
-        }
-      }
+      //std::vector<std::string> TriggerNames = trCS.getVec<std::string>("TriggerNames");
+      //std::vector<int> PassTrigger = trCS.getVec<int>("PassTrigger");
+      //bool foundTrigger = false;
+      //for(unsigned it=0; it<TriggerNames.size(); it++)
+      //{
+      //  if( TriggerNames[it].find("HLT_PFHT350_PFMET100_JetIdCleaned_v") || TriggerNames[it].find("HLT_PFHT350_PFMET100_NoiseCleaned_v") || TriggerNames[it].find("HLT_PFHT350_PFMET100_v*") )
+      //  if( TriggerNames[it].find("HLT_PFHT300_PFMET100_v") )
+      //  {
+      //    if( PassTrigger[it] ) foundTrigger = true;
+      //  }
+      //}
 
       //HLT_PFHT300_PFMET100_v
       //if( !foundTrigger ) std::cout << "FL: trigger not found" << std::endl;
@@ -1810,27 +1812,26 @@ int main(int argc, char* argv[])
   //https://github.com/susy2015/SusyAnaTools/blob/master/Tools/samples.cc
   //TTJets nominal
   //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_", 831.76, 11339232, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_DiLept"            ,         831.76*TTbar_DiLept_BR, 30682233, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromT_"  , 831.76*0.5*TTbar_SingleLept_BR, 49576803, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromTbar", 831.76*0.5*TTbar_SingleLept_BR, 60494823, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_top"     , 35.6, 998400, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_antitop" , 35.6, 985000, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-400To600"  ,   48.91, 7432746, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-600To800"  ,   12.05, 3722395, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-800To1200" ,   5.501, 7854734, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-1200To2500",   1.329, 7063909, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-2500ToInf" , 0.03216,  252809, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_DiLept"            ,         831.76*TTbar_DiLept_BR, 30682233, LUMI, 1, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromT_"  , 831.76*0.5*TTbar_SingleLept_BR, 49576803, LUMI, 1, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromTbar", 831.76*0.5*TTbar_SingleLept_BR, 60494823, LUMI, 1, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_top"     , 35.6, 998400, LUMI, 1, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_antitop" , 35.6, 985000, LUMI, 1, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-400To600"  ,   48.91, 7432746, LUMI, 1.23, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-600To800"  ,   12.05, 3722395, LUMI, 1.23, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-800To1200" ,   5.501, 7854734, LUMI, 1.23, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-1200To2500",   1.329, 7063909, LUMI, 1.23, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-2500ToInf" , 0.03216,  252809, LUMI, 1.23, inputFileList_Cal );
   //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "HTMHT" , 1, 1, 1, inputFileList_Cal );
-
   //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "SMS-T2tt_mStop" , 1.0, 1.0, 1.0, inputFileList_Cal );
   //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "stop", 0.0189612, 240685, LUMI, inputFileList_Cal ); // 850,100
-
+  
   //TTJetsSampleWeight myExpPredSampleWeight;
   //myExpPredSampleWeight.TTJetsSampleInfo_push_back( "TTJets_", 831.76, 11339232, LUMI, inputFileList_Exp_Pred );
 
-  LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
-  //LoopLLExp( myAccRecoIsoEffs, myTTJetsSampleWeight );
-  //LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight );
+  //LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
+  LoopLLExp( myAccRecoIsoEffs, myTTJetsSampleWeight );
+  LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight );
 
   std::cout << "done" << std::endl;
   //std::cout << "main: printOverview" << std::endl;

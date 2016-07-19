@@ -10,8 +10,8 @@ bool TTJetsSampleWeight::FillChain(TChain *chain, const TString &inputFileList, 
     std::cerr << "** ERROR: Can't open '" << inputFileList << "' for input" << std::endl;
     return false;
   }
-
-  std::cout << "TreeUtilities : FillChain " << std::endl;
+  
+	std::cout << "TreeUtilities : FillChain " << tag << std::endl;
   while(1)
   {
     buffer.clear();
@@ -30,12 +30,12 @@ bool TTJetsSampleWeight::FillChain(TChain *chain, const TString &inputFileList, 
   return true;
 }
 
-void TTJetsSampleWeight::TTJetsSampleInfo_push_back( std::string tag, double xsec, double nevents, double lumi, const TString &inputFileList)
+void TTJetsSampleWeight::TTJetsSampleInfo_push_back( std::string tag, double xsec, double nevents, double lumi, double kf, const TString &inputFileList)
 {
   TTJetsSampleInfo oneInfo;
 
   oneInfo.TTJetsTag = tag;
-  oneInfo.weight = xsec*lumi/nevents;
+  oneInfo.weight = xsec*lumi*kf/nevents;
   //oneInfo.chain= new TChain("AUX");
   oneInfo.chain= new TChain("stopTreeMaker/AUX");
   if(!FillChain(oneInfo.chain, inputFileList, oneInfo.TTJetsTag))
