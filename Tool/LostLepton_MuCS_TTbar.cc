@@ -14,6 +14,7 @@
 #include "SusyAnaTools/Tools/samples.h"
 #include "SusyAnaTools/Tools/customize.h"
 #include "SusyAnaTools/Tools/searchBins.h"
+//#include "SusyAnaTools/Tools/PDFUncertainty.h"
 
 #include "TGraph.h"
 #include "TCanvas.h"
@@ -30,16 +31,11 @@
 #include "TStyle.h"
 #include "TStopwatch.h"
 #include "TString.h"
-
 #include "Math/QuantFuncMathCore.h"
 #include "TMath.h"
 #include "TLorentzVector.h"
-//#include "TROOT.h"
-//#include "TInterpreter.h"
 
-#include "Activity.h"
 #include "LostLepton_MuCS_TTbar.h"
-#include "TTJetsReWeighting.h"
 //#include "v151203_EffsHeader_MuCS.h"
 //#include "v151209_EffsHeader_MuCS.h"
 //#include "v160105_EffsHeader_MuCS.h"
@@ -101,10 +97,6 @@
 //#include "invertedDPhi_v160706_EffsHeader_MuCS.h"
 //#include "v160707_invertedDPhi_EffsHeader_MuCS.h"
 #include "v160707c_EffsHeader_MuCS.h"
-// v7 is ttbar+Wjets after bug fix
-#include "TriggerEff.h"
-
-//#include "SusyAnaTools/Tools/PDFUncertainty.h"
 
 //const double isotrackvetoeff = 0.563499421;
 const bool applyisotrkveto = false; // should be false
@@ -1843,7 +1835,7 @@ int main(int argc, char* argv[])
 
   //LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
   //LoopLLExp( myAccRecoIsoEffs, myTTJetsSampleWeight );
-  LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight );
+  //LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight );
 
   std::cout << "done" << std::endl;
   //std::cout << "main: printOverview" << std::endl;

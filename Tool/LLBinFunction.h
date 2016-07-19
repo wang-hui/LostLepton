@@ -94,11 +94,11 @@ int Set_HTbin_number(int ht)
 
 int Set_MT2bin_number(int mt2)
 {
-  int htbin_num;
-  if (mt2<230) htbin_num=0;
-  else if (mt2<300) htbin_num=1;
-  else htbin_num=2;
-  return htbin_num;
+  int mt2bin_num;
+  if (mt2<230) mt2bin_num=0;
+  else if (mt2<300) mt2bin_num=1;
+  else mt2bin_num=2;
+  return mt2bin_num;
 }
 
 int Set_njetsbin_number(int njets)
