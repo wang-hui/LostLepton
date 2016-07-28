@@ -17,6 +17,9 @@
 
 #include "SusyAnaTools/Tools/searchBins.h"
 
+#include "LLBinFunction.h"
+
+
 class ClosurePlots
 {
  public:
@@ -64,7 +67,15 @@ void ClosurePlots::Initialization()
   //fin = TFile::Open("v160217_ttbar_v3_invertedDPhi_ExpLL.root");
   //fin = TFile::Open("v160120_invertedDPhi_ttbar_ExpLL.root");
   //fin = TFile::Open("v160113_nodilepton_ExpLL.root");
-	fin = TFile::Open("v160309_ttbarSingletopW_45bins_ExpLL.root");
+  //fin = TFile::Open("v160309_ttbarSingletopW_45bins_ExpLL.root");
+  //fin = TFile::Open("v3_ExpLL.root");
+  //fin = TFile::Open("v4_59_ExpLL.root");
+	//fin = TFile::Open("v7_ExpLL.root");
+        //fin = TFile::Open("v160707_invertedDPhi_ExpLL.root");
+        //fin = TFile::Open("v160707_ExpLL.root");
+        //fin = TFile::Open("v160714_newMuonID_ExpLL.root");
+        //fin = TFile::Open("invertedDphi_app_ExpLL.root");
+        fin = TFile::Open("app_ExpLL.root");
   //fin2 = TFile::Open("v151204_PredLL.root");
   //fin2 = TFile::Open("v151209_PredLL.root");
   //fin2 = TFile::Open("v151216_PredLL.root");
@@ -80,7 +91,19 @@ void ClosurePlots::Initialization()
   //fin2 = TFile::Open("v160116_data_PredLL.root");
   //fin2 = TFile::Open("v160217_ttbar_PredLL.root");
   //fin2 = TFile::Open("v160217_ttbar_v3_PredLL.root");
-	fin2 = TFile::Open("v160309_ttbarSingletopW_45bins_PredLL.root");
+	//fin2 = TFile::Open("v160309_ttbarSingletopW_45bins_PredLL.root");
+	//fin2 = TFile::Open("v4_PredLL.root");
+	//fin2 = TFile::Open("v4_59_PredLL.root");
+	//fin2 = TFile::Open("v5_PredLL.root");
+	//fin2 = TFile::Open("v6_PredLL.root");
+	//fin2 = TFile::Open("v7_MC_PredLL.root");
+        //fin2 = TFile::Open("v160707_invertedDPhi_PredLL.root");
+        //fin2 = TFile::Open("v160707c_PredLL.root");
+        //fin2 = TFile::Open("v160714b_newMuonID_PredLL.root");
+        //fin2 = TFile::Open("v160714_newMuonID_accNoSingleTop_PredLL.root");
+        //fin2 = TFile::Open("v160714_newMuonID_accNoSingleTop_bin7f6_PredLL.root");
+        //fin2 = TFile::Open("invertedDphi_app_PredLL.root");
+        fin2 = TFile::Open("app_PredLL.root");
   //fin2 = TFile::Open("v160217_ttbar_v3_invertedDPhi_PredLL.root");
   //fin2 = TFile::Open("v160120_invertedDPhi_ttbar_PredLL.root");
   //fin2 = TFile::Open("v160122_accfromInvertedDPhi_PredLL.root");
@@ -142,7 +165,10 @@ void ClosurePlots::DiLeptonPlots(
   h_exp_dl->Draw();
   h_exp_sl->Draw("same");
 
-  const std::string titre="CMS Preliminary 2016, 2.3 fb^{-1}, #sqrt{s} = 13 TeV";
+  //const std::string titre="CMS Preliminary 2016, 2.3 fb^{-1}, #sqrt{s} = 13 TeV";
+  //const std::string titre="CMS Preliminary 2016, 8.0 fb^{-1}, #sqrt{s} = 13 TeV";
+  //const std::string titre="CMS Preliminary 2016, 7.6 fb^{-1}, #sqrt{s} = 13 TeV";
+  const std::string titre="CMS Preliminary 2016, 12.9 fb^{-1}, #sqrt{s} = 13 TeV";
   TLatex *title = new TLatex(0.09770115,0.9194915,titre.c_str());
   title->SetNDC();
   title->SetTextSize(0.045);
@@ -255,7 +281,10 @@ void ClosurePlots::ClosureTemplate(
   //Create LUMI stamp
   //const std::string titre="CMS Preliminary 2015, "+ lumi_str + " fb^{-1}, #sqrt{s} = 13 TeV";
   //const std::string titre="CMS Preliminary 2016, 2.3 fb^{-1}, #sqrt{s} = 13 TeV";
-  const std::string titre="CMS Supplementary                                                             2.3 fb^{-1}(13 TeV)";
+  //const std::string titre="CMS Supplementary                                                             2.3 fb^{-1}(13 TeV)";
+  //const std::string titre="CMS Supplementary                                                             8.0 fb^{-1}(13 TeV)";
+  //const std::string titre="CMS Supplementary                                                             7.6 fb^{-1}(13 TeV)";
+  const std::string titre="CMS Supplementary                                                           12.9 fb^{-1}(13 TeV)";
 
   TLatex *title = new TLatex(0.09770115,0.9194915,titre.c_str());
   title->SetNDC();
@@ -299,11 +328,13 @@ void ClosurePlots::ClosureTemplate(
 	if( hist_tag.Contains("_sb") )
 	{ 
 	  pad1->SetLogy(); 
-    h_exp->GetXaxis()->SetRangeUser(0.,45);
+	  //h_exp->GetXaxis()->SetRangeUser(0.,45);
+    h_exp->GetXaxis()->SetRangeUser(0.,NSEARCH_BINS);
 	  //h_exp->GetYaxis()->SetRangeUser(0.,100);
 
 		Double_t pred,exp,pred_err,exp_err;
-		double non_closure_unc[45] ={-10};
+		//double non_closure_unc[45] ={-10};
+		double non_closure_unc[NSEARCH_BINS] ={-10};
     for (Int_t i = 1; i < h_pred->GetNbinsX(); i++)
     {
       pred = h_pred->GetBinContent(i);
@@ -332,7 +363,7 @@ void ClosurePlots::ClosureTemplate(
 	h_pred->SetFillStyle(3001);
 	h_pred->Draw("E2 same");
 
-  SearchBins theSearchBins("SB_69_2016");
+  SearchBins theSearchBins("SB_59_2016");
   if( hist_tag.Contains("_sb") ){ theSearchBins.drawSBregionDef(0.0, 75.0, true); }
   title->Draw("same");
   leg->Draw("same");
@@ -352,7 +383,7 @@ void ClosurePlots::ClosureTemplate(
   {
     h_ratio->GetXaxis()->SetLabelSize(0.1);
     h_ratio->GetXaxis()->SetTitleOffset(0.8);
-    h_ratio->GetXaxis()->SetRangeUser(0.,45);
+    h_ratio->GetXaxis()->SetRangeUser(0.,NSEARCH_BINS);
   }
 
   TLine *tl_one = new TLine();
