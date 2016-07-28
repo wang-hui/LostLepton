@@ -20,7 +20,11 @@
 //#define LUMI 3000.0
 //#define LUMI 2154.5
 //#define LUMI 2262.946
-#define LUMI 8000.0
+//#define LUMI 8000.0
+//#define LUMI 7647.637518921
+//#define LUMI 12905.3
+#define LUMI 12877.0846508279992
+
 //Fill chain from txt file
 bool FillChain(TChain *chain, const TString &inputFileList, std::string tag)
 {
