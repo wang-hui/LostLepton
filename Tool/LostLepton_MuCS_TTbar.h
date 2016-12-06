@@ -92,7 +92,7 @@ class AccRecoIsoEffs
   double mtwall[PT_BINS] = {0}, mtw100[PT_BINS] = {0};
 
   //here we define the event weight we are going to use in the second loop ( muon/electron CS and prediction plots)
-  double mus_EventWeight_iso[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS] = {{{{0}}}}, mus_EventWeight_reco[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS] = {{{{0}}}}, mus_EventWeight_acc[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS][NSEARCH_BINS] = {{{{{0}}}}};
+  double mus_EventWeight_iso[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS][NSEARCH_BINS] = {{{{{0}}}}}, mus_EventWeight_reco[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS][NSEARCH_BINS] = {{{{{0}}}}}, mus_EventWeight_acc[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS][NSEARCH_BINS] = {{{{{0}}}}};
   double els_EventWeight_iso[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS][NSEARCH_BINS] = {{{{{0}}}}}, els_EventWeight_reco[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS][NSEARCH_BINS] = {{{{{0}}}}}, els_EventWeight_acc[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS][NSEARCH_BINS] = {{{{{0}}}}};
 
   //here we define the search bin variables
@@ -399,6 +399,7 @@ class ClosureHistgram
   TH1D *h_exp_lept_all_Z_sb, *h_exp_lept_all_Z_njets30, *h_exp_lept_all_Z_njets50, *h_exp_lept_all_Z_ntops, *h_exp_lept_all_Z_nbjets, *h_exp_lept_all_Z_MET, *h_exp_lept_all_Z_MT2, *h_exp_lept_all_Z_HT;
 
   TH2D *h_pred_lept_all_2d_met_mupt;
+  TH2D *h_pred_el_all_2d_met_njets;
 
   TH1D *h_exp_elsingle_all_met, *h_exp_elsingle_all_njets, *h_exp_elsingle_all_mt2, *h_exp_elsingle_all_ht, *h_exp_elsingle_all_mht, *h_exp_elsingle_all_ntopjets;
 
@@ -523,6 +524,7 @@ void ClosureHistgram::BookHistgram(const char *outFileName)
 
   h_pred_lept_all_met = new TH1D("h_pred_lept_all_met","",100,0,1000);
   h_pred_lept_all_2d_met_mupt = new TH2D("h_pred_lept_all_2d_met_mupt","",100,-10,10,100,0,100);
+  h_pred_el_all_2d_met_njets = new TH2D("h_pred_el_all_2d_met_njets","",100,0,1000,20,0,20);
   h_pred_lept_all_njets = new TH1D("h_pred_lept_all_njets","",20,0,20);
   h_pred_lept_all_mt2 = new TH1D("h_pred_lept_all_mt2","",100,0,1000);
   h_pred_lept_all_ht = new TH1D("h_pred_lept_all_ht","",300,0,3000);
