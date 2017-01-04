@@ -1,3 +1,0 @@
-/afs/cern.ch/work/l/lacroix/SUSY/stop_2015/flat_ntuples/v151127/Skimmed_MET200_HT500_TTJets_DiLept_TuneCUETP8M1_13TeV-madgraphMLM-pythia8stopFlatNtuples.root
-/afs/cern.ch/work/l/lacroix/SUSY/stop_2015/flat_ntuples/v151127/Skimmed_MET200_HT500_TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8stopFlatNtuples.root
-/afs/cern.ch/work/l/lacroix/SUSY/stop_2015/flat_ntuples/v151127/Skimmed_MET200_HT500_TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8stopFlatNtuples.root

@@ -1,3 +1,0 @@
-/eos/uscms/store/group/lpcsusyhad/hua/TTJets_Leptonic_SkimmedTreeMET200_HT500_20151013/HT500skimmed_TTJets_SingleLeptFromT_all.root
-/eos/uscms/store/group/lpcsusyhad/hua/TTJets_Leptonic_SkimmedTreeMET200_HT500_20151013/HT500skimmed_TTJets_SingleLeptFromTbar_all.root
-/eos/uscms/store/group/lpcsusyhad/hua/TTJets_Leptonic_SkimmedTreeMET200_HT500_20151013/HT500skimmed_TTJets_DiLept_all.root

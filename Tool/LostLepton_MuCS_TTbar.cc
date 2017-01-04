@@ -40,75 +40,7 @@
 #include "Activity.h"
 #include "LostLepton_MuCS_TTbar.h"
 #include "TTJetsReWeighting.h"
-//#include "v151203_EffsHeader_MuCS.h"
-//#include "v151209_EffsHeader_MuCS.h"
-//#include "v160105_EffsHeader_MuCS.h"
-//#include "v160114_EffsHeader_MuCS.h"
-//#include "v160114_emuaccSB_EffsHeader_MuCS.h"
-//#include "v160114_dimuonStatUp_EffsHeader_MuCS.h"
-//#include "v160114_dimuonSystUp_EffsHeader_MuCS.h"
-//#include "v160114_dieleStatUp_EffsHeader_MuCS.h"
-//#include "v160114_dieleSystUp_EffsHeader_MuCS.h"
-//#include "v160208_muIsoSystUp_EffsHeader_MuCS.h"
-//#include "v160208_muIsoStatUp_EffsHeader_MuCS.h"
-//#include "v160208_muIsoStatDown_EffsHeader_MuCS.h"
-//#include "v160208_muIsoSystDown_EffsHeader_MuCS.h"
-//#include "v160208_muRecoSystUp_EffsHeader_MuCS.h"
-//#include "v160208_muRecoStatUp_EffsHeader_MuCS.h"
-//#include "v160208_muRecoStatDown_EffsHeader_MuCS.h"
-//#include "v160208_muRecoSystDown_EffsHeader_MuCS.h"
-//#include "v160208_elIsoStatUp_EffsHeader_MuCS.h"
-//#include "v160208_elIsoStatDown_EffsHeader_MuCS.h"
-//#include "v160208_elIsoSystUp_EffsHeader_MuCS.h"
-//#include "v160208_elIsoSystDown_EffsHeader_MuCS.h"
-//#include "v160208_elIdStatUp_EffsHeader_MuCS.h"
-//#include "v160208_elIdStatDown_EffsHeader_MuCS.h"
-//#include "v160208_elIdSystUp_EffsHeader_MuCS.h"
-//#include "v160208_elIdSystDown_EffsHeader_MuCS.h"
-//#include "v160208_istrkUp_EffsHeader_MuCS.h"
-//#include "v160122_accfromInvertedDPhi_EffsHeader_MuCS.h"
-//#include "v160122_invertedDPhi_EffsHeader_MuCS.h"
-//#include "v160217_ttbar_EffsHeader_MuCS.h"
-//#include "v160217_ttbar_v3_EffsHeader_MuCS.h"
-//#include "v160217_ttbar_v3_invertedDPhi_EffsHeader_MuCS.h"
-//#include "v160224_ttbarSingleTopWjets_EffsHeader_MuCS.h"
-//#include "v160302_ttbarv6_EffsHeader_MuCS.h"
-//#include "v160302_ttbarSTWv6_EffsHeader_MuCS.h"
-//#include "v160302_muIsoStatUp_EffsHeader_MuCS.h"
-//#include "v160302_muIsoStatDown_EffsHeader_MuCS.h"
-//#include "v160302_muIsoSystUp_EffsHeader_MuCS.h"
-//#include "v160302_muIsoSystDown_EffsHeader_MuCS.h"
-//#include "v160302_eIsoStatUp_EffsHeader_MuCS.h"
-//#include "v160302_eIsoStatDown_EffsHeader_MuCS.h"
-//#include "v160302_eIsoSystUp_EffsHeader_MuCS.h"
-//#include "v160302_eIsoSystDown_EffsHeader_MuCS.h"
-//#include "v160302_muIDStatUp_EffsHeader_MuCS.h"
-//#include "v160302_muIDStatDown_EffsHeader_MuCS.h"
-//#include "v160302_muIDSystUp_EffsHeader_MuCS.h"
-//#include "v160302_muIDSystDown_EffsHeader_MuCS.h"
-//#include "v160302_eIDStatUp_EffsHeader_MuCS.h"
-//#include "v160302_eIDStatDown_EffsHeader_MuCS.h"
-//#include "v160302_eIDSystUp_EffsHeader_MuCS.h"
-//#include "v160302_eIDSystDown_EffsHeader_MuCS.h"
-//#include "v160302_istrkUp_EffsHeader_MuCS.h"
-//#include "v160309_ttbarSingletopW_45bins_EffsHeader_MuCS.h"
-//#include "v160309_ttbarSingletopW_45bins_invertedDphi_EffsHeader_MuCS.h"
-//#include "v2_EffsHeader_MuCS.h"
-//#include "v4_59_EffsHeader_MuCS.h"
-//#include "v5_59_EffsHeader_MuCS.h"
-//#include "v4_59_ttbarW_EffsHeader_MuCS.h"
-//#include "v7_EffsHeader_MuCS.h"
-//#include "invertedDPhi_v160706_EffsHeader_MuCS.h"
-//#include "v160707_invertedDPhi_EffsHeader_MuCS.h"
-//#include "v160707c_EffsHeader_MuCS.h"
-//#include "v160714_newMuonID_EffsHeader_MuCS.h"
-//#include "invertedDphi_v160714_newMuonID_EffsHeader_MuCS.h"
-//#include "v160714_newMuonID_accNoSingleTop_EffsHeader_MuCS.h"
-//#include "v160714_newMuonID_accNoSingleTop_bin7f6_EffsHeader_MuCS.h"
 #include "v160714_newMuonID_accNoSingleTop_bin7f6_trkSF_EffsHeader_MuCS.h"
-//#include "invertedDphi_app_EffsHeader_MuCS.h"
-//#include "invertedDphi_app_trkSF_EffsHeader_MuCS.h"
-// v7 is ttbar+Wjets after bug fix
 #include "TriggerEff.h"
 #include "SusyAnaTools/Tools/PDFUncertainty.h"
 
@@ -124,16 +56,18 @@ double isotrkeff[NSEARCH_BINS];
 void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSampleWeight )
 {
   BaseHistgram myBaseHistgram;
-  myBaseHistgram.BookHistgram("test.root");
+  myBaseHistgram.BookHistgram("new_test.root");
+
+NTupleReader *tr =0;
 
   //use class BaselineVessel in the SusyAnaTools/Tools/baselineDef.h file
   std::string spec = "lostlept";
-  myBaselineVessel = new BaselineVessel(spec);
+  myBaselineVessel = new BaselineVessel(*tr, spec);
 
   size_t t0 = clock();
   std::vector<TTJetsSampleInfo>::iterator iter_TTJetsSampleInfos;
 
-  SearchBins theSearchBins("SB_59_2016");
+  SearchBins theSearchBins("SB_v1_2017");
 
   std::cout << "Efficiencies Calculation: " << std::endl;
 
@@ -153,11 +87,18 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
   for(iter_TTJetsSampleInfos = myTTJetsSampleWeight.TTJetsSampleInfos.begin(); iter_TTJetsSampleInfos != myTTJetsSampleWeight.TTJetsSampleInfos.end(); iter_TTJetsSampleInfos++)
   {  
     //use class NTupleReader in the SusyAnaTools/Tools/NTupleReader.h file
+    
+    //std::cout << "start ntuple reader" << std::endl;
+
     NTupleReader tr((*iter_TTJetsSampleInfos).chain);
     //initialize the type3Ptr defined in the customize.h
-    AnaFunctions::prepareTopTagger();
-    //The passBaseline is registered here
+    //AnaFunctions::prepareTopTagger();
+
+    //std::cout << "The passBaseline is registered here" << std::endl;
+
     tr.registerFunction(&mypassBaselineFunc);    
+
+    //std::cout << "The PDFUncertainty is registered here" << std::endl;
  
     PDFUncertainty pdf;
     tr.registerFunction(pdf);
@@ -165,12 +106,15 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
     double thisweight = (*iter_TTJetsSampleInfos).weight;
     std::cout << "Weight " << thisweight << std::endl;
     int neventc=0;
+
+    //std::cout << "tr.getNextEvent()=" << tr.getNextEvent() <<std::endl;
+
     while(tr.getNextEvent())
     //while(tr.getNextEvent() && neventc<10000)
     {
       ++neventc;
       if(tr.getEvtNum()%20000 == 0) std::cout << tr.getEvtNum() << "\t" << ((clock() - t0)/1000000.0) << std::endl;
-    
+
       myAccRecoIsoEffs.nevents_tot+=thisweight;
 
       bool passLeptVeto = tr.getVar<bool>("passLeptVeto"+spec);
@@ -200,7 +144,6 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
       if (passBaselinelostlept)
 	//if (passInvertedBaseline)
       {
-
 	const double pdf_Unc_Up = tr.getVar<double>("NNPDF_From_Median_Up");
 	const double pdf_Unc_Down = tr.getVar<double>("NNPDF_From_Median_Down");
         const double scaleUp = tr.getVar<double>("Scaled_Variations_Up");
@@ -227,7 +170,12 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
         double MT2 = tr.getVar<double>("best_had_brJet_MT2"+spec);
         double met = tr.getVar<double>("met");
         double metphi = tr.getVar<double>("metphi");
-	const double ht = tr.getVar<double>("ht");
+	//const double ht = tr.getVar<double>("ht");
+	const double ht = tr.getVar<double>("HT"+spec);
+	//std::cout << "ht = " << ht << std::endl;
+
+	//if (ht > 300) //a bad solution
+	//{
 
         int ngenmu = 0;
         int ngenel = 0;
@@ -271,11 +219,12 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
           for(int gen_emus_i = 0 ; gen_emus_i < gen_emus_count ; gen_emus_i++)
           {
             int genId;
+
             genId = emuVec_merge.at ( gen_emus_i );
             double genmuonpfActivity = emu_pfActivityVec_merge.at(gen_emus_i);
 
             LostLeptonObj myLostMuonObj;
-            
+        
             myLostMuonObj.SetMyLL(
                                    //LL variables that will be always useful 
                                    genDecayPdgIdVec.at ( genId ),
@@ -290,39 +239,59 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
             if( myLostMuonObj.isMu )
             {
 	      ngenmu++;
-              const int njetsbin_number = Set_njetsbin_number(njets30);
-	      const int HTbin_number = Set_HTbin_number(ht);
+              //const int njetsbin_number = Set_njetsbin_number(njets30);
+	      //const int HTbin_number = Set_HTbin_number(ht);
 	      //const int HTbin_number = Set_MT2bin_number(MT2);
 	      //std::cout << "HTbin_number = " << HTbin_number << std::endl;            
 
-              myAccRecoIsoEffs.nmus[njetsbin_number][HTbin_number]+=thisweight;
+              //myAccRecoIsoEffs.nmus[njetsbin_number][HTbin_number]+=thisweight;
               //myAccRecoIsoEffs.nmus_MC[njetsbin_number][HTbin_number]+=thisweight*thisweight;
-              myAccRecoIsoEffs.nmus_MC[njetsbin_number][HTbin_number]++;
+              //myAccRecoIsoEffs.nmus_MC[njetsbin_number][HTbin_number]++;
 
-	      const int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );            
+	      //const int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+	      //59 bins
+	      const int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met, ht);
+
+		/*if (searchbin_id==83)
+		  {
+ 		  std::cout << "thisweight["<< searchbin_id << "] = " << thisweight << std::endl;
+		  std::cout << "systWeight["<< searchbin_id << "] = " << systWeight << std::endl;
+		  std::cout << "nmus_sb["<< searchbin_id << "] = " << myAccRecoIsoEffs.nmus_sb[searchbin_id] << std::endl;
+ 		  std::cout << "nmus_MC_sb["<< searchbin_id << "] = " << myAccRecoIsoEffs.nmus_MC_sb[searchbin_id] << " " << __LINE__<< std::endl;
+		  std::cout << "nbottomjets["<< searchbin_id << "] = " << nbottomjets << std::endl;
+		  std::cout << "ntopjets["<< searchbin_id << "] = " << ntopjets << std::endl;
+		  std::cout << "MT2["<< searchbin_id << "] = " << MT2 << std::endl;
+		  std::cout << "met["<< searchbin_id << "] = " << met << std::endl;
+		  std::cout << "ht["<< searchbin_id << "] = " << ht << std::endl;
+ 		  }*/
+
+		//std::cout << "start nmus_MC_sb[83] = " << myAccRecoIsoEffs.nmus_MC_sb[83] << " # " << tr.getEvtNum() << " "  << __LINE__ << std::endl;
+          	//std::cout << "nmus_sb["<< searchbin_id << "] = " << myAccRecoIsoEffs.nmus_sb[searchbin_id] << " " << __LINE__<< std::endl;
+		//std::cout << "nmus_MC_sb["<< searchbin_id << "] = " << myAccRecoIsoEffs.nmus_MC_sb[searchbin_id] << " " << __LINE__<< std::endl;
+ 
 	      myAccRecoIsoEffs.nmus_sb[searchbin_id]+=thisweight*systWeight;
+
+		//std::cout << "nmus_sb["<< searchbin_id << "] = " << myAccRecoIsoEffs.nmus_sb[searchbin_id]<< " " << __LINE__ << std::endl;
+		//std::cout << "nmus_MC_sb["<< searchbin_id << "] = " << myAccRecoIsoEffs.nmus_MC_sb[searchbin_id] << " " << __LINE__<< std::endl;
+		//std::cout << "middle nmus_MC_sb[83] = " << myAccRecoIsoEffs.nmus_MC_sb[83] << " # " << tr.getEvtNum() << " "  << __LINE__ << std::endl;
+
 	      myAccRecoIsoEffs.nmus_MC_sb[searchbin_id]++;
 
-	      //debug
-	      //if (searchbin_id==21) std::cout << "thisweight = " << thisweight << std::endl;
+		//std::cout << "end nmus_MC_sb[83] = " << myAccRecoIsoEffs.nmus_MC_sb[83] << " # " << tr.getEvtNum() << " "  << __LINE__ << std::endl;
 
               if( myLostMuonObj.passAcc )
               {
-                myAccRecoIsoEffs.nmus_acc[njetsbin_number][HTbin_number]+=thisweight;
+                //myAccRecoIsoEffs.nmus_acc[njetsbin_number][HTbin_number]+=thisweight;
                 //myAccRecoIsoEffs.nmus_acc_MC[njetsbin_number][HTbin_number]+=thisweight*thisweight;
-                myAccRecoIsoEffs.nmus_acc_MC[njetsbin_number][HTbin_number]++;
+                //myAccRecoIsoEffs.nmus_acc_MC[njetsbin_number][HTbin_number]++;
 
                 int ptbin_number = Set_ptbin_number(myLostMuonObj.gen_pt);
                 int acbin_number = Set_acbin_number(myLostMuonObj.gen_activity);
+		myAccRecoIsoEffs.nmus_acc_bin[ptbin_number][acbin_number]+=thisweight;
+		myAccRecoIsoEffs.nmus_acc_bin_MC[ptbin_number][acbin_number]++;
 
 		myAccRecoIsoEffs.nmus_acc_sb[searchbin_id]+=thisweight*systWeight;
 		myAccRecoIsoEffs.nmus_acc_MC_sb[searchbin_id]++;
-
-		//debug
-		//if (searchbin_id==21) std::cout << "acc thisweight = " << thisweight << std::endl;
-
-                myAccRecoIsoEffs.nmus_acc_bin[ptbin_number][acbin_number]+=thisweight;
-                myAccRecoIsoEffs.nmus_acc_bin_MC[ptbin_number][acbin_number]++;
               }
 
 		// apply muon tracking SF:
@@ -339,7 +308,8 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 		else TrkSF=0.9768119;
 
               //call another process for iso eff calculation, reset pt bin number for iso efficiency, as reco_pt
-              if( myLostMuonObj.passId )
+
+	      if( myLostMuonObj.passId )
               {
                 int ptbin_number = Set_ptbin_number(myLostMuonObj.gen_pt);
                 int acbin_number = Set_acbin_number(myLostMuonObj.gen_activity);
@@ -374,6 +344,7 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
                 myAccRecoIsoEffs.nmus_iso_MC_allreco[ptbin_number_allreco][acbin_number_allreco]++;
                 //std::cout << muonsMiniIso.size() << "," << myLostMuonObj.reco_index << "ISO:" << muonsMiniIso.at(myLostMuonObj.reco_index) << std::endl;
               }
+
               //check warning function when we calculate the efficienies!
               if ( nMuons == 0 && myLostMuonObj.passIso )
               { 
@@ -426,11 +397,15 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
                                        elesMiniIso
                                      );
 
+                //std::cout << "myLostElectronObj.isEl=" << myLostElectronObj.isEl << std::endl;
+
             if( myLostElectronObj.isEl )
             {
 	      ngenel++;
               int njetsbin_number = Set_njetsbin_number(njets30);
-	      const int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );   
+	      //const int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );   
+	      //59 bins
+	      const int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met, ht);
             
               //myAccRecoIsoEffs.nels[njetsbin_number]+=thisweight;
               //myAccRecoIsoEffs.nels_MC[njetsbin_number]++;
@@ -452,6 +427,7 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
               }
 
 		// apply electron tracking SF:
+		// check with POG
 		double TrkSF=1.0;
 		if (myLostElectronObj.reco_eta<-2.4) TrkSF=1.170338;
 		else if (myLostElectronObj.reco_eta<-2.3) TrkSF=1.00852;
@@ -576,7 +552,10 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
           }
 
           //muon CS statistics
-          int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+          //int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+          //59 bins
+          int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met, ht);
+
           if( searchbin_id >= 0 )
           {
             myAccRecoIsoEffs.nevents_mus_CS_SB_MC[searchbin_id]++;
@@ -586,7 +565,9 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 
 	if (nElectrons == 0 && nMuons == 0 && (ngenmu==1 || ngenmu==2 || ngenel==1 || ngenel==2))
 	{
-          const int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+          //const int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+          //59 bins
+          const int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met, ht);
           if( searchbin_id >= 0 )
           {
 	    neventsSB[searchbin_id]+=thisweight;
@@ -600,7 +581,8 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
             if (neventsSB_afterITV[searchbin_id]>neventsSB[searchbin_id]) std::cout << "neventsSB_afterITV[searchbin_id]>neventsSB[searchbin_id]" << std::endl;
 
 	  }
-	}
+	 }
+	//}//end a bad solution
       }//baseline, nolepveto
     }//TTjets samples class
   }//end of first loop
@@ -625,21 +607,21 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
     std::cout << "isoTrackErr[" << searchbinc << "] = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[searchbinc],neventsSB_MC[searchbinc]) << ";" << std::endl;
   }
 
-//  // debug
-//  for( int searchbinc = 0 ; searchbinc < NSEARCH_BINS ; ++searchbinc )
-//  {
-//    std::cout << "nmus_acc_sb[" << searchbinc << "] = " << myAccRecoIsoEffs.nmus_acc_sb[searchbinc] << std::endl;
-//    std::cout << "nmus_acc_MC_sb[" << searchbinc << "] = " << myAccRecoIsoEffs.nmus_acc_MC_sb[searchbinc] << std::endl;
-//    std::cout << "nmus_sb[" << searchbinc << "] = " << myAccRecoIsoEffs.nmus_sb[searchbinc] << std::endl;
-//    std::cout << "nmus_MC_sb[" << searchbinc << "] = " << myAccRecoIsoEffs.nmus_MC_sb[searchbinc] << std::endl;
-//  }
-//  for( int searchbinc = 0 ; searchbinc < NSEARCH_BINS ; ++searchbinc )
-//  {
-//    std::cout << "nels_acc[" << searchbinc << "] = " << myAccRecoIsoEffs.nels_acc[searchbinc] << std::endl;
-//    std::cout << "nels_acc_MC[" << searchbinc << "] = " << myAccRecoIsoEffs.nels_acc_MC[searchbinc] << std::endl;
-//    std::cout << "nels[" << searchbinc << "] = " << myAccRecoIsoEffs.nels[searchbinc] << std::endl;
-//    std::cout << "nels_MC[" << searchbinc << "] = " << myAccRecoIsoEffs.nels_MC[searchbinc] << std::endl;
-//  }
+// debug
+  /*for( int searchbinc = 0 ; searchbinc < NSEARCH_BINS ; ++searchbinc )
+  {
+    std::cout << "nmus_acc_sb[" << searchbinc << "] = " << myAccRecoIsoEffs.nmus_acc_sb[searchbinc] << std::endl;
+    std::cout << "nmus_acc_MC_sb[" << searchbinc << "] = " << myAccRecoIsoEffs.nmus_acc_MC_sb[searchbinc] << std::endl;
+    std::cout << "nmus_sb[" << searchbinc << "] = " << myAccRecoIsoEffs.nmus_sb[searchbinc] << std::endl;
+    std::cout << "nmus_MC_sb[" << searchbinc << "] = " << myAccRecoIsoEffs.nmus_MC_sb[searchbinc] << std::endl;
+  }
+  for( int searchbinc = 0 ; searchbinc < NSEARCH_BINS ; ++searchbinc )
+  {
+    std::cout << "nels_acc[" << searchbinc << "] = " << myAccRecoIsoEffs.nels_acc[searchbinc] << std::endl;
+    std::cout << "nels_acc_MC[" << searchbinc << "] = " << myAccRecoIsoEffs.nels_acc_MC[searchbinc] << std::endl;
+    std::cout << "nels[" << searchbinc << "] = " << myAccRecoIsoEffs.nels[searchbinc] << std::endl;
+    std::cout << "nels_MC[" << searchbinc << "] = " << myAccRecoIsoEffs.nels_MC[searchbinc] << std::endl;
+  }*/
 
   myAccRecoIsoEffs.NumberstoEffs();
   myAccRecoIsoEffs.EffsPlotsGen();
@@ -658,9 +640,12 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 {
   ClosureHistgram myClosureHistgram;
   myClosureHistgram.BookHistgram("ExpLL.root");
+
+NTupleReader *tr =0;
+
   //use class BaselineVessel in the SusyAnaTools/Tools/baselineDef.h file
   std::string spec = "lostlept";
-  myBaselineVessel = new BaselineVessel(spec);
+  myBaselineVessel = new BaselineVessel(*tr, spec);
 
   size_t t0 = clock();
   std::vector<TTJetsSampleInfo>::iterator iter_TTJetsSampleInfos;
@@ -673,7 +658,7 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
     //use class NTupleReader in the SusyAnaTools/Tools/NTupleReader.h file
     NTupleReader tr((*iter_TTJetsSampleInfos).chain);
     //initialize the type3Ptr defined in the customize.h
-    AnaFunctions::prepareTopTagger();
+    //AnaFunctions::prepareTopTagger();
     //The passBaseline is registered here
     tr.registerFunction(&mypassBaselineFunc);    
  
@@ -881,7 +866,10 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 	    (myClosureHistgram.h_exp_mu_iso_ntopjets)->Fill(ntopjets,(thisweight*metEff));
 	  }
 
-          int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+          //int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+          //59 bins
+	  int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met, ht);
+
           //if( searchbin_id >= 0 && ngenmu==1)
 	  if( searchbin_id >= 0)
           {
@@ -908,7 +896,10 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 	    (myClosureHistgram.h_exp_mu_id_ntopjets)->Fill(ntopjets,(thisweight*metEff));
 	  }
 
-          int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+          //int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+          //59 bins
+          int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met,ht);
+
           //if( searchbin_id >= 0  && ngenmu==1)
 	  if( searchbin_id >= 0)
           {
@@ -933,7 +924,10 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 	    (myClosureHistgram.h_exp_mu_acc_ntopjets)->Fill(ntopjets,(thisweight*metEff));
 	  }
 
-          int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+          //int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+          //59 bins
+          int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met, ht);
+
           //if( searchbin_id >= 0  && ngenmu==1)
 	  if( searchbin_id >= 0)
           {
@@ -951,7 +945,10 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
           myAccRecoIsoEffs.nevents_exp_all_mus+=(thisweight*metEff);
           //myAccRecoIsoEffs.nevents_single_mus+=(thisweight*metEff);
 
-          int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+          //int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+          //59 bins
+          int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met, ht);
+
           if( searchbin_id >= 0 )
           {
             //myAccRecoIsoEffs.nevents_mus_exp_SB_MC[searchbin_id]++;
@@ -985,7 +982,10 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
           //myAccRecoIsoEffs.nevents_di_mus+=(thisweight*metEff);
           myAccRecoIsoEffs.nevents_exp_all_mus+=(thisweight*metEff);
 
-          int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+          //int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+          //59 bins
+          int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met, ht);
+
           if( searchbin_id >= 0 )
           {
             //myAccRecoIsoEffs.nevents_mus_exp_SB_MC[searchbin_id]++;
@@ -1012,7 +1012,10 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 	  //if (ngenel==1 || ngenel==2) ++n_exp_ele_noitv;
 	  //if (nIsoTrks==0) n_exp_lep_itv+=(thisweight*metEff);
 
-          int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+          //int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+          //59 bins
+          int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met, ht);
+
           if( searchbin_id >= 0 )
           {
             //myAccRecoIsoEffs.nevents_lept_exp_SB_MC[searchbin_id]++;
@@ -1058,7 +1061,10 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 	    (myClosureHistgram.h_exp_el_iso_ntopjets)->Fill(ntopjets,(thisweight*metEff));
 	  }
 
-          int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+          //int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+          //59 bins
+          int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met, ht);
+
 	  if( searchbin_id >= 0)
           {
             //myAccRecoIsoEffs.nevents_mus_exp_iso_SB_Normalized[searchbin_id]+=thisweight*metEff;
@@ -1084,7 +1090,10 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 	    (myClosureHistgram.h_exp_el_id_ntopjets)->Fill(ntopjets,(thisweight*metEff));
 	  }
 
-          int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+          //int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+          //59 bins
+          int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met, ht);
+
 	  if( searchbin_id >= 0)
           {
             //myAccRecoIsoEffs.nevents_mus_exp_reco_SB_Normalized[searchbin_id]+=thisweight*metEff;
@@ -1110,7 +1119,10 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 	    (myClosureHistgram.h_exp_el_acc_ntopjets)->Fill(ntopjets,(thisweight*metEff));
 	  }
 
-          int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+          //int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+          //59 bins
+          int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met, ht);
+
 	  if( searchbin_id >= 0)
           {
             //myAccRecoIsoEffs.nevents_mus_exp_acc_SB_Normalized[searchbin_id]+=thisweight*metEff;
@@ -1128,7 +1140,10 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
           myAccRecoIsoEffs.nevents_exp_all_els+=(thisweight*metEff);
           //myAccRecoIsoEffs.nevents_single_els+=(thisweight*metEff);
 
-          int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+          //int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+          //59 bins
+          int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met, ht);
+
           if( searchbin_id >= 0 )
           {
             //myAccRecoIsoEffs.nevents_els_exp_SB_MC[searchbin_id]++;
@@ -1160,7 +1175,10 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
           myAccRecoIsoEffs.nevents_exp_all_els+=(thisweight*metEff);
           //myAccRecoIsoEffs.nevents_di_els+=(thisweight*metEff);
 
-          int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+          //int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+          //59 bins
+          int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met, ht);
+
           if( searchbin_id >= 0 )
           {
             //myAccRecoIsoEffs.nevents_els_exp_SB_MC[searchbin_id]++;
@@ -1304,9 +1322,12 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
   const bool storePlots=true;
   ClosureHistgram myClosureHistgram;
   if (storePlots) myClosureHistgram.BookHistgram("PredLL_gen_ele_2D.root");
+
+NTupleReader *tr =0;
+
   //use class BaselineVessel in the SusyAnaTools/Tools/baselineDef.h file
   std::string spec = "lostlept";
-  myBaselineVessel = new BaselineVessel(spec);
+  myBaselineVessel = new BaselineVessel(*tr, spec);
   //myBaselineVessel = new BaselineVessel(spec, "fastsim");
 
   size_t t0 = clock();
@@ -1325,7 +1346,7 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
     //use class NTupleReader in the SusyAnaTools/Tools/NTupleReader.h file
     NTupleReader trCS((*iter_TTJetsSampleInfos).chain);
     //initialize the type3Ptr defined in the customize.h
-    AnaFunctions::prepareTopTagger();
+    //AnaFunctions::prepareTopTagger();
     //The passBaseline is registered here
     trCS.registerFunction(&mypassBaselineFunc);
 
@@ -1472,7 +1493,9 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
             const int acbin_number = Set_acbin_number(activity);
 	    const int htbin_number = Set_HTbin_number(ht);
             //const int htbin_number = Set_MT2bin_number(MT2);
-            int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+            //int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+            //59 bins
+            int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met, ht);
 
 	    //// for signal scan
 	    ////std::cout << "SusyMotherMass = " << SusyMotherMass << std::endl;
@@ -1754,7 +1777,9 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
             const int acbin_number = Set_acbin_number(activity);
 	    const int htbin_number = Set_HTbin_number(ht);
             //const int htbin_number = Set_MT2bin_number(MT2);
-            int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+            //int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
+            //59 bins
+            int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met, ht);
 
 	    //// for signal scan
 	    ////std::cout << "SusyMotherMass = " << SusyMotherMass << std::endl;
@@ -3015,34 +3040,27 @@ int main(int argc, char* argv[])
   // https://github.com/susy2015/SusyAnaTools/blob/master/Tools/samples.cc
   //TTJets nominal
   //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_", 831.76, 11339232, LUMI, inputFileList_Cal );
-  //TTJets single lepton and di-lepton
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromT_", 831.76*0.5*TTbar_SingleLept_BR, 59654914, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromTbar", 831.76*0.5*TTbar_SingleLept_BR, 51873969, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_DiLept", 831.76*TTbar_DiLept_BR, 30587326, LUMI, inputFileList_Cal );
 
-  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "stop", 0.0189612, 240685, LUMI, inputFileList_Cal ); // 850,100
-  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "HTMHT" , 1, 1, LUMI, inputFileList_Cal );
-  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "HTMHT" , 1, 1, 1.0, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromT_", 831.76*0.5*TTbar_SingleLept_BR,  53057043, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromTbar", 831.76*0.5*TTbar_SingleLept_BR, 60494823, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_DiLept", 831.76*TTbar_DiLept_BR, 30682233, LUMI, inputFileList_Cal );
 
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_top" , 35.6, 998400, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_antitop" , 35.6, 967600, LUMI, inputFileList_Cal );
+  /*myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_top" , 35.6, 998400, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_antitop" , 35.6, 985000, LUMI, inputFileList_Cal );
 
   // 1.21 is the kf
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-400To600" , 48.91*1.21, 7299788, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-600To800" , 12.05*1.21, 3723054, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-800To1200" , 5.501*1.21, 7480017, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-1200To2500" , 1.329*1.21, 7042924, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-2500ToInf" , 0.03216*1.21, 252809, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-200To400" , 359.7*1.21, 19591498, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-400To600" , 48.91*1.21, 7432746, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-600To800" , 12.05*1.21, 18088165, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-800To1200" , 5.501*1.21, 7854734, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-1200To2500" , 1.329*1.21, 7023857, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-2500ToInf" , 0.03216*1.21, 2507809, LUMI, inputFileList_Cal );
+  */
 
-  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "SMS-T2tt_mStop" , 1.0, 1.0, 1.0, inputFileList_Cal );
-
-  //TTJetsSampleWeight myExpPredSampleWeight;
-  //myExpPredSampleWeight.TTJetsSampleInfo_push_back( "TTJets_", 831.76, 11339232, LUMI, inputFileList_Exp_Pred );
-
-  //LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
+  LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
   //LoopLLExp( myAccRecoIsoEffs, myTTJetsSampleWeight );
-  double results[NSEARCH_BINS]={0};
-  LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, results );
+  //double results[NSEARCH_BINS]={0};
+  //LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, results );
   //LoopLLSyst( myTTJetsSampleWeight );
 
   std::cout << "done" << std::endl;
@@ -3096,14 +3114,19 @@ void AccRecoIsoEffs::NumberstoEffs()
   {
     //std::cout << "acc[" << searchbinc << "] = " << nmus_acc_sb[searchbinc]/nmus_sb[searchbinc] << ";" << std::endl;
     std::cout << "err_acc[" << searchbinc << "] = " << get_stat_Error(nmus_acc_MC_sb[searchbinc],nmus_MC_sb[searchbinc]) << ";" << std::endl;
-    els_acc[searchbinc] = nels_acc[searchbinc]/nels[searchbinc];
-    els_acc_err[searchbinc] = get_stat_Error(nels_acc_MC[searchbinc],nels_MC[searchbinc]);
+
+	//let us move!!
+
+    //els_acc[searchbinc] = nels_acc[searchbinc]/nels[searchbinc];
+    //els_acc_err[searchbinc] = get_stat_Error(nels_acc_MC[searchbinc],nels_MC[searchbinc]);
   }
 
 
   for( int searchbinc = 0 ; searchbinc < NSEARCH_BINS ; ++searchbinc )
   {
-    std::cout << "err_acc_el[" << searchbinc << "] = " << els_acc_err[searchbinc] << ";" << std::endl;
+    //std::cout << "err_acc_el[" << searchbinc << "] = " << els_acc_err[searchbinc] << ";" << std::endl;
+    std::cout << "err_acc_el[" << searchbinc << "] = " << get_stat_Error(nels_acc_MC[searchbinc],nels_MC[searchbinc]) << ";" << std::endl;
+
   }
 
 
@@ -3755,7 +3778,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
 void AccRecoIsoEffs::printEffsHeader()
 {
   std::ofstream EffsHeader;
-  EffsHeader.open ("EffsHeader_MuCS.h");
+  EffsHeader.open ("new_EffsHeader_MuCS.h");
 
   int i_cal = 0;
   int j_cal = 0;
@@ -3772,6 +3795,10 @@ void AccRecoIsoEffs::printEffsHeader()
   EffsHeader << "  double ttbar_mus_acc[" << NSEARCH_BINS << "] = "; 
   for( int searchbinc = 0 ; searchbinc < NSEARCH_BINS ; ++searchbinc )
   {
+
+std::cout << "mu bin " << searchbinc +1 << " acc " << nmus_acc_sb[searchbinc] << " all " << nmus_sb[searchbinc] << " raw acc " << nmus_acc_MC_sb[searchbinc] << " raw all " << nmus_MC_sb[searchbinc] << std::endl;
+//std::cout << "eff" << nmus_acc_sb[searchbinc]/nmus_sb[searchbinc] << std::endl;
+
     if( searchbinc == 0 ) { EffsHeader << "{"; }
     EffsHeader << nmus_acc_sb[searchbinc]/nmus_sb[searchbinc];
     if( searchbinc != NSEARCH_BINS-1 ) { EffsHeader << ","; }
@@ -3813,8 +3840,13 @@ void AccRecoIsoEffs::printEffsHeader()
   EffsHeader << "  double ttbar_els_acc[" << NSEARCH_BINS << "] = ";                            
   for( int searchbinc = 0 ; searchbinc < NSEARCH_BINS ; ++searchbinc )
   {
+
+std::cout << "el bin " << searchbinc +1 << " acc " << nels_acc[searchbinc] << " all " << nels[searchbinc] << " raw acc " << nels_acc_MC[searchbinc] << " raw all " << nels_MC[searchbinc] << std::endl;
+
+//els_acc[searchbinc] = nels_acc[searchbinc]/nels[searchbinc];
     if( searchbinc == 0 ) { EffsHeader << "{"; }
-    EffsHeader << els_acc[searchbinc];
+    //EffsHeader << els_acc[searchbinc];
+    EffsHeader << nels_acc[searchbinc]/nels[searchbinc];
     if( searchbinc != NSEARCH_BINS-1 ) { EffsHeader << ","; }
     if( searchbinc == NSEARCH_BINS-1 ) { EffsHeader << "};" << std::endl; }
   }
@@ -3878,6 +3910,25 @@ void LostLeptonObj::SetMyLL(
                            )
 {
 
+/*std::cout << "pid=" << pid << std::endl;
+
+std::cout << "genpfActivity=" << genpfActivity << std::endl;
+
+for ( int i=0; i < IdFlag.size(); i++)
+{
+std::cout << "IdFlag=" << IdFlag.at(i) << std::endl;
+}
+
+for ( int i=0; i < recoleptactivityVec.size(); i++)
+{
+std::cout << "recoleptactivityVec=" << recoleptactivityVec.at(i) << std::endl;
+}
+
+for ( int i=0; i < MiniIso.size(); i++)
+{
+std::cout << "MiniIso=" << MiniIso.at(i) << std::endl;
+}
+*/
 
   SetFlavor( pid );
   genLeptonSetup( onegenlept, genpfActivity );

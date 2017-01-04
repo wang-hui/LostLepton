@@ -1,1 +1,0 @@
-/eos/uscms/store/group/lpcsusyhad/PHYS14_720_Mar14_2014_v2/hua/PU20bx25_T1tttt_2J_mGl-1200_mLSP-800_madgraph-tauola/SMS-T1tttt_2J_mGl-1200_mLSP-800_Tune4C_13TeV-madgraph-tauola/PHYS14_PU20bx25_PHYS14_25_V2-FLAT/150330_165230/0000/stopFlatNtuples_1.root

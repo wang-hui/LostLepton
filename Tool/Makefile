@@ -19,7 +19,13 @@ CXXDEPFLAGS = -MMD -MP
 LD         = g++
 LDFLAGS    =
 
+OPENCV_DIRECTORY=$(CMSSW_BASE)/src/opencv
 LIBS       = $(shell root-config --glibs)
+LIBS      += -L$(CMSSW_BASE)/src/SusyAnaTools/Tools/obj -lSusyAnaTools
+LIBS      += -L$(CMSSW_BASE)/src/TopTagger/TopTagger/test -lTopTagger
+LIBS      += -L$(OPENCV_DIRECTORY)/lib/ -lopencv_ml -lopencv_core
+LIBS      += -L$(CMSSW_BASE)/lib/${SCRAM_ARCH}/ -lrecipeAUXOxbridgeMT2
+LIBS      += -L$(CMSSW_RELEASE_BASE)/lib/${SCRAM_ARCH}/ -lPhysicsToolsHeppy
 
 LHAPDFLIB = -L$(LHAPDF_DATA_PATH)/../../lib -lLHAPDF
 

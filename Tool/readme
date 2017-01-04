@@ -1,0 +1,3 @@
+source $CMSSW_BASE/src/SusyAnaTools/Tools/setup.csh
+/uscms_data/d3/benwu/StopHad/CMSSW_8_0_23/src/UserCode/SbottomAna/Tool/FileList
+

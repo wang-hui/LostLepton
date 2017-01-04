@@ -73,10 +73,11 @@ int main(int argc, char* argv[])
   fChain[3] = new TChain("stopTreeMaker/AUX");
   fChain[4] = new TChain("stopTreeMaker/AUX");
 
+NTupleReader *tr=0;
 
   //use class BaselineVessel in the SusyAnaTools/Tools/baselineDef.h file
   std::string spec = "lostlept";
-  myBaselineVessel = new BaselineVessel(spec);
+  myBaselineVessel = new BaselineVessel(*tr, spec);
 
   for(int i = 0 ; i < N_FILES ; i++ )
   {
@@ -92,9 +93,9 @@ int main(int argc, char* argv[])
 
     NTupleReader tr(fChain[i]);
     //initialize the type3Ptr defined in the customize.h
-    AnaFunctions::prepareTopTagger();
+    //AnaFunctions::prepareTopTagger();
     //The passBaselineFunc is registered here
-    tr.registerFunction(&passBaselineFunc);
+    tr.registerFunction(&mypassBaselineFunc);
  
     std::cout << i+1 << " loop begin: " << std::endl;
     while(tr.getNextEvent())

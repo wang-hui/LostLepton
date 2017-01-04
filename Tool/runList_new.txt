@@ -1,0 +1,7 @@
+root://cmseos.fnal.gov//store/user/lpcsusyhad/Stop_production/Spring16_80X_Nov_2016_Ntp_v11X_new_IDs/TTJets_SingleLeptFromT_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/Spring16_80X_Nov_2016_Ntp_v11p0_new_IDs_TTJets_SingleLeptFromT/161111_230825/0000/stopFlatNtuples_1.root
+
+root://cmseos.fnal.gov//store/user/lpcsusyhad/Stop_production/Spring16_80X_Nov_2016_Ntp_v11X_new_IDs/TTJets_SingleLeptFromTbar_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/Spring16_80X_Nov_2016_Ntp_v11p0_new_IDs_TTJets_SingleLeptFromTbar_ext1/161111_231248/0000/stopFlatNtuples_1.root
+
+root://cmseos.fnal.gov//store/user/lpcsusyhad/Stop_production/Spring16_80X_Nov_2016_Ntp_v11X_new_IDs/WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/Spring16_80X_Nov_2016_Ntp_v11p0_new_IDs_WJetsToLNu_HT-400To600/161118_170739/0000/stopFlatNtuples_1.root
+
+
