@@ -40,7 +40,8 @@
 #include "Activity.h"
 #include "LostLepton_MuCS_TTbar.h"
 #include "TTJetsReWeighting.h"
-#include "v160714_newMuonID_accNoSingleTop_bin7f6_trkSF_EffsHeader_MuCS.h"
+//#include "v160714_newMuonID_accNoSingleTop_bin7f6_trkSF_EffsHeader_MuCS.h"
+#include "v2_new_EffsHeader_MuCS.h"
 #include "TriggerEff.h"
 #include "SusyAnaTools/Tools/PDFUncertainty.h"
 
@@ -48,8 +49,8 @@
 const bool applyisotrkveto = false; // should be false
 //const double isotrackvetoeff = 1;
 
-const bool use_muon_control_sample = false;
-const bool use_electron_control_sample = true;
+const bool use_muon_control_sample = true;
+const bool use_electron_control_sample = false;
 
 double isotrkeff[NSEARCH_BINS];
 
@@ -650,7 +651,7 @@ NTupleReader *tr =0;
   size_t t0 = clock();
   std::vector<TTJetsSampleInfo>::iterator iter_TTJetsSampleInfos;
 
-  SearchBins theSearchBins("SB_59_2016");
+  SearchBins theSearchBins("SB_v1_2017");
 
   std::cout << "Expectation: " << std::endl;
   for(iter_TTJetsSampleInfos = myTTJetsSampleWeight.TTJetsSampleInfos.begin(); iter_TTJetsSampleInfos != myTTJetsSampleWeight.TTJetsSampleInfos.end(); iter_TTJetsSampleInfos++)
@@ -1321,7 +1322,7 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
 {
   const bool storePlots=true;
   ClosureHistgram myClosureHistgram;
-  if (storePlots) myClosureHistgram.BookHistgram("PredLL_gen_ele_2D.root");
+  if (storePlots) myClosureHistgram.BookHistgram("PredLL_mu_2D.root");
 
 NTupleReader *tr =0;
 
@@ -1333,7 +1334,7 @@ NTupleReader *tr =0;
   size_t t0 = clock();
   std::vector<TTJetsSampleInfo>::iterator iter_TTJetsSampleInfos;
 
-  SearchBins theSearchBins("SB_59_2016");
+  SearchBins theSearchBins("SB_v1_2017");
    
   std::cout << "Prediction: " << std::endl;
   //int sidebandLowMT2=0;
@@ -1549,7 +1550,7 @@ NTupleReader *tr =0;
 
 	    if (storePlots)
 	    {
-		EventWeight_mus=1;    //delete this line!!!
+		//EventWeight_mus=1;    //for purity study only!!!
 	    (myClosureHistgram.h_pred_mu_all_met)->Fill(met, EventWeight_all_mus*EventWeight_mus);
 	    (myClosureHistgram.h_pred_mu_all_njets)->Fill(njets30, EventWeight_all_mus*EventWeight_mus);
 	    (myClosureHistgram.h_pred_mu_all_mt2)->Fill(MT2, EventWeight_all_mus*EventWeight_mus);
@@ -1654,7 +1655,7 @@ NTupleReader *tr =0;
 
 	    if (storePlots)
 	    {
-		EventWeight_els=1;    //delete this line!!!
+		//EventWeight_els=1;    //for purity study only!!!
             (myClosureHistgram.h_pred_el_all_met)->Fill(met, EventWeight_all_els*EventWeight_els);
             (myClosureHistgram.h_pred_el_all_njets)->Fill(njets30, EventWeight_all_els*EventWeight_els);
             (myClosureHistgram.h_pred_el_all_mt2)->Fill(MT2, EventWeight_all_els*EventWeight_els);
@@ -1854,8 +1855,8 @@ NTupleReader *tr =0;
 
 	    if (storePlots)
 	    {
-		EventWeight_mus=1;  //delete this line!!!
-		EventWeight_all_mus=1;  //delete this line!!!
+		//EventWeight_mus=1;  //for purity study only!!!
+		//EventWeight_all_mus=1;  //for purity study only!!!
 	    (myClosureHistgram.h_pred_mu_all_met)->Fill(met, EventWeight_all_mus*EventWeight_mus);
 	    (myClosureHistgram.h_pred_mu_all_njets)->Fill(njets30, EventWeight_all_mus*EventWeight_mus);
 	    (myClosureHistgram.h_pred_mu_all_mt2)->Fill(MT2, EventWeight_all_mus*EventWeight_mus);
@@ -1960,8 +1961,8 @@ NTupleReader *tr =0;
 
 	    if (storePlots)
 	    {
-		EventWeight_els=1;  //delete this line!!!
-		EventWeight_all_els=1;  //delete this line!!!
+		//EventWeight_els=1;  //for purity study only!!!
+		//EventWeight_all_els=1;  //for purity study only!!!
             (myClosureHistgram.h_pred_el_all_met)->Fill(met, EventWeight_all_els*EventWeight_els);
             (myClosureHistgram.h_pred_el_all_njets)->Fill(njets30, EventWeight_all_els*EventWeight_els);
             (myClosureHistgram.h_pred_el_all_mt2)->Fill(MT2, EventWeight_all_els*EventWeight_els);
@@ -3045,7 +3046,7 @@ int main(int argc, char* argv[])
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromTbar", 831.76*0.5*TTbar_SingleLept_BR, 60494823, LUMI, inputFileList_Cal );
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_DiLept", 831.76*TTbar_DiLept_BR, 30682233, LUMI, inputFileList_Cal );
 
-  /*myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_top" , 35.6, 998400, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_top" , 35.6, 998400, LUMI, inputFileList_Cal );
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_antitop" , 35.6, 985000, LUMI, inputFileList_Cal );
 
   // 1.21 is the kf
@@ -3055,10 +3056,10 @@ int main(int argc, char* argv[])
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-800To1200" , 5.501*1.21, 7854734, LUMI, inputFileList_Cal );
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-1200To2500" , 1.329*1.21, 7023857, LUMI, inputFileList_Cal );
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-2500ToInf" , 0.03216*1.21, 2507809, LUMI, inputFileList_Cal );
-  */
+  
 
-  LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
-  //LoopLLExp( myAccRecoIsoEffs, myTTJetsSampleWeight );
+  //LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
+  LoopLLExp( myAccRecoIsoEffs, myTTJetsSampleWeight );
   //double results[NSEARCH_BINS]={0};
   //LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, results );
   //LoopLLSyst( myTTJetsSampleWeight );
