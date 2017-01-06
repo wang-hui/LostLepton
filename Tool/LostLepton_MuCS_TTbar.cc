@@ -41,7 +41,7 @@
 #include "LostLepton_MuCS_TTbar.h"
 #include "TTJetsReWeighting.h"
 //#include "v160714_newMuonID_accNoSingleTop_bin7f6_trkSF_EffsHeader_MuCS.h"
-#include "v2_new_EffsHeader_MuCS.h"
+#include "new_EffsHeader_MuCS.h"
 #include "TriggerEff.h"
 #include "SusyAnaTools/Tools/PDFUncertainty.h"
 
@@ -3059,9 +3059,9 @@ int main(int argc, char* argv[])
   
 
   //LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
-  LoopLLExp( myAccRecoIsoEffs, myTTJetsSampleWeight );
-  //double results[NSEARCH_BINS]={0};
-  //LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, results );
+  //LoopLLExp( myAccRecoIsoEffs, myTTJetsSampleWeight );
+  double results[NSEARCH_BINS]={0};
+  LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, results );
   //LoopLLSyst( myTTJetsSampleWeight );
 
   std::cout << "done" << std::endl;

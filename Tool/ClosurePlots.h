@@ -55,59 +55,8 @@ class ClosurePlots
 
 void ClosurePlots::Initialization()
 {
-  //fin = TFile::Open("test.root");
-  //fin = TFile::Open("v151201_0p5fb_ExpLL.root");
-  //fin = TFile::Open("v151201_2p1fb_ExpLL.root");
-  //fin = TFile::Open("v151216_ExpLL.root");
-  //fin = TFile::Open("v160106_ttbar_ExpLL.root");
-  //fin = TFile::Open("v160112_notrigeff_ExpLL.root");
-  //fin = TFile::Open("v160113_notrigeff_ExpLL.root");
-  //fin = TFile::Open("v160217_ttbar_ExpLL.root");
-  //fin = TFile::Open("v160217_ttbar_v3_ExpLL.root");
-  //fin = TFile::Open("v160217_ttbar_v3_invertedDPhi_ExpLL.root");
-  //fin = TFile::Open("v160120_invertedDPhi_ttbar_ExpLL.root");
-  //fin = TFile::Open("v160113_nodilepton_ExpLL.root");
-  //fin = TFile::Open("v160309_ttbarSingletopW_45bins_ExpLL.root");
-  //fin = TFile::Open("v3_ExpLL.root");
-  //fin = TFile::Open("v4_59_ExpLL.root");
-	//fin = TFile::Open("v7_ExpLL.root");
-        //fin = TFile::Open("v160707_invertedDPhi_ExpLL.root");
-        //fin = TFile::Open("v160707_ExpLL.root");
-        //fin = TFile::Open("v160714_newMuonID_ExpLL.root");
-        //fin = TFile::Open("invertedDphi_app_ExpLL.root");
-        fin = TFile::Open("app_ExpLL.root");
-  //fin2 = TFile::Open("v151204_PredLL.root");
-  //fin2 = TFile::Open("v151209_PredLL.root");
-  //fin2 = TFile::Open("v151216_PredLL.root");
-  //fin2 = TFile::Open("ttbar_v151217_PredLL.root");
-  //fin2 = TFile::Open("v160106_ttbar_PredLL.root");
-  //fin2 = TFile::Open("v160106_data_PredLL.root");
-  //fin2 = TFile::Open("v160106_data_trigSel_PredLL.root");
-  //fin2 = TFile::Open("v160112_PredLL.root");
-  //fin2 = TFile::Open("v160112_nomtw_PredLL.root");
-  //fin2 = TFile::Open("v160112_nodilepton_PredLL.root");
-  //fin2 = TFile::Open("v160114_accSB_PredLL.root");
-  //fin2 = TFile::Open("v160114_ttbar_PredLL.root");
-  //fin2 = TFile::Open("v160116_data_PredLL.root");
-  //fin2 = TFile::Open("v160217_ttbar_PredLL.root");
-  //fin2 = TFile::Open("v160217_ttbar_v3_PredLL.root");
-	//fin2 = TFile::Open("v160309_ttbarSingletopW_45bins_PredLL.root");
-	//fin2 = TFile::Open("v4_PredLL.root");
-	//fin2 = TFile::Open("v4_59_PredLL.root");
-	//fin2 = TFile::Open("v5_PredLL.root");
-	//fin2 = TFile::Open("v6_PredLL.root");
-	//fin2 = TFile::Open("v7_MC_PredLL.root");
-        //fin2 = TFile::Open("v160707_invertedDPhi_PredLL.root");
-        //fin2 = TFile::Open("v160707c_PredLL.root");
-        //fin2 = TFile::Open("v160714b_newMuonID_PredLL.root");
-        //fin2 = TFile::Open("v160714_newMuonID_accNoSingleTop_PredLL.root");
-        //fin2 = TFile::Open("v160714_newMuonID_accNoSingleTop_bin7f6_PredLL.root");
-        //fin2 = TFile::Open("invertedDphi_app_PredLL.root");
-        fin2 = TFile::Open("app_PredLL.root");
-  //fin2 = TFile::Open("v160217_ttbar_v3_invertedDPhi_PredLL.root");
-  //fin2 = TFile::Open("v160120_invertedDPhi_ttbar_PredLL.root");
-  //fin2 = TFile::Open("v160122_accfromInvertedDPhi_PredLL.root");
-  //fin2 = TFile::Open("v160122_efffromInvertedDPhi_PredLL.root");
+  fin = TFile::Open("ExpLL.root");
+  fin2 = TFile::Open("PredLL_mu_2D.root");
   list = fin->GetListOfKeys();
   list2 = fin2->GetListOfKeys();
   scale=1.0;
@@ -183,7 +132,7 @@ void ClosurePlots::DiLeptonPlots(
   leg->Draw("same");
 
   c->SaveAs( TString("Plotsc/") + DLhist + TString("_compare.png") );
-  c->SaveAs( TString("Plotsc/") + DLhist + TString("_compare.C") );
+  //c->SaveAs( TString("Plotsc/") + DLhist + TString("_compare.C") );
 }
 
 void ClosurePlots::ClosureTemplate(
@@ -363,7 +312,7 @@ void ClosurePlots::ClosureTemplate(
 	h_pred->SetFillStyle(3001);
 	h_pred->Draw("E2 same");
 
-  SearchBins theSearchBins("SB_59_2016");
+  SearchBins theSearchBins("SB_v1_2017");
   if( hist_tag.Contains("_sb") ){ theSearchBins.drawSBregionDef(0.0, 75.0, true); }
   title->Draw("same");
   leg->Draw("same");
@@ -395,8 +344,8 @@ void ClosurePlots::ClosureTemplate(
   tl_one->DrawLine(min,1.,max,1.);
 
   c->SaveAs( TString("Plotsc/") + hist_tag + TString(".png") );
-  c->SaveAs( TString("Plotsc/") + hist_tag + TString(".pdf") );
-  c->SaveAs( TString("Plotsc/") + hist_tag + TString(".C") );
+  //c->SaveAs( TString("Plotsc/") + hist_tag + TString(".pdf") );
+  //c->SaveAs( TString("Plotsc/") + hist_tag + TString(".C") );
 
 	/*
   TCanvas *c = new TCanvas("c","A Simple Graph Example",200,10,700,500); 
