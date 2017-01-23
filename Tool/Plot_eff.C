@@ -2,7 +2,7 @@
 
 void Plot_eff()
 {
-  TFile f_eff("v160302_ttbarSTWv6_Effs2dPlots.root");
+  TFile f_eff("v2_Effs2dPlots.root");
 
   const std::string titre="CMS Supplementary";
 
@@ -30,7 +30,7 @@ void Plot_eff()
   //h_mu_iso_eff_ori->Draw("colztext");
 
   TH2F *h_mu_iso_eff;
- h_mu_iso_eff = new TH2F("h_mu_iso_eff", "h_mu_iso_eff", nxbin, xbins, nybin, ybins);
+  h_mu_iso_eff = new TH2F("h_mu_iso_eff", "h_mu_iso_eff", nxbin, xbins, nybin, ybins);
   h_mu_iso_eff->SetTitle("");
   h_mu_iso_eff->SetXTitle("muon p_{T} [GeV]");
   h_mu_iso_eff->SetYTitle("activity");
@@ -61,9 +61,9 @@ void Plot_eff()
 
    CMSStylePlot::CMS_lumi( c1, 0, 0 );
 
-  c1->SaveAs( "_mu_2d_iso_eff.png" );
-  c1->SaveAs( "2deffs_mus_iso.pdf" );
-  c1->SaveAs( "_mu_2d_iso_eff.C" );
+  //c1->SaveAs( "_mu_2d_iso_eff.png" );
+  c1->SaveAs( "v2_2deffs_mus_iso.pdf" );
+  //c1->SaveAs( "_mu_2d_iso_eff.C" );
   }
 
   ///////////////////
@@ -115,9 +115,9 @@ void Plot_eff()
 
    CMSStylePlot::CMS_lumi( c2, 0, 0 );
 
-  c2->SaveAs( "_el_2d_iso_eff.png" );
-  c2->SaveAs( "2deffs_els_iso.pdf" );
-  c2->SaveAs( "_el_2d_iso_eff.C" );
+  //c2->SaveAs( "_el_2d_iso_eff.png" );
+  c2->SaveAs( "v2_2deffs_els_iso.pdf" );
+  //c2->SaveAs( "_el_2d_iso_eff.C" );
 
   }
 
@@ -169,9 +169,9 @@ void Plot_eff()
 
    CMSStylePlot::CMS_lumi( c3, 0, 0 );
 
-  c3->SaveAs( "_mu_2d_reco_eff.png" );
-  c3->SaveAs( "2deffs_mus_reco.pdf" );
-  c3->SaveAs( "_mu_2d_reco_eff.C" );
+  //c3->SaveAs( "_mu_2d_reco_eff.png" );
+  c3->SaveAs( "v2_2deffs_mus_reco.pdf" );
+  //c3->SaveAs( "_mu_2d_reco_eff.C" );
   }
   ///////////////////
   //     c4
@@ -220,8 +220,8 @@ void Plot_eff()
 
    CMSStylePlot::CMS_lumi( c4, 0, 0 );
 
-  c4->SaveAs( "_el_2d_reco_eff.png" );
-  c4->SaveAs( "2deffs_els_reco.pdf" );
-  c4->SaveAs( "_el_2d_reco_eff.C" );
+  //c4->SaveAs( "_el_2d_reco_eff.png" );
+  c4->SaveAs( "v2_2deffs_els_reco.pdf" );
+  //c4->SaveAs( "_el_2d_reco_eff.C" );
   }
 }

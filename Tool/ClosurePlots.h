@@ -56,7 +56,7 @@ class ClosurePlots
 void ClosurePlots::Initialization()
 {
   fin = TFile::Open("ExpLL.root");
-  fin2 = TFile::Open("PredLL_mu_2D.root");
+  fin2 = TFile::Open("v1_PredLL_pure_el.root");
   list = fin->GetListOfKeys();
   list2 = fin2->GetListOfKeys();
   scale=1.0;
@@ -117,7 +117,7 @@ void ClosurePlots::DiLeptonPlots(
   //const std::string titre="CMS Preliminary 2016, 2.3 fb^{-1}, #sqrt{s} = 13 TeV";
   //const std::string titre="CMS Preliminary 2016, 8.0 fb^{-1}, #sqrt{s} = 13 TeV";
   //const std::string titre="CMS Preliminary 2016, 7.6 fb^{-1}, #sqrt{s} = 13 TeV";
-  const std::string titre="CMS Preliminary 2016, 12.9 fb^{-1}, #sqrt{s} = 13 TeV";
+  const std::string titre="CMS Supplementary, 36.4 fb^{-1}, #sqrt{s} = 13 TeV";
   TLatex *title = new TLatex(0.09770115,0.9194915,titre.c_str());
   title->SetNDC();
   title->SetTextSize(0.045);
@@ -132,7 +132,7 @@ void ClosurePlots::DiLeptonPlots(
   leg->Draw("same");
 
   c->SaveAs( TString("Plotsc/") + DLhist + TString("_compare.png") );
-  //c->SaveAs( TString("Plotsc/") + DLhist + TString("_compare.C") );
+  c->SaveAs( TString("Plotsc/") + DLhist + TString("_compare.C") );
 }
 
 void ClosurePlots::ClosureTemplate(
@@ -205,7 +205,7 @@ void ClosurePlots::ClosureTemplate(
     
   h_ratio = static_cast<TH1*>(h_exp->Clone("Ratio"));
   h_ratio->Divide(h_pred);
-	h_ratio->SetMarkerSize(1);
+  h_ratio->SetMarkerSize(1);
   h_ratio->GetYaxis()->SetTitle("#frac{Direct}{Prediction}");
   //h_ratio->GetYaxis()->SetRangeUser(0.0,5.1);
   h_ratio->SetTitle("");
@@ -222,10 +222,6 @@ void ClosurePlots::ClosureTemplate(
   h_ratio->GetXaxis()->SetTitleSize(0.16);
   h_ratio->GetXaxis()->SetTitleFont(42);
   h_ratio->GetXaxis()->SetTitleOffset(0.6);
-  if ( hist_tag.Contains("_sb") )
-  {
-    h_ratio->GetXaxis()->SetTitle("Search region bin number");
-  }
 
   //Create LUMI stamp
   //const std::string titre="CMS Preliminary 2015, "+ lumi_str + " fb^{-1}, #sqrt{s} = 13 TeV";
@@ -233,14 +229,14 @@ void ClosurePlots::ClosureTemplate(
   //const std::string titre="CMS Supplementary                                                             2.3 fb^{-1}(13 TeV)";
   //const std::string titre="CMS Supplementary                                                             8.0 fb^{-1}(13 TeV)";
   //const std::string titre="CMS Supplementary                                                             7.6 fb^{-1}(13 TeV)";
-  const std::string titre="CMS Supplementary                                                           12.9 fb^{-1}(13 TeV)";
+  const std::string titre="CMS Supplementary                                                             36.4 fb^{-1}(13 TeV)";
 
   TLatex *title = new TLatex(0.09770115,0.9194915,titre.c_str());
   title->SetNDC();
   title->SetTextSize(0.045);
 
   //Create Legend
-	TLegend* leg = new TLegend(0.55,0.75,0.90,0.90);
+  TLegend* leg = new TLegend(0.55,0.75,0.90,0.90);
   leg->SetBorderSize(1);
   leg->SetLineColor(1);
   leg->SetLineWidth(2);
@@ -253,10 +249,10 @@ void ClosurePlots::ClosureTemplate(
   //leg->AddEntry(hPred[0],"Treat simulation like data","L");
   leg->AddEntry(h_pred,"Treat simulation like data");
 
-	//Draw plots on Canvas
+  //Draw plots on Canvas
   TCanvas *c = new TCanvas("c","",50,50,800,600); 
-	//HistStyle::init();
-	gStyle->SetOptStat(0);
+  //HistStyle::init();
+  gStyle->SetOptStat(0);
 
   TPad *pad = (TPad*) c->GetPad(0); 
   pad->Clear();
@@ -272,18 +268,20 @@ void ClosurePlots::ClosureTemplate(
   pad1->SetBottomMargin(0.005);
   pad1->SetBorderMode(0);
   
-	TExec *setex = new TExec("setex", "gStyle->SetErrorX(0.0)");
+  TExec *setex = new TExec("setex", "gStyle->SetErrorX(0.0)");
 
-	if( hist_tag.Contains("_sb") )
-	{ 
-	  pad1->SetLogy(); 
-	  //h_exp->GetXaxis()->SetRangeUser(0.,45);
-    h_exp->GetXaxis()->SetRangeUser(0.,NSEARCH_BINS);
-	  //h_exp->GetYaxis()->SetRangeUser(0.,100);
+  if( hist_tag.Contains("_sb") || hist_tag.Contains("_isotrk") )
+  { 
+  pad1->SetLogy(); 
+  //h_exp->GetXaxis()->SetRangeUser(0.,45);
+  h_exp->GetXaxis()->SetRangeUser(0.,NSEARCH_BINS);
+  //h_exp->GetYaxis()->SetRangeUser(0.,100);
+  h_exp->SetMinimum(0.005);
 
-		Double_t pred,exp,pred_err,exp_err;
-		//double non_closure_unc[45] ={-10};
-		double non_closure_unc[NSEARCH_BINS] ={-10};
+  Double_t pred,exp,pred_err,exp_err;
+  //double non_closure_unc[45] ={-10};
+  double non_closure_unc[NSEARCH_BINS] ={-10};
+
     for (Int_t i = 1; i < h_pred->GetNbinsX(); i++)
     {
       pred = h_pred->GetBinContent(i);
@@ -303,14 +301,14 @@ void ClosurePlots::ClosureTemplate(
         //std::cout << "i: " << i << " Pred: "<< pred << " Exp: "<< exp << " Ratio: " << r-1 << " Error: " << e << std::endl;
       }
     }
-	}
+  }
 	  
-	setex->Draw();
-	h_exp->Draw("PE1");
+  setex->Draw();
+  h_exp->Draw("PE1");
   h_pred->DrawCopy("hist same");
-	h_pred->SetFillColor(kBlue-4);
-	h_pred->SetFillStyle(3001);
-	h_pred->Draw("E2 same");
+  h_pred->SetFillColor(kBlue-4);
+  h_pred->SetFillStyle(3001);
+  h_pred->Draw("E2 same");
 
   SearchBins theSearchBins("SB_v1_2017");
   if( hist_tag.Contains("_sb") ){ theSearchBins.drawSBregionDef(0.0, 75.0, true); }
@@ -319,15 +317,15 @@ void ClosurePlots::ClosureTemplate(
 
   c->Update(); 
   
-	pad->cd(2);
+  pad->cd(2);
   TPad *pad2 = (TPad*) pad->GetPad(2);
   pad2->SetPad("ratio", "", 0, 0, 1.0, divRatio, kWhite);
   pad2->SetBottomMargin(0.3);
   pad2->SetTopMargin(small);
   pad2->SetBorderMode(0);
 
-  h_ratio->SetMaximum(1.8);
-  h_ratio->SetMinimum(0.4);
+  h_ratio->SetMaximum(2);
+  h_ratio->SetMinimum(0);
   if( hist_tag.Contains("_sb") )
   {
     h_ratio->GetXaxis()->SetLabelSize(0.1);
@@ -345,7 +343,7 @@ void ClosurePlots::ClosureTemplate(
 
   c->SaveAs( TString("Plotsc/") + hist_tag + TString(".png") );
   //c->SaveAs( TString("Plotsc/") + hist_tag + TString(".pdf") );
-  //c->SaveAs( TString("Plotsc/") + hist_tag + TString(".C") );
+  c->SaveAs( TString("Plotsc/") + hist_tag + TString(".C") );
 
 	/*
   TCanvas *c = new TCanvas("c","A Simple Graph Example",200,10,700,500); 

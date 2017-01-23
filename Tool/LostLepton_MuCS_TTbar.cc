@@ -41,23 +41,23 @@
 #include "LostLepton_MuCS_TTbar.h"
 #include "TTJetsReWeighting.h"
 //#include "v160714_newMuonID_accNoSingleTop_bin7f6_trkSF_EffsHeader_MuCS.h"
-#include "new_EffsHeader_MuCS.h"
+#include "v6_EffsHeader_MuCS.h"
 #include "TriggerEff.h"
-#include "SusyAnaTools/Tools/PDFUncertainty.h"
+//#include "SusyAnaTools/Tools/PDFUncertainty.h"
 
 //const double isotrackvetoeff = 0.563499421;
 const bool applyisotrkveto = false; // should be false
 //const double isotrackvetoeff = 1;
+double isotrkeff[NSEARCH_BINS];
 
 const bool use_muon_control_sample = true;
 const bool use_electron_control_sample = false;
-
-double isotrkeff[NSEARCH_BINS];
+const double electron_purity = 0.96;
 
 void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSampleWeight )
 {
   BaseHistgram myBaseHistgram;
-  myBaseHistgram.BookHistgram("new_test.root");
+  myBaseHistgram.BookHistgram("v1_Cal.root");
 
 NTupleReader *tr =0;
 
@@ -101,8 +101,8 @@ NTupleReader *tr =0;
 
     //std::cout << "The PDFUncertainty is registered here" << std::endl;
  
-    PDFUncertainty pdf;
-    tr.registerFunction(pdf);
+    //PDFUncertainty pdf;
+    //tr.registerFunction(pdf);
 
     double thisweight = (*iter_TTJetsSampleInfos).weight;
     std::cout << "Weight " << thisweight << std::endl;
@@ -145,10 +145,10 @@ NTupleReader *tr =0;
       if (passBaselinelostlept)
 	//if (passInvertedBaseline)
       {
-	const double pdf_Unc_Up = tr.getVar<double>("NNPDF_From_Median_Up");
-	const double pdf_Unc_Down = tr.getVar<double>("NNPDF_From_Median_Down");
-        const double scaleUp = tr.getVar<double>("Scaled_Variations_Up");
-        const double scaleDown = tr.getVar<double>("Scaled_Variations_Down");
+	//const double pdf_Unc_Up = tr.getVar<double>("NNPDF_From_Median_Up");
+	//const double pdf_Unc_Down = tr.getVar<double>("NNPDF_From_Median_Down");
+        //const double scaleUp = tr.getVar<double>("Scaled_Variations_Up");
+        //const double scaleDown = tr.getVar<double>("Scaled_Variations_Down");
  
         //std::cout << "pdfUp = " << pdf_Unc_Up << std::endl;
 	const double systWeight=1.0;
@@ -550,7 +550,6 @@ NTupleReader *tr =0;
           {
             myAccRecoIsoEffs.mtw100[ptbin_number_allreco]+=thisweight;
             myAccRecoIsoEffs.mtw100_MC[ptbin_number_allreco]+=thisweight*thisweight;
-          }
 
           //muon CS statistics
           //int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met );
@@ -562,6 +561,7 @@ NTupleReader *tr =0;
             myAccRecoIsoEffs.nevents_mus_CS_SB_MC[searchbin_id]++;
             myAccRecoIsoEffs.nevents_mus_CS_SB_Normalized[searchbin_id]+=thisweight;
           }
+	  }
         }
 
 	if (nElectrons == 0 && nMuons == 0 && (ngenmu==1 || ngenmu==2 || ngenel==1 || ngenel==2))
@@ -599,14 +599,39 @@ NTupleReader *tr =0;
     else
     {
       isotrkeff[searchbinc]=neventsSB_afterITV[searchbinc]/neventsSB[searchbinc];
-      //std::cout << "neventsSB[" << searchbinc << "] = " << neventsSB[searchbinc] << " , neventsSB_afterITV = " << neventsSB_afterITV[searchbinc] << " , ratio = " << isotrkeff[searchbinc] << std::endl;
-      std::cout << "isotrackeff_SB[" << searchbinc << "] = " << isotrkeff[searchbinc] << std::endl;
+      std::cout << "isotrack bin " << searchbinc << " pass " << neventsSB_afterITV[searchbinc] << " all " << neventsSB[searchbinc] << " eff " << isotrkeff[searchbinc] << " raw pass " << neventsSB_afterITV_MC[searchbinc] << " raw all " << neventsSB_MC[searchbinc] << std::endl;
+      //std::cout << "isotrackeff_SB[" << searchbinc << "] = " << isotrkeff[searchbinc] << std::endl;
     }
   }
+
+   std::cout << "13 () = " <<(neventsSB_afterITV[13]+neventsSB_afterITV[14])/(neventsSB[13]+neventsSB[14])<< " err = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[13] + neventsSB_afterITV_MC[14] ,neventsSB_MC[13] + neventsSB_MC[14]) << std::endl;
+   std::cout << "18 () = " <<(neventsSB_afterITV[18]+neventsSB_afterITV[19]+neventsSB_afterITV[20])/(neventsSB[18]+neventsSB[19]+neventsSB[20])<< " err = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[18] + neventsSB_afterITV_MC[19] + neventsSB_afterITV_MC[20] ,neventsSB_MC[18] + neventsSB_MC[19] + neventsSB_MC[20]) << std::endl;
+   std::cout << "19 () = " <<(neventsSB_afterITV[18]+neventsSB_afterITV[19]+neventsSB_afterITV[20])/(neventsSB[18]+neventsSB[19]+neventsSB[20])<< " err = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[18] + neventsSB_afterITV_MC[19] + neventsSB_afterITV_MC[20] ,neventsSB_MC[18] + neventsSB_MC[19] + neventsSB_MC[20]) << std::endl;
+   std::cout << "20 () = " <<(neventsSB_afterITV[18]+neventsSB_afterITV[19]+neventsSB_afterITV[20])/(neventsSB[18]+neventsSB[19]+neventsSB[20])<< " err = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[18] + neventsSB_afterITV_MC[19] + neventsSB_afterITV_MC[20] ,neventsSB_MC[18] + neventsSB_MC[19] + neventsSB_MC[20]) << std::endl;
+   std::cout << "29 () = " <<(neventsSB_afterITV[29]+neventsSB_afterITV[28])/(neventsSB[28]+neventsSB[29])<< " err = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[29] + neventsSB_afterITV_MC[28] ,neventsSB_MC[29] + neventsSB_MC[28]) << std::endl;
+   std::cout << "34 () = " <<(neventsSB_afterITV[34]+neventsSB_afterITV[35]+neventsSB_afterITV[36])/(neventsSB[34]+neventsSB[35]+neventsSB[36])<< " err = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[34] + neventsSB_afterITV_MC[35] + neventsSB_afterITV_MC[36] ,neventsSB_MC[34] + neventsSB_MC[35] + neventsSB_MC[36]) << std::endl;
+   std::cout << "35 () = " <<(neventsSB_afterITV[34]+neventsSB_afterITV[35]+neventsSB_afterITV[36])/(neventsSB[34]+neventsSB[35]+neventsSB[36])<< " err = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[34] + neventsSB_afterITV_MC[35] + neventsSB_afterITV_MC[36] ,neventsSB_MC[34] + neventsSB_MC[35] + neventsSB_MC[36]) << std::endl;
+   std::cout << "36 () = " <<(neventsSB_afterITV[34]+neventsSB_afterITV[35]+neventsSB_afterITV[36])/(neventsSB[34]+neventsSB[35]+neventsSB[36])<< " err = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[34] + neventsSB_afterITV_MC[35] + neventsSB_afterITV_MC[36] ,neventsSB_MC[34] + neventsSB_MC[35] + neventsSB_MC[36]) << std::endl;
+   std::cout << "40 () = " <<(neventsSB_afterITV[39]+neventsSB_afterITV[40])/(neventsSB[39]+neventsSB[40])<< " err = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[39] + neventsSB_afterITV_MC[40] ,neventsSB_MC[39] + neventsSB_MC[40]) << std::endl;
+   std::cout << "51 () = " <<(neventsSB_afterITV[51]+neventsSB_afterITV[50])/(neventsSB[51]+neventsSB[50])<< " err = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[51] + neventsSB_afterITV_MC[50] ,neventsSB_MC[51] + neventsSB_MC[50]) << std::endl;
+   std::cout << "57 () = " <<(neventsSB_afterITV[57]+neventsSB_afterITV[56])/(neventsSB[57]+neventsSB[56])<< " err = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[56] + neventsSB_afterITV_MC[57] ,neventsSB_MC[56] + neventsSB_MC[57]) << std::endl;
+   std::cout << "61 () = " <<(neventsSB_afterITV[61]+neventsSB_afterITV[60])/(neventsSB[61]+neventsSB[60])<< " err = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[60] + neventsSB_afterITV_MC[61] ,neventsSB_MC[60] + neventsSB_MC[61]) << std::endl;
+   std::cout << "67 () = " <<(neventsSB_afterITV[67]+neventsSB_afterITV[69])/(neventsSB[67]+neventsSB[69])<< " err = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[67] + neventsSB_afterITV_MC[69] ,neventsSB_MC[67] + neventsSB_MC[69]) << std::endl;
+   std::cout << "77 () = " <<(neventsSB_afterITV[77]+neventsSB_afterITV[76])/(neventsSB[77]+neventsSB[76])<< " err = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[76] + neventsSB_afterITV_MC[77] ,neventsSB_MC[76] + neventsSB_MC[77]) << std::endl;
+   std::cout << "79 () = " <<(neventsSB_afterITV[79]+neventsSB_afterITV[78])/(neventsSB[79]+neventsSB[78])<< " err = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[79] + neventsSB_afterITV_MC[78] ,neventsSB_MC[79] + neventsSB_MC[78]) << std::endl;
+   std::cout << "81 () = " <<(neventsSB_afterITV[81]+neventsSB_afterITV[80])/(neventsSB[81]+neventsSB[80])<< " err = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[81] + neventsSB_afterITV_MC[80] ,neventsSB_MC[81] + neventsSB_MC[80]) << std::endl;
+   std::cout << "83 () = " <<(neventsSB_afterITV[83]+neventsSB_afterITV[82])/(neventsSB[83]+neventsSB[82])<< " err = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[83] + neventsSB_afterITV_MC[82] ,neventsSB_MC[83] + neventsSB_MC[82]) << std::endl;
+
   for( int searchbinc = 0 ; searchbinc < NSEARCH_BINS ; ++searchbinc )
   {
     std::cout << "isoTrackErr[" << searchbinc << "] = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[searchbinc],neventsSB_MC[searchbinc]) << ";" << std::endl;
   }
+
+  std::cout << "Muon CS # in Search Bins: " << std::endl;  
+  for( int searchbinc = 0 ; searchbinc < NSEARCH_BINS ; ++searchbinc )
+  {
+  std::cout << "bin " << searchbinc << " raw events " << myAccRecoIsoEffs.nevents_mus_CS_SB_MC[searchbinc] << " weighted events " << myAccRecoIsoEffs.nevents_mus_CS_SB_Normalized[searchbinc] << std::endl;
+  } 
 
 // debug
   /*for( int searchbinc = 0 ; searchbinc < NSEARCH_BINS ; ++searchbinc )
@@ -1202,23 +1227,23 @@ NTupleReader *tr =0;
   }//end of first loop
 
   // printSearchBin
-//  //std::cout << "Muon CS # in Search Bins: " << std::endl;  
-//  for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
-//  {
+  //std::cout << "Muon CS # in Search Bins: " << std::endl;
+  //for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
+  //{
 //    //myAccRecoIsoEffs.nevents_lept_exp_SB_MC[i_cal] = nevents_mus_exp_SB_MC[i_cal] + nevents_els_exp_SB_MC[i_cal];
 //    //nevents_lept_pred_SB_MC[i_cal] = nevents_mus_pred_SB_MC[i_cal] + nevents_els_pred_SB_MC[i_cal];
 //    //myAccRecoIsoEffs.nevents_lept_exp_SB_Normalized[i_cal] = nevents_mus_exp_SB_Normalized[i_cal] + nevents_els_exp_SB_Normalized[i_cal];
 //    //myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal] = nevents_mus_pred_SB_Normalized[i_cal] + nevents_els_pred_SB_Normalized[i_cal];
 //    //nevents_lept_pred_SB_Normalized[i_cal] = nevents_lept_pred_SB_MC[i_cal]*scale;
 //
-//    //std::cout << "idx: " << i_cal << "; MC Numbers: " << nevents_mus_CS_SB_MC[i_cal] << "; Normalized Numbers: " << nevents_mus_CS_SB_Normalized[i_cal] << std::endl;
-//    //std::cout << "Mus Exp MC Numbers: " << nevents_mus_exp_SB_MC[i_cal] << "; Mus Exp Normalized Numbers: " << nevents_mus_exp_SB_Normalized[i_cal] << std::endl;
+  //std::cout << "idx: " << i_cal << "; MC Numbers: " << myAccRecoIsoEffs.nevents_mus_CS_SB_MC[i_cal] << "; Normalized Numbers: " << myAccRecoIsoEffs.nevents_mus_CS_SB_Normalized[i_cal] << std::endl;
+  //std::cout << "Mus Exp MC Numbers: " << myAccRecoIsoEffs.nevents_mus_exp_SB_MC[i_cal] << "; Mus Exp Normalized Numbers: " << myAccRecoIsoEffs.nevents_mus_exp_SB_Normalized[i_cal] << std::endl;
 //    //std::cout << "Mus Pred Normalized Numbers: " << nevents_mus_pred_SB_Normalized[i_cal] << std::endl;
-//    //std::cout << "Els Exp MC Numbers: " << nevents_els_exp_SB_MC[i_cal] << "; Els Exp Normalized Numbers: " << nevents_els_exp_SB_Normalized[i_cal] << std::endl;
+  //std::cout << "Els Exp MC Numbers: " << myAccRecoIsoEffs.nevents_els_exp_SB_MC[i_cal] << "; Els Exp Normalized Numbers: " << myAccRecoIsoEffs.nevents_els_exp_SB_Normalized[i_cal] << std::endl;
 //    //std::cout << "Els Pred Normalized Numbers: " << nevents_els_pred_SB_Normalized[i_cal] << std::endl;
 //    std::cout << "Lept Exp MC Numbers: " << myAccRecoIsoEffs.nevents_lept_exp_SB_MC[i_cal] << "; Lept Exp Normalized Numbers: " << myAccRecoIsoEffs.nevents_lept_exp_SB_Normalized[i_cal] << std::endl;
 //    //std::cout << "Lept Pred Normalized Numbers: " << nevents_lept_pred_SB_Normalized[i_cal] << std::endl;
-//  }
+  //}
   
 //  TH1D * h_cs_mus_sb = new TH1D("h_cs_mus_sb","",NSEARCH_BINS+1,0,NSEARCH_BINS+1);
 //
@@ -1320,9 +1345,10 @@ NTupleReader *tr =0;
 
 void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSampleWeight, double resultspred[NSEARCH_BINS] )
 {
-  const bool storePlots=true;
+  const bool storePlots = false;  //set to false when running LLSys
   ClosureHistgram myClosureHistgram;
-  if (storePlots) myClosureHistgram.BookHistgram("PredLL_mu_2D.root");
+  if (storePlots) myClosureHistgram.BookHistgram("v1_PredLL_pure_el.root");
+  //if (storePlots) myClosureHistgram.BookHistgram("v2_PredLL_data.root");
 
 NTupleReader *tr =0;
 
@@ -1366,23 +1392,25 @@ NTupleReader *tr =0;
       //const double& SusyMotherMass  = trCS.getVar<double>("SusyMotherMass");
       //const double& SusyLSPMass     = trCS.getVar<double>("SusyLSPMass");
 
-//      std::vector<std::string> TriggerNames = trCS.getVec<std::string>("TriggerNames");
-//      std::vector<int> PassTrigger = trCS.getVec<int>("PassTrigger");
-//      bool foundTrigger = false;
-//
-//      for(unsigned it=0; it<TriggerNames.size(); it++)
-//      {
-//	if( TriggerNames[it].find("HLT_PFHT350_PFMET100_JetIdCleaned_v") || TriggerNames[it].find("HLT_PFHT350_PFMET100_NoiseCleaned_v") || TriggerNames[it].find("HLT_PFHT350_PFMET100_v*") )
-//	{
-//	  if( PassTrigger[it] ) foundTrigger = true;
-//	}
-//      }
-//
-      //HLT_PFHT300_PFMET100_v
-      //if( !foundTrigger ) std::cout << "FL: trigger not found" << std::endl;
-      //FSLICHEP//if( !foundTrigger ) continue;
+      std::vector<std::string> TriggerNames = trCS.getVec<std::string>("TriggerNames");
+      std::vector<int> PassTrigger = trCS.getVec<int>("PassTrigger");
+      bool foundTrigger = false;
 
-      //std::cout << "FSL: test" << std::endl;
+/*      //for data only!!!
+      for(unsigned it=0; it<TriggerNames.size(); it++)
+      {
+	using namespace std;
+
+	//if( TriggerNames[it].find("HLT_PFHT350_PFMET100_JetIdCleaned_v") || TriggerNames[it].find("HLT_PFHT350_PFMET100_NoiseCleaned_v") || TriggerNames[it].find("HLT_PFHT350_PFMET100_v*") )
+	if( TriggerNames[it].find("HLT_PFMET170_NoiseCleaned_v")!= string::npos || TriggerNames[it].find("HLT_PFMET170_JetIdCleaned_v") != string::npos || TriggerNames[it].find("HLT_PFMET170_HBHECleaned_v") != string::npos || TriggerNames[it].find("HLT_PFMET100_PFMHT100_IDTight_v") != string::npos || TriggerNames[it].find("HLT_PFMET110_PFMHT110_IDTight_v")!= string::npos || TriggerNames[it].find("HLT_PFMET120_PFMHT120_IDTight_v")!= string::npos || TriggerNames[it].find("HLT_PFMET130_PFMHT130_IDTight_v")!= string::npos || TriggerNames[it].find("HLT_PFMET140_PFMHT140_IDTight_v")!= string::npos || TriggerNames[it].find("HLT_PFMET150_PFMHT150_IDTight_v")!= string::npos)
+
+	{
+	  if( PassTrigger[it] ) foundTrigger = true;
+	}
+      }
+      if( !foundTrigger ) continue;
+
+*/      //std::cout << "FSL: test" << std::endl;
 
       bool passLeptVeto = trCS.getVar<bool>("passLeptVeto"+spec);
       bool passnJets = trCS.getVar<bool>("passnJets"+spec);
@@ -1550,7 +1578,6 @@ NTupleReader *tr =0;
 
 	    if (storePlots)
 	    {
-		//EventWeight_mus=1;    //for purity study only!!!
 	    (myClosureHistgram.h_pred_mu_all_met)->Fill(met, EventWeight_all_mus*EventWeight_mus);
 	    (myClosureHistgram.h_pred_mu_all_njets)->Fill(njets30, EventWeight_all_mus*EventWeight_mus);
 	    (myClosureHistgram.h_pred_mu_all_mt2)->Fill(MT2, EventWeight_all_mus*EventWeight_mus);
@@ -1655,7 +1682,6 @@ NTupleReader *tr =0;
 
 	    if (storePlots)
 	    {
-		//EventWeight_els=1;    //for purity study only!!!
             (myClosureHistgram.h_pred_el_all_met)->Fill(met, EventWeight_all_els*EventWeight_els);
             (myClosureHistgram.h_pred_el_all_njets)->Fill(njets30, EventWeight_all_els*EventWeight_els);
             (myClosureHistgram.h_pred_el_all_mt2)->Fill(MT2, EventWeight_all_els*EventWeight_els);
@@ -1815,7 +1841,7 @@ NTupleReader *tr =0;
         if (n_gen_electron=1 && elesLVec.at(0).DeltaR(gen_LVec.at(temp))< 0.4)
         {*/ 
 
-        int n_gen_electron=0;
+        /*int n_gen_electron=0;
         for(int i=0; i < PdgId.size(); i++)
         {
         if(PdgId.at(i) == 11 || PdgId.at(i) == -11 && elesLVec.at(0).DeltaR(gen_LVec.at(i))< 0.2)
@@ -1823,7 +1849,7 @@ NTupleReader *tr =0;
         n_gen_electron++;}
         }
         if (n_gen_electron > 0)
-	{
+	{*/
 
             //muon prediction from muon CS
 	    if (storePlots)
@@ -2022,7 +2048,7 @@ NTupleReader *tr =0;
             myAccRecoIsoEffs.nevents_pred_acc_els_err += myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number][htbin_number][searchbin_id]*EventWeight_els*myAccRecoIsoEffs.els_EventWeight_acc[njetsbin_number][ptbin_number][acbin_number][htbin_number][searchbin_id]*EventWeight_els;
             myAccRecoIsoEffs.nevents_pred_id_els_err += myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number][htbin_number][searchbin_id]*EventWeight_els*myAccRecoIsoEffs.els_EventWeight_reco[njetsbin_number][ptbin_number][acbin_number][htbin_number][searchbin_id]*EventWeight_els;
             myAccRecoIsoEffs.nevents_pred_iso_els_err += myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number][htbin_number][searchbin_id]*EventWeight_els*myAccRecoIsoEffs.els_EventWeight_iso[njetsbin_number][ptbin_number][acbin_number][htbin_number][searchbin_id]*EventWeight_els;
-         }//end of electron purity
+         //}//end of electron purity
 	 }//mtW5_els<125 (muon CS)
         }//nElectrons == 0 && nMuons == 1 (muon CS)
 	}//end of bool: use_electron_control_sample
@@ -2062,12 +2088,17 @@ NTupleReader *tr =0;
 
  double psystdown[59]={0.135041 ,  0.17512 ,  0.25655 ,  0.429403 ,  0.180822 ,  0.161191 ,  0.269557 ,  2.70448 ,  0.394197 ,  0.207341 ,  0.252545 ,  0.232165 ,  0.133252 ,  0.163376 ,  0.297673 ,  2.15843 ,  0.213299 ,  0.19908 ,  0.274622 ,  0.596593 ,  0.230761 ,  0.413593 ,  0.63333 ,  0.143975 ,  0.21637 ,  0.502754 ,  0.209333 ,  0.240647 ,  0.154642 ,  0.25382 ,  0.368643 ,  2.96625 ,  0.176922 ,  0.216364 ,  0.392408 ,  0.670447 ,  0.360404 ,  0.274704 ,  0.365873 ,  0.658942 ,  0.153364 ,  0.206316 ,  0.33079 ,  0.167786 ,  0.278542 ,  0.401816 ,  0.560994 ,  0.286035 ,  0.347855 ,  0.176094 ,  1.32009 ,  0.252893 ,  0.338503 ,  0.841751 ,  0.445161 ,  0.242563 ,  0.410078 ,  0.402505 ,  0.626202};
 
- std::cout.precision(1);
+ //std::cout.precision(1);
  //std::cout.precision(3);
- //std::cout.precision(5);
+ std::cout.precision(5);
  std::cout << std::fixed;
   for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
   {
+
+    if (use_electron_control_sample)
+    {myAccRecoIsoEffs.nevents_mus_pred_SB_Normalized[i_cal] = myAccRecoIsoEffs.nevents_mus_pred_SB_Normalized[i_cal] * electron_purity;
+    myAccRecoIsoEffs.nevents_els_pred_SB_Normalized[i_cal] = myAccRecoIsoEffs.nevents_els_pred_SB_Normalized[i_cal] * electron_purity;}
+
     myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal] = myAccRecoIsoEffs.nevents_mus_pred_SB_Normalized[i_cal] + myAccRecoIsoEffs.nevents_els_pred_SB_Normalized[i_cal];
 //    h_cs_mus_sb->SetBinContent( i_cal+1 , nevents_mus_CS_SB_Normalized[i_cal] );
     if (storePlots)
@@ -2092,7 +2123,7 @@ NTupleReader *tr =0;
     //std::cout << "N events [" << i_cal << "] = " << myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal] << " , pred = " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal] << std::endl;
  
     // data card
-    //std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal];
+    std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal];
     //std::cout << " " << myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal];
     //std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]/myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal]*1.8*(60144642+59816364+30498962)/2262.946/831.76;
     //std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]/myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal]*1.83333*(59654914+51873969+30587326)/4004.345/831.76;
@@ -2260,19 +2291,21 @@ std::endl;
 
 void LoopLLSyst( TTJetsSampleWeight& myTTJetsSampleWeight )
 {
+  //std::cout <<__LINE__<<std::endl;
   //https://twiki.cern.ch/twiki/bin/view/CMS/SUSLeptonSF#2016_analyses_80X_Data_and_MC_IC
-  std::cout << "Computing syst: " << std::endl;
+  std::cout << "----Computing syst: " << std::endl;
   AccRecoIsoEffs myAccRecoIsoEffs;
   double resultspred[NSEARCH_BINS]={0};
   LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, resultspred );
+  //return ;
 
-  const bool domureco=false;
+  const bool domureco=true;
   const bool domuiso=false;
   const bool dodimu=false;
   const bool dodie=false;
   const bool doereco=false;
   const bool doeiso=false;
-  const bool doacc=true;
+  const bool doacc=false;
 
   if (domureco)
   {
@@ -2280,7 +2313,7 @@ void LoopLLSyst( TTJetsSampleWeight& myTTJetsSampleWeight )
   AccRecoIsoEffs myAccRecoIsoEffs2;
   double resultspredStatUp[NSEARCH_BINS]={0};
   double MuRecoEff[PT_BINS][AC_BINS] = {{0}}, MuRecoEff_Stat_Unc_up[PT_BINS][AC_BINS] = {{0}}, MuRecoEff_Stat_Unc_dn[PT_BINS][AC_BINS] = {{0}};
-  TFile *fin = TFile::Open("v160714_newMuonID_Effs2dPlots.root");
+  TFile *fin = TFile::Open("v2_Effs2dPlots.root");
   TH2D * murecoeff;
   murecoeff = (TH2D*)fin->Get("mus_recoeffs")->Clone();
 
@@ -2324,7 +2357,7 @@ void LoopLLSyst( TTJetsSampleWeight& myTTJetsSampleWeight )
 
   std::cout << "Computing syst mu reco syst up: " << std::endl;
   AccRecoIsoEffs myAccRecoIsoEffs4;
-  double resultspredSystUp[NSEARCH_BINS]={0};
+/*  double resultspredSystUp[NSEARCH_BINS]={0};
   for(int i=0;i<PT_BINS;++i)
   {
     for(int j=0;j<AC_BINS;++j)
@@ -2379,9 +2412,9 @@ void LoopLLSyst( TTJetsSampleWeight& myTTJetsSampleWeight )
       ttbar_mus_recoeff[i][j]=MuRecoEff[i][j];
     }
   }
-
+*/
   }
-
+/*
   if (domuiso)
   {
   std::cout << "Computing syst mu iso stat up: " << std::endl;
@@ -3013,7 +3046,7 @@ err_acc_el[58] = 0.1356854731;
   }
   
 
-
+*/
   std::cout << "syst is done" << std::endl;
   return ;
 }
@@ -3045,9 +3078,10 @@ int main(int argc, char* argv[])
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromT_", 831.76*0.5*TTbar_SingleLept_BR,  53057043, LUMI, inputFileList_Cal );
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromTbar", 831.76*0.5*TTbar_SingleLept_BR, 60494823, LUMI, inputFileList_Cal );
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_DiLept", 831.76*TTbar_DiLept_BR, 30682233, LUMI, inputFileList_Cal );
-
+/*
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_top" , 35.6, 998400, LUMI, inputFileList_Cal );
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_antitop" , 35.6, 985000, LUMI, inputFileList_Cal );
+
 
   // 1.21 is the kf
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-200To400" , 359.7*1.21, 19591498, LUMI, inputFileList_Cal );
@@ -3056,13 +3090,17 @@ int main(int argc, char* argv[])
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-800To1200" , 5.501*1.21, 7854734, LUMI, inputFileList_Cal );
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-1200To2500" , 1.329*1.21, 7023857, LUMI, inputFileList_Cal );
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-2500ToInf" , 0.03216*1.21, 2507809, LUMI, inputFileList_Cal );
-  
+*/
+
+  //data
+  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "MET" , 1, 1, 1.0, inputFileList_Cal );  
 
   //LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
   //LoopLLExp( myAccRecoIsoEffs, myTTJetsSampleWeight );
-  double results[NSEARCH_BINS]={0};
-  LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, results );
-  //LoopLLSyst( myTTJetsSampleWeight );
+  //double results[NSEARCH_BINS]={0};
+  //LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, results );
+  std::cout << " what the hell happened!!" << std::endl;
+  LoopLLSyst( myTTJetsSampleWeight );
 
   std::cout << "done" << std::endl;
   //std::cout << "main: printOverview" << std::endl;
@@ -3167,6 +3205,16 @@ void AccRecoIsoEffs::EffsPlotsGen()
 {
   int i_cal;
   int j_cal;
+TFile *Effs2dPlots = new TFile("Effs2dPlots.root", "recreate");
+double ptbins[PT_BINS+1]={10.0,20.0,30.0,40.0,50.0,70.0,100.0,120.0};
+double acbins[AC_BINS+2]={0.0,0.005,0.02,0.05,0.15,1.0,10.0};
+double njetbins[NJETS_BINS+1]={3.5,4.5,5.5,6.5,7.5,8.5,9.5};
+double htbins[NHT_BINS+1]={500.0,650.0,900.0,1400.0};
+TH2D *mus_recoeffs2d  = new TH2D("mus_recoeffs","Muon RecoEffs",PT_BINS,ptbins,AC_BINS+1,acbins);
+TH2D *mus_isoeffs2d  = new TH2D("mus_isoeffs","Muon IsoEffs",PT_BINS,ptbins,AC_BINS+1,acbins);
+TH2D *els_recoeffs2d  = new TH2D("els_recoeffs","Electron RecoEffs",PT_BINS,ptbins,AC_BINS+1,acbins);
+TH2D *els_isoeffs2d  = new TH2D("els_isoeffs","Electron IsoEffs",PT_BINS,ptbins,AC_BINS+1,acbins);
+TH2D *mus_acc2d  = new TH2D("mus_acc","mus_acc",NJETS_BINS,njetbins,NHT_BINS,htbins);
 
   for(i_cal = 0 ; i_cal < PT_BINS ; i_cal++)
   {
@@ -3416,7 +3464,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
 {
   int i_cal = 0;
   int j_cal = 0;
-  std::cout.precision(3);
+  //std::cout.precision(3);
 
   std::cout << "mtW correction factor & ";
   for( i_cal=0 ; i_cal < PT_BINS ; i_cal++ )
@@ -3779,7 +3827,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
 void AccRecoIsoEffs::printEffsHeader()
 {
   std::ofstream EffsHeader;
-  EffsHeader.open ("new_EffsHeader_MuCS.h");
+  EffsHeader.open ("v5_EffsHeader_MuCS.h");
 
   int i_cal = 0;
   int j_cal = 0;
@@ -3797,7 +3845,7 @@ void AccRecoIsoEffs::printEffsHeader()
   for( int searchbinc = 0 ; searchbinc < NSEARCH_BINS ; ++searchbinc )
   {
 
-std::cout << "mu bin " << searchbinc +1 << " acc " << nmus_acc_sb[searchbinc] << " all " << nmus_sb[searchbinc] << " raw acc " << nmus_acc_MC_sb[searchbinc] << " raw all " << nmus_MC_sb[searchbinc] << std::endl;
+std::cout << "mu bin " << searchbinc << " acc " << nmus_acc_sb[searchbinc] << " all " << nmus_sb[searchbinc] << " eff " << nmus_acc_sb[searchbinc]/nmus_sb[searchbinc] << " raw acc " << nmus_acc_MC_sb[searchbinc] << " raw all " << nmus_MC_sb[searchbinc] << std::endl;
 //std::cout << "eff" << nmus_acc_sb[searchbinc]/nmus_sb[searchbinc] << std::endl;
 
     if( searchbinc == 0 ) { EffsHeader << "{"; }
@@ -3805,6 +3853,36 @@ std::cout << "mu bin " << searchbinc +1 << " acc " << nmus_acc_sb[searchbinc] <<
     if( searchbinc != NSEARCH_BINS-1 ) { EffsHeader << ","; }
     if( searchbinc == NSEARCH_BINS-1 ) { EffsHeader << "};" << std::endl; }
   }
+
+//for merge mu acc bins!!!
+
+std::cout << "bin 4 = " << (nmus_acc_sb[4] + nmus_acc_sb[17]) / (nmus_sb[4] + nmus_sb[17]) << " err = " << get_stat_Error(nmus_acc_MC_sb[4] + nmus_acc_MC_sb[17] ,nmus_MC_sb[4] + nmus_MC_sb[17]) << std::endl;
+std::cout << "bin 13 = " << (nmus_acc_sb[13] + nmus_acc_sb[14]) / (nmus_sb[13] + nmus_sb[14]) << " err = " << get_stat_Error(nmus_acc_MC_sb[13] + nmus_acc_MC_sb[14] ,nmus_MC_sb[13] + nmus_MC_sb[14]) << std::endl;
+std::cout << "bin 17 = " << (nmus_acc_sb[4] + nmus_acc_sb[17]) / (nmus_sb[4] + nmus_sb[17]) << " err = " << get_stat_Error(nmus_acc_MC_sb[4] + nmus_acc_MC_sb[17] ,nmus_MC_sb[4] + nmus_MC_sb[17]) << std::endl;
+std::cout << "bin 18 = " << (nmus_acc_sb[18] + nmus_acc_sb[19]) / (nmus_sb[18] + nmus_sb[19]) << " err = " << get_stat_Error(nmus_acc_MC_sb[18] + nmus_acc_MC_sb[19] ,nmus_MC_sb[18] + nmus_MC_sb[19]) << std::endl;
+std::cout << "bin 19 = " << (nmus_acc_sb[18] + nmus_acc_sb[19]) / (nmus_sb[18] + nmus_sb[19]) << " err = " << get_stat_Error(nmus_acc_MC_sb[18] + nmus_acc_MC_sb[19] ,nmus_MC_sb[18] + nmus_MC_sb[19]) << std::endl;
+std::cout << "bin 20 = " << (nmus_acc_sb[18] + nmus_acc_sb[19] + nmus_acc_sb[20]) / (nmus_sb[18] + nmus_sb[19] + nmus_sb[20]) << " err = " << get_stat_Error(nmus_acc_MC_sb[18] + nmus_acc_MC_sb[19]+ nmus_acc_MC_sb[20] ,nmus_MC_sb[18] + nmus_MC_sb[19] + nmus_MC_sb[20]) << std::endl;
+std::cout << "bin 25 = " << (nmus_acc_sb[25] + nmus_acc_sb[36]) / (nmus_sb[25] + nmus_sb[36]) << " err = " << get_stat_Error(nmus_acc_MC_sb[25] + nmus_acc_MC_sb[36] ,nmus_MC_sb[25] + nmus_MC_sb[36]) << std::endl;
+std::cout << "bin 29 = " << (nmus_acc_sb[29] + nmus_acc_sb[28]) / (nmus_sb[29] + nmus_sb[28]) << " err = " << get_stat_Error(nmus_acc_MC_sb[29] + nmus_acc_MC_sb[28] ,nmus_MC_sb[29] + nmus_MC_sb[28]) << std::endl;
+std::cout << "bin 33 = " << (nmus_acc_sb[33] + nmus_acc_sb[32]) / (nmus_sb[33] + nmus_sb[32]) << " err = " << get_stat_Error(nmus_acc_MC_sb[33] + nmus_acc_MC_sb[32] ,nmus_MC_sb[33] + nmus_MC_sb[32]) << std::endl;
+std::cout << "bin 34 = " << (nmus_acc_sb[34] + nmus_acc_sb[35]) / (nmus_sb[34] + nmus_sb[35]) << " err = " << get_stat_Error(nmus_acc_MC_sb[34] + nmus_acc_MC_sb[35] ,nmus_MC_sb[34] + nmus_MC_sb[35]) << std::endl;
+std::cout << "bin 35 = " << (nmus_acc_sb[34] + nmus_acc_sb[35]) / (nmus_sb[34] + nmus_sb[35]) << " err = " << get_stat_Error(nmus_acc_MC_sb[34] + nmus_acc_MC_sb[35] ,nmus_MC_sb[34] + nmus_MC_sb[35]) << std::endl;
+std::cout << "bin 36 = " << (nmus_acc_sb[25] + nmus_acc_sb[36]) / (nmus_sb[25] + nmus_sb[36]) << " err = " << get_stat_Error(nmus_acc_MC_sb[25] + nmus_acc_MC_sb[36] ,nmus_MC_sb[25] + nmus_MC_sb[36]) << std::endl;
+std::cout << "bin 40 = " << (nmus_acc_sb[40] + nmus_acc_sb[39]) / (nmus_sb[40] + nmus_sb[39]) << " err = " << get_stat_Error(nmus_acc_MC_sb[40] + nmus_acc_MC_sb[39] ,nmus_MC_sb[40] + nmus_MC_sb[39]) << std::endl;
+std::cout << "bin 47 = " << (nmus_acc_sb[47] + nmus_acc_sb[46]) / (nmus_sb[47] + nmus_sb[46]) << " err = " << get_stat_Error(nmus_acc_MC_sb[47] + nmus_acc_MC_sb[46] ,nmus_MC_sb[47] + nmus_MC_sb[46]) << std::endl;
+std::cout << "bin 51 = " << (nmus_acc_sb[51] + nmus_acc_sb[57]) / (nmus_sb[51] + nmus_sb[57]) << " err = " << get_stat_Error(nmus_acc_MC_sb[51] + nmus_acc_MC_sb[57] ,nmus_MC_sb[51] + nmus_MC_sb[57]) << std::endl;
+std::cout << "bin 57 = " << (nmus_acc_sb[51] + nmus_acc_sb[57]) / (nmus_sb[51] + nmus_sb[57]) << " err = " << get_stat_Error(nmus_acc_MC_sb[51] + nmus_acc_MC_sb[57] ,nmus_MC_sb[51] + nmus_MC_sb[57]) << std::endl;
+std::cout << "bin 61 = " << (nmus_acc_sb[61] + nmus_acc_sb[67]) / (nmus_sb[61] + nmus_sb[67]) << " err = " << get_stat_Error(nmus_acc_MC_sb[61] + nmus_acc_MC_sb[67] ,nmus_MC_sb[61] + nmus_MC_sb[67]) << std::endl;
+std::cout << "bin 67 = " << (nmus_acc_sb[61] + nmus_acc_sb[67]) / (nmus_sb[61] + nmus_sb[67]) << " err = " << get_stat_Error(nmus_acc_MC_sb[61] + nmus_acc_MC_sb[67] ,nmus_MC_sb[61] + nmus_MC_sb[67]) << std::endl;
+std::cout << "bin 69 = " << (nmus_acc_sb[69] + nmus_acc_sb[68]) / (nmus_sb[69] + nmus_sb[68]) << " err = " << get_stat_Error(nmus_acc_MC_sb[69] + nmus_acc_MC_sb[68] ,nmus_MC_sb[69] + nmus_MC_sb[68]) << std::endl;
+std::cout << "bin 72 = " << (nmus_acc_sb[72] + nmus_acc_sb[77]) / (nmus_sb[72] + nmus_sb[77]) << " err = " << get_stat_Error(nmus_acc_MC_sb[72] + nmus_acc_MC_sb[77] ,nmus_MC_sb[72] + nmus_MC_sb[77]) << std::endl;
+std::cout << "bin 77 = " << (nmus_acc_sb[72] + nmus_acc_sb[77]) / (nmus_sb[72] + nmus_sb[77]) << " err = " << get_stat_Error(nmus_acc_MC_sb[72] + nmus_acc_MC_sb[77] ,nmus_MC_sb[72] + nmus_MC_sb[77]) << std::endl;
+std::cout << "bin 79 = " << (nmus_acc_sb[79] + nmus_acc_sb[78]) / (nmus_sb[79] + nmus_sb[78]) << " err = " << get_stat_Error(nmus_acc_MC_sb[79] + nmus_acc_MC_sb[78] ,nmus_MC_sb[79] + nmus_MC_sb[78]) << std::endl;
+std::cout << "bin 81 = " << (nmus_acc_sb[81] + nmus_acc_sb[80]) / (nmus_sb[81] + nmus_sb[80]) << " err = " << get_stat_Error(nmus_acc_MC_sb[81] + nmus_acc_MC_sb[80] ,nmus_MC_sb[81] + nmus_MC_sb[80]) << std::endl;
+std::cout << "bin 82 = " << (nmus_acc_sb[82] + nmus_acc_sb[83]) / (nmus_sb[82] + nmus_sb[83]) << " err = " << get_stat_Error(nmus_acc_MC_sb[82] + nmus_acc_MC_sb[83] ,nmus_MC_sb[82] + nmus_MC_sb[83]) << std::endl;
+std::cout << "bin 83 = " << (nmus_acc_sb[82] + nmus_acc_sb[83]) / (nmus_sb[82] + nmus_sb[83]) << " err = " << get_stat_Error(nmus_acc_MC_sb[82] + nmus_acc_MC_sb[83] ,nmus_MC_sb[82] + nmus_MC_sb[83]) << std::endl;
+
+
 
   EffsHeader << "  double ttbar_mus_recoeff[" << PT_BINS << "][" << AC_BINS << "] = ";
   for( i_cal = 0 ; i_cal < PT_BINS ; i_cal++ )
@@ -3842,7 +3920,7 @@ std::cout << "mu bin " << searchbinc +1 << " acc " << nmus_acc_sb[searchbinc] <<
   for( int searchbinc = 0 ; searchbinc < NSEARCH_BINS ; ++searchbinc )
   {
 
-std::cout << "el bin " << searchbinc +1 << " acc " << nels_acc[searchbinc] << " all " << nels[searchbinc] << " raw acc " << nels_acc_MC[searchbinc] << " raw all " << nels_MC[searchbinc] << std::endl;
+std::cout << "el bin " << searchbinc << " acc " << nels_acc[searchbinc] << " all " << nels[searchbinc] << " eff " << nels_acc[searchbinc]/nels[searchbinc] << " raw acc " << nels_acc_MC[searchbinc] << " raw all " << nels_MC[searchbinc] << std::endl;
 
 //els_acc[searchbinc] = nels_acc[searchbinc]/nels[searchbinc];
     if( searchbinc == 0 ) { EffsHeader << "{"; }
@@ -3852,6 +3930,31 @@ std::cout << "el bin " << searchbinc +1 << " acc " << nels_acc[searchbinc] << " 
     if( searchbinc == NSEARCH_BINS-1 ) { EffsHeader << "};" << std::endl; }
   }
 
+std::cout << "bin 4 = " << (nels_acc[4] + nels_acc[17]) / (nels[4] + nels[17]) << " err = " << get_stat_Error(nels_acc_MC[4] + nels_acc_MC[17] ,nels_MC[4] + nels_MC[17]) << std::endl;
+std::cout << "bin 13 = " << (nels_acc[13] + nels_acc[14]) / (nels[13] + nels[14]) << " err = " << get_stat_Error(nels_acc_MC[13] + nels_acc_MC[14] ,nels_MC[13] + nels_MC[14]) << std::endl;
+std::cout << "bin 17 = " << (nels_acc[4] + nels_acc[17]) / (nels[4] + nels[17]) << " err = " << get_stat_Error(nels_acc_MC[4] + nels_acc_MC[17] ,nels_MC[4] + nels_MC[17]) << std::endl;
+std::cout << "bin 18 = " << (nels_acc[18] + nels_acc[19] + nels_acc[20]) / (nels[18] + nels[19] + nels[20]) << " err = " << get_stat_Error(nels_acc_MC[18] + nels_acc_MC[19]+ nels_acc_MC[20] ,nels_MC[18] + nels_MC[19] + nels_MC[20]) << std::endl;
+std::cout << "bin 19 = " << (nels_acc[18] + nels_acc[19] + nels_acc[20]) / (nels[18] + nels[19] + nels[20]) << " err = " << get_stat_Error(nels_acc_MC[18] + nels_acc_MC[19]+ nels_acc_MC[20] ,nels_MC[18] + nels_MC[19] + nels_MC[20]) << std::endl;
+std::cout << "bin 20 = " << (nels_acc[18] + nels_acc[19] + nels_acc[20]) / (nels[18] + nels[19] + nels[20]) << " err = " << get_stat_Error(nels_acc_MC[18] + nels_acc_MC[19]+ nels_acc_MC[20] ,nels_MC[18] + nels_MC[19] + nels_MC[20]) << std::endl;
+std::cout << "bin 25 = " << (nels_acc[25] + nels_acc[36]) / (nels[25] + nels[36]) << " err = " << get_stat_Error(nels_acc_MC[25] + nels_acc_MC[36] ,nels_MC[25] + nels_MC[36]) << std::endl;
+std::cout << "bin 29 = " << (nels_acc[29] + nels_acc[28]) / (nels[29] + nels[28]) << " err = " << get_stat_Error(nels_acc_MC[29] + nels_acc_MC[28] ,nels_MC[29] + nels_MC[28]) << std::endl;
+std::cout << "bin 33 = " << (nels_acc[33] + nels_acc[32]) / (nels[33] + nels[32]) << " err = " << get_stat_Error(nels_acc_MC[33] + nels_acc_MC[32] ,nels_MC[33] + nels_MC[32]) << std::endl;
+std::cout << "bin 34 = " << (nels_acc[34] + nels_acc[35]) / (nels[34] + nels[35]) << " err = " << get_stat_Error(nels_acc_MC[34] + nels_acc_MC[35] ,nels_MC[34] + nels_MC[35]) << std::endl;
+std::cout << "bin 35 = " << (nels_acc[34] + nels_acc[35]) / (nels[34] + nels[35]) << " err = " << get_stat_Error(nels_acc_MC[34] + nels_acc_MC[35] ,nels_MC[34] + nels_MC[35]) << std::endl;
+std::cout << "bin 36 = " << (nels_acc[25] + nels_acc[36]) / (nels[25] + nels[36]) << " err = " << get_stat_Error(nels_acc_MC[25] + nels_acc_MC[36] ,nels_MC[25] + nels_MC[36]) << std::endl;
+std::cout << "bin 40 = " << (nels_acc[40] + nels_acc[39]) / (nels[40] + nels[39]) << " err = " << get_stat_Error(nels_acc_MC[40] + nels_acc_MC[39] ,nels_MC[40] + nels_MC[39]) << std::endl;
+std::cout << "bin 47 = " << (nels_acc[47] + nels_acc[46]) / (nels[47] + nels[46]) << " err = " << get_stat_Error(nels_acc_MC[47] + nels_acc_MC[46] ,nels_MC[47] + nels_MC[46]) << std::endl;
+std::cout << "bin 51 = " << (nels_acc[51] + nels_acc[57]) / (nels[51] + nels[57]) << " err = " << get_stat_Error(nels_acc_MC[51] + nels_acc_MC[57] ,nels_MC[51] + nels_MC[57]) << std::endl;
+std::cout << "bin 57 = " << (nels_acc[51] + nels_acc[57]) / (nels[51] + nels[57]) << " err = " << get_stat_Error(nels_acc_MC[51] + nels_acc_MC[57] ,nels_MC[51] + nels_MC[57]) << std::endl;
+std::cout << "bin 61 = " << (nels_acc[61] + nels_acc[67]) / (nels[61] + nels[67]) << " err = " << get_stat_Error(nels_acc_MC[61] + nels_acc_MC[67] ,nels_MC[61] + nels_MC[67]) << std::endl;
+std::cout << "bin 67 = " << (nels_acc[61] + nels_acc[67]) / (nels[61] + nels[67]) << " err = " << get_stat_Error(nels_acc_MC[61] + nels_acc_MC[67] ,nels_MC[61] + nels_MC[67]) << std::endl;
+std::cout << "bin 69 = " << (nels_acc[69] + nels_acc[68]) / (nels[69] + nels[68]) << " err = " << get_stat_Error(nels_acc_MC[69] + nels_acc_MC[68] ,nels_MC[69] + nels_MC[68]) << std::endl;
+std::cout << "bin 72 = " << (nels_acc[72] + nels_acc[77]) / (nels[72] + nels[77]) << " err = " << get_stat_Error(nels_acc_MC[72] + nels_acc_MC[77] ,nels_MC[72] + nels_MC[77]) << std::endl;
+std::cout << "bin 77 = " << (nels_acc[72] + nels_acc[77]) / (nels[72] + nels[77]) << " err = " << get_stat_Error(nels_acc_MC[72] + nels_acc_MC[77] ,nels_MC[72] + nels_MC[77]) << std::endl;
+std::cout << "bin 79 = " << (nels_acc[79] + nels_acc[78]) / (nels[79] + nels[78]) << " err = " << get_stat_Error(nels_acc_MC[79] + nels_acc_MC[78] ,nels_MC[79] + nels_MC[78]) << std::endl;
+std::cout << "bin 81 = " << (nels_acc[81] + nels_acc[80]) / (nels[81] + nels[80]) << " err = " << get_stat_Error(nels_acc_MC[81] + nels_acc_MC[80] ,nels_MC[81] + nels_MC[80]) << std::endl;
+std::cout << "bin 82 = " << (nels_acc[82] + nels_acc[83]) / (nels[82] + nels[83]) << " err = " << get_stat_Error(nels_acc_MC[82] + nels_acc_MC[83] ,nels_MC[82] + nels_MC[83]) << std::endl;
+std::cout << "bin 83 = " << (nels_acc[82] + nels_acc[83]) / (nels[82] + nels[83]) << " err = " << get_stat_Error(nels_acc_MC[82] + nels_acc_MC[83] ,nels_MC[82] + nels_MC[83]) << std::endl;
 
   EffsHeader << "  double ttbar_els_recoeff[" << PT_BINS << "][" << AC_BINS << "] = ";
   for( i_cal = 0 ; i_cal < PT_BINS ; i_cal++ )
