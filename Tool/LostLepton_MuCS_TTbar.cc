@@ -1345,7 +1345,7 @@ NTupleReader *tr =0;
 
 void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSampleWeight, double resultspred[NSEARCH_BINS] )
 {
-  const bool storePlots = true;  //set to false when running LLSys
+  const bool storePlots = false;  //set to false when running LLsyst
   ClosureHistgram myClosureHistgram;
   if (storePlots) myClosureHistgram.BookHistgram("v1_PredLL_pure_el.root");
   //if (storePlots) myClosureHistgram.BookHistgram("v2_PredLL_data.root");
@@ -1381,7 +1381,7 @@ NTupleReader *tr =0;
     std::cout << "Weight " << thisweight << std::endl;
     int neventc=0;
 
-    //while(trCS.getNextEvent() && neventc<10000)
+    //while(trCS.getNextEvent() && neventc<1000)
     while(trCS.getNextEvent())
     {
       ++neventc;
@@ -1392,11 +1392,11 @@ NTupleReader *tr =0;
       //const double& SusyMotherMass  = trCS.getVar<double>("SusyMotherMass");
       //const double& SusyLSPMass     = trCS.getVar<double>("SusyLSPMass");
 
+/*      //for data only!!  start
       std::vector<std::string> TriggerNames = trCS.getVec<std::string>("TriggerNames");
       std::vector<int> PassTrigger = trCS.getVec<int>("PassTrigger");
       bool foundTrigger = false;
 
-/*      //for data only!!!
       for(unsigned it=0; it<TriggerNames.size(); it++)
       {
 	using namespace std;
@@ -1409,8 +1409,7 @@ NTupleReader *tr =0;
 	}
       }
       if( !foundTrigger ) continue;
-
-*/      //std::cout << "FSL: test" << std::endl;
+*/      //for data only!!  end
 
       bool passLeptVeto = trCS.getVar<bool>("passLeptVeto"+spec);
       bool passnJets = trCS.getVar<bool>("passnJets"+spec);
@@ -1820,7 +1819,9 @@ NTupleReader *tr =0;
 
 	    myAccRecoIsoEffs.EffstoWeights_fromH();
 
+	    //std::cout << "nevents_cs_mus_sb before = " << myAccRecoIsoEffs.nevents_cs_mus_sb[searchbin_id] << std::endl;
 	    ++myAccRecoIsoEffs.nevents_cs_mus_sb[searchbin_id];
+	    //std::cout << "nevents_cs_mus_sb after = " << myAccRecoIsoEffs.nevents_cs_mus_sb[searchbin_id] << std::endl;
 
 	    //std::cout << "ttbar_mtwcorrfactor[0] = " << ttbar_mtwcorrfactor[0] << std::endl;
 	    //mtwcorrfactor
@@ -2059,8 +2060,12 @@ NTupleReader *tr =0;
   //std::cout << "sidebandLowMT2 = " << sidebandLowMT2 << std::endl;
   //std::cout << "sidebandHighMT2 = " << sidebandHighMT2 << std::endl;
 
- 
-  double aveTFfromMC[84]={0.64718, 0.54607, 0.68486, 0.72258, 0.53391, 0.62296, 0.64942, 0.54682, 0.72027, 0.57920, 0.61270, 0.61530, 0.62862, 0.37975, 0.45417, 0.54550, 0.45707, 0.29137, 0.64549, 0.99841, 0.89697, 0.63376, 0.58900, 0.48153, 0.65243, 0.27659, 0.53326, 0.57811, 0.47716, 0.47412, 0.67794, 0.44542, 0.73614, 0.55661, 0.18247, 0.24244, 0.54556, 0.62026, 0.72007, 0.61392, 0.55420, 0.52652, 0.66536, 0.57971, 0.89502, 0.62887, 0.52408, 0.79464, 0.36406, 0.30258, 0.71393, 0.49519, 0.63497, 0.45040, 0.30237, 0.41106, 0.88353, 0.40487, 0.32024, 0.37574, 0.30400, 0.27665, 0.56934, 0.50703, 0.66099, 0.59415, 0.54465, 0.48374, 0.75598, 0.62101, 0.38479, 0.81652, 0.24710, 0.34828, 0.34683, 0.54442, 0.27696, 0.24813, 0.30250, 0.54704, 0.40792, 0.37645, 0.35962, 0.37900};
+  // TF muon CS
+  //double aveTFfromMC[84]={0.64718, 0.54607, 0.68486, 0.72258, 0.53391, 0.62296, 0.64942, 0.54682, 0.72027, 0.57920, 0.61270, 0.61530, 0.62862, 0.37975, 0.45417, 0.54550, 0.45707, 0.29137, 0.64549, 0.99841, 0.89697, 0.63376, 0.58900, 0.48153, 0.65243, 0.27659, 0.53326, 0.57811, 0.47716, 0.47412, 0.67794, 0.44542, 0.73614, 0.55661, 0.18247, 0.24244, 0.54556, 0.62026, 0.72007, 0.61392, 0.55420, 0.52652, 0.66536, 0.57971, 0.89502, 0.62887, 0.52408, 0.79464, 0.36406, 0.30258, 0.71393, 0.49519, 0.63497, 0.45040, 0.30237, 0.41106, 0.88353, 0.40487, 0.32024, 0.37574, 0.30400, 0.27665, 0.56934, 0.50703, 0.66099, 0.59415, 0.54465, 0.48374, 0.75598, 0.62101, 0.38479, 0.81652, 0.24710, 0.34828, 0.34683, 0.54442, 0.27696, 0.24813, 0.30250, 0.54704, 0.40792, 0.37645, 0.35962, 0.37900};
+
+  // TF ele CS
+  double aveTFfromMC[84]={0.76810, 0.67570, 0.92517, 0.79962, 0.58213, 0.72719, 0.77320, 0.52420, 0.63397, 0.70466, 0.73023, 0.63788, 0.63530, 0.36003, 0.46102, 0.75163, 0.60728, 0.32000, 0.5, 1.35187, 0.73699, 0.72565, 0.70838, 0.53720, 0.61524, 0.27198, 0.64912, 0.62166, 0.73962, 0.49458, 0.95204, 0.65817, 0.56362, 0.59732, 0.5, 0.29122, 0.24607, 0.76121, 0.83031, 0.99158, 0.74341, 0.53957, 0.75386, 0.77088, 0.76271, 0.59959, 0.76396, 0.59704, 0.43387, 0.34557, 0.83736, 0.49554, 0.73161, 0.52211, 0.53665, 0.39873, 0.88512, 0.46192, 0.37563, 0.43773, 0.29540, 0.49586, 0.69239, 0.53031, 0.66728, 0.71600, 1.05441, 0.51507, 0.85732, 0.94921, 0.51798, 0.67811, 0.30192, 0.35386, 0.48773, 0.58158, 0.43956, 0.33780, 0.42080, 0.35928, 0.55627, 0.56943, 0.64673, 0.64023};
+
 
 
   double psystup[84]={0.222331 ,  0.232846 ,  0.365067 ,  0.693452 ,  0.533625 ,  0.210093 ,  0.235539 ,  0.427174 ,  0.508428 ,  0.279131 ,  0.27366 ,  0.280738 ,  0.362284 ,  1.34308 ,  0.512719 ,  0.395768 ,  0.347547 ,  0.768519 ,  1.18455 ,  0.794172 ,  0.679942 ,  0.215124 ,  0.260163 ,  0.370625 ,  0.443297 ,  1.04235 ,  0.300143 ,  0.363733 ,  0.563737 ,  0.684077 ,  0.677213 ,  0.356993 ,  0.378372 ,  0.912265 ,  1.16299 ,  1.198 ,  11.3234 ,  0.23611 ,  0.282095 ,  0.405362 ,  0.618342 ,  0.287652 ,  0.385904 ,  0.652676 ,  1.37527 ,  0.451081 ,  0.782247 ,  0.601983 ,  0.233522 ,  0.398513 ,  1.38303 ,  0.655637 ,  0.24922 ,  0.348807 ,  0.753337 ,  0.592553 ,  0.447955 ,  1.15275 ,  0.231433 ,  0.536916 ,  0.531596 ,  0.794419 ,  0.262598 ,  0.424343 ,  0.574137 ,  0.321691 ,  0.551045 ,  2.09576 ,  0.846289 ,  0.738532 ,  0.317367 ,  0.70955 ,  1.01619 ,  0.455137 ,  0.495764 ,  0.495544 ,  1.05361 ,  1.4284 ,  0.667495 ,  0.759063 ,  0.60185 ,  0.719594 ,  1.15249 ,  1.69776};
@@ -2068,9 +2073,9 @@ NTupleReader *tr =0;
 
 
 
- std::cout.precision(1);
- //std::cout.precision(3);
- //std::cout.precision(5);
+  //std::cout.precision(1);
+  //std::cout.precision(3);
+  std::cout.precision(5);
  std::cout << std::fixed;
   for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
   {
@@ -2103,13 +2108,17 @@ NTupleReader *tr =0;
     //std::cout << "N events [" << i_cal << "] = " << myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal] << " , pred = " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal] << std::endl;
  
     // data card
-    //std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal];
+    std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal];
     //std::cout << " " << myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal];
     //std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]/myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal]*1.8*(60144642+59816364+30498962)/2262.946/831.76;
     //std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]/myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal]*1.83333*(59654914+51873969+30587326)/4004.345/831.76;
     //std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]/myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal]*1.83333*(59654914+51873969+30587326)/8000.0/831.76;
     //std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]/myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal]*1.83333*(59654914+51873969+30587326)/7647.637518921/831.76;
     //std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]/myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal]*1.83333*(59654914+51873969+30587326)/12877.0846508279992/831.76;
+    //std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]/myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal]*1.83333*(53057043+60494823+30682233)/36352.970569733/831.76;
+    //std::cout << " 2: " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal];
+    //std::cout << " 3: " << isoTrackEff_SB[i_cal];
+    //std::cout << " 4: " << myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal];
     // 1.83333 c'est 1/(0.43930872+0.10614564)
     //std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]/myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal];
     //std::cout << " " << (std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isoTrackEff_SB[i_cal];
@@ -2122,7 +2131,7 @@ NTupleReader *tr =0;
        //                //std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal] << ",";
 
     // syst
-    //resultspred[i_cal]=myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal];
+    resultspred[i_cal]=myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal];
     //std::cout << "systStatus = " << systStatus << std::endl;
     //if (systStatus==1) std::cout << "Pred[" << i_cal << "] = " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal] << ";" << std::endl;
     //std::cout << "Pred[" << i_cal << "] = " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal] << ";" << std::endl;
@@ -2141,7 +2150,7 @@ NTupleReader *tr =0;
 
 
 
-    if (true)
+    if (false)
     {
     if (i_cal == 0) std::cout  <<  "0 &               1 &               1 &         200-300 &         250-400 & ";
     if (i_cal == 1) std::cout  <<  "1 &               1 &               1 &         200-300 &         400-500 & ";
@@ -2294,12 +2303,12 @@ void LoopLLSyst( TTJetsSampleWeight& myTTJetsSampleWeight )
   AccRecoIsoEffs myAccRecoIsoEffs;
   double resultspred[NSEARCH_BINS]={0};
   LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, resultspred );
-  //return ;
+  myAccRecoIsoEffs.init();
 
-  const bool domureco=true;
+  const bool domureco=false;
   const bool domuiso=false;
   const bool dodimu=false;
-  const bool dodie=false;
+  const bool dodie=true;
   const bool doereco=false;
   const bool doeiso=false;
   const bool doacc=false;
@@ -2307,14 +2316,13 @@ void LoopLLSyst( TTJetsSampleWeight& myTTJetsSampleWeight )
   if (domureco)
   {
   std::cout << "Computing syst mu reco stat up: " << std::endl;
-  AccRecoIsoEffs myAccRecoIsoEffs2;
   double resultspredStatUp[NSEARCH_BINS]={0};
   double MuRecoEff[PT_BINS][AC_BINS] = {{0}}, MuRecoEff_Stat_Unc_up[PT_BINS][AC_BINS] = {{0}}, MuRecoEff_Stat_Unc_dn[PT_BINS][AC_BINS] = {{0}};
   TFile *fin = TFile::Open("v2_Effs2dPlots.root");
   TH2D * murecoeff;
   murecoeff = (TH2D*)fin->Get("mus_recoeffs")->Clone();
 
-  for(int i=0;i<PT_BINS;++i)
+/*  for(int i=0;i<PT_BINS;++i)
   {
     for(int j=0;j<AC_BINS;++j)
     {
@@ -2329,32 +2337,41 @@ void LoopLLSyst( TTJetsSampleWeight& myTTJetsSampleWeight )
       //std::cout << "ttbar_mus_recoeff = " << ttbar_mus_recoeff[i][j] << std::endl;
     }
   }
-
+*/
   for(int i=0;i<PT_BINS;++i)
   {
     for(int j=0;j<AC_BINS;++j)
     {
-      //ttbar_mus_recoeff[i][j]=MuRecoEff[i][j];
-      ttbar_mus_recoeff[i][j]=MuRecoEff_Stat_Unc_up[i][j];
+      MuRecoEff[i][j] = murecoeff->GetBinContent(i+1,j+2);
+      ttbar_mus_recoeff[i][j] = murecoeff->GetBinContent(i+1,j+2)+murecoeff->GetBinError(i+1,j+2);
+      if (ttbar_mus_recoeff[i][j] > 1.0) ttbar_mus_recoeff[i][j] = 1.0;
+      //ttbar_mus_recoeff[i][j]=MuRecoEff_Stat_Unc_up[i][j];
     }
   }
-  LoopLLPred( myAccRecoIsoEffs2, myTTJetsSampleWeight, resultspredStatUp );
+
+  LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, resultspredStatUp );
+
+  myAccRecoIsoEffs.init();
 
   std::cout << "Computing syst mu reco stat dn: " << std::endl;
-  AccRecoIsoEffs myAccRecoIsoEffs3;
   double resultspredStatDn[NSEARCH_BINS]={0};
   for(int i=0;i<PT_BINS;++i)
   {
     for(int j=0;j<AC_BINS;++j)
     {
-      ttbar_mus_recoeff[i][j]=MuRecoEff_Stat_Unc_dn[i][j];
+      ttbar_mus_recoeff[i][j] = murecoeff->GetBinContent(i+1,j+2)-murecoeff->GetBinError(i+1,j+2);
+      if (ttbar_mus_recoeff[i][j] < 0.0) {ttbar_mus_recoeff[i][j] = 0.0;
+      std::cout << "mu reco eff [" << i << "][" << j << "] set to 0" << std::endl;}
+      //ttbar_mus_recoeff[i][j]=MuRecoEff_Stat_Unc_dn[i][j];
     }
   }
-  LoopLLPred( myAccRecoIsoEffs3, myTTJetsSampleWeight, resultspredStatDn );
+
+  LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, resultspredStatDn );
+
+  myAccRecoIsoEffs.init();
 
   std::cout << "Computing syst mu reco syst up: " << std::endl;
-  AccRecoIsoEffs myAccRecoIsoEffs4;
-/*  double resultspredSystUp[NSEARCH_BINS]={0};
+  double resultspredSystUp[NSEARCH_BINS]={0};
   for(int i=0;i<PT_BINS;++i)
   {
     for(int j=0;j<AC_BINS;++j)
@@ -2363,41 +2380,46 @@ void LoopLLSyst( TTJetsSampleWeight& myTTJetsSampleWeight )
       if (ttbar_mus_recoeff[i][j]>1.0) ttbar_mus_recoeff[i][j]=1.0;
     }
   }
-  LoopLLPred( myAccRecoIsoEffs4, myTTJetsSampleWeight, resultspredSystUp );
-
+  LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, resultspredSystUp );
+  myAccRecoIsoEffs.init();
 
   std::cout << "Computing syst mu reco syst dn: " << std::endl;
-  AccRecoIsoEffs myAccRecoIsoEffs5;
   double resultspredSystDn[NSEARCH_BINS]={0};
   for(int i=0;i<PT_BINS;++i)
   {
     for(int j=0;j<AC_BINS;++j)
     {
       ttbar_mus_recoeff[i][j]=MuRecoEff[i][j]-0.03;
-      if (ttbar_mus_recoeff[i][j]<0.0) ttbar_mus_recoeff[i][j]=0.0;
+      if (ttbar_mus_recoeff[i][j]<0.0) {ttbar_mus_recoeff[i][j]=0.0;
+      std::cout << "mu reco eff [" << i << "][" << j << "] set to 0" << std::endl;}
     }
   }
-  LoopLLPred( myAccRecoIsoEffs5, myTTJetsSampleWeight, resultspredSystDn );
+  LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, resultspredSystDn );
+  myAccRecoIsoEffs.init();
 
-
-  std::cout << "mu reco syst dn:" << std::endl;
+  std::cout << "mu reco syst up:" << std::endl;
   for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
   {
     //std::cout << "resultspred[" << i_cal << "] = " << resultspred[i_cal] << std::endl;
     //std::cout << "resultspredStatUp[i_cal] = " << resultspredStatUp[i_cal] << std::endl;
     //std::cout << "resultspredStatDn[i_cal] = " << resultspredStatDn[i_cal] << std::endl;
     //if (resultspred[i_cal]>0.0) std::cout << " " << resultspred[i_cal]-resultspredStatUp[i_cal];
-    if (resultspred[i_cal]>0.0) std::cout << " " << std::abs(resultspred[i_cal]-resultspredStatUp[i_cal])/resultspred[i_cal]+std::abs(resultspred[i_cal]-resultspredSystUp[i_cal])/resultspred[i_cal];
-    else std::cout << " nan";
+
+    //if (resultspred[i_cal]>0.0) std::cout << " " << std::abs(resultspred[i_cal]-resultspredStatUp[i_cal])/resultspred[i_cal]+std::abs(resultspred[i_cal]-resultspredSystUp[i_cal])/resultspred[i_cal];
+    
+    if (resultspred[i_cal]>0.0) std::cout << sqrt((resultspred[i_cal]-resultspredStatUp[i_cal])*(resultspred[i_cal]-resultspredStatUp[i_cal]) + (resultspred[i_cal]-resultspredSystUp[i_cal])*(resultspred[i_cal]-resultspredSystUp[i_cal])) / resultspred[i_cal] << " ";
+
+    else std::cout << "nan ";
   }
   std::cout << std::endl;
 
-  std::cout << "mu reco syst up:" << std::endl;
+  std::cout << "mu reco syst down:" << std::endl;
   for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
   {
     //if (resultspred[i_cal]>0.0) std::cout << " " << resultspred[i_cal]-resultspredStatDn[i_cal];
-    if (resultspred[i_cal]>0.0) std::cout << " " << std::abs(resultspred[i_cal]-resultspredStatDn[i_cal])/resultspred[i_cal]+std::abs(resultspred[i_cal]-resultspredSystDn[i_cal])/resultspred[i_cal];
-    else std::cout << " nan";
+    //if (resultspred[i_cal]>0.0) std::cout << " " << std::abs(resultspred[i_cal]-resultspredStatDn[i_cal])/resultspred[i_cal]+std::abs(resultspred[i_cal]-resultspredSystDn[i_cal])/resultspred[i_cal];
+    if (resultspred[i_cal]>0.0) std::cout << sqrt((resultspred[i_cal]-resultspredStatDn[i_cal])*(resultspred[i_cal]-resultspredStatDn[i_cal]) + (resultspred[i_cal]-resultspredSystDn[i_cal])*(resultspred[i_cal]-resultspredSystDn[i_cal])) / resultspred[i_cal] << " ";
+    else std::cout << "nan ";
   }
   std::cout << std::endl;
 
@@ -2409,20 +2431,19 @@ void LoopLLSyst( TTJetsSampleWeight& myTTJetsSampleWeight )
       ttbar_mus_recoeff[i][j]=MuRecoEff[i][j];
     }
   }
-*/
+
   }
-/*
+
   if (domuiso)
   {
   std::cout << "Computing syst mu iso stat up: " << std::endl;
-  AccRecoIsoEffs myAccRecoIsoEffs2;
   double resultspredStatUp[NSEARCH_BINS]={0};
   double MuRecoEff[PT_BINS][AC_BINS] = {{0}}, MuRecoEff_Stat_Unc_up[PT_BINS][AC_BINS] = {{0}}, MuRecoEff_Stat_Unc_dn[PT_BINS][AC_BINS] = {{0}};
-  TFile *fin = TFile::Open("v160714_newMuonID_Effs2dPlots.root");
+  TFile *fin = TFile::Open("v2_Effs2dPlots.root");
   TH2D * murecoeff;
   murecoeff = (TH2D*)fin->Get("mus_isoeffs")->Clone();
 
-  for(int i=0;i<PT_BINS;++i)
+/*  for(int i=0;i<PT_BINS;++i)
   {
     for(int j=0;j<AC_BINS;++j)
     {
@@ -2437,31 +2458,38 @@ void LoopLLSyst( TTJetsSampleWeight& myTTJetsSampleWeight )
       //std::cout << "ttbar_mus_isoeff = " << ttbar_mus_isoeff[i][j] << std::endl;
     }
   }
-
+*/
   for(int i=0;i<PT_BINS;++i)
   {
     for(int j=0;j<AC_BINS;++j)
     {
-      //ttbar_mus_isoeff[i][j]=MuRecoEff[i][j];
-      ttbar_mus_isoeff[i][j]=MuRecoEff_Stat_Unc_up[i][j];
+      MuRecoEff[i][j] = murecoeff->GetBinContent(i+1,j+2);
+      ttbar_mus_isoeff[i][j] = murecoeff->GetBinContent(i+1,j+2)+murecoeff->GetBinError(i+1,j+2);
+      if (ttbar_mus_isoeff[i][j] > 1.0) ttbar_mus_isoeff[i][j] = 1.0;
+      //ttbar_mus_isoeff[i][j]=MuRecoEff_Stat_Unc_up[i][j];
     }
   }
-  LoopLLPred( myAccRecoIsoEffs2, myTTJetsSampleWeight, resultspredStatUp );
+  LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, resultspredStatUp );
+
+  myAccRecoIsoEffs.init();
 
   std::cout << "Computing syst mu iso stat dn: " << std::endl;
-  AccRecoIsoEffs myAccRecoIsoEffs3;
   double resultspredStatDn[NSEARCH_BINS]={0};
   for(int i=0;i<PT_BINS;++i)
   {
     for(int j=0;j<AC_BINS;++j)
     {
-      ttbar_mus_isoeff[i][j]=MuRecoEff_Stat_Unc_dn[i][j];
+      ttbar_mus_isoeff[i][j] = murecoeff->GetBinContent(i+1,j+2)-murecoeff->GetBinError(i+1,j+2);
+      if (ttbar_mus_isoeff[i][j] < 0.0) {ttbar_mus_isoeff[i][j] = 0.0;
+      std::cout << "mu iso eff [" << i << "][" << j << "] set to 0" << std::endl;}
+      //ttbar_mus_isoeff[i][j]=MuRecoEff_Stat_Unc_dn[i][j];
     }
   }
-  LoopLLPred( myAccRecoIsoEffs3, myTTJetsSampleWeight, resultspredStatDn );
+  LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, resultspredStatDn );
+
+  myAccRecoIsoEffs.init();
 
   std::cout << "Computing syst mu iso syst up: " << std::endl;
-  AccRecoIsoEffs myAccRecoIsoEffs4;
   double resultspredSystUp[NSEARCH_BINS]={0};
   for(int i=0;i<PT_BINS;++i)
   {
@@ -2471,8 +2499,9 @@ void LoopLLSyst( TTJetsSampleWeight& myTTJetsSampleWeight )
       if (ttbar_mus_isoeff[i][j]>1.0) ttbar_mus_isoeff[i][j]=1.0;
     }
   }
-  LoopLLPred( myAccRecoIsoEffs4, myTTJetsSampleWeight, resultspredSystUp );
+  LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, resultspredSystUp );
 
+  myAccRecoIsoEffs.init();
 
   std::cout << "Computing syst mu iso syst dn: " << std::endl;
   AccRecoIsoEffs myAccRecoIsoEffs5;
@@ -2482,30 +2511,36 @@ void LoopLLSyst( TTJetsSampleWeight& myTTJetsSampleWeight )
     for(int j=0;j<AC_BINS;++j)
     {
       ttbar_mus_isoeff[i][j]=MuRecoEff[i][j]-0.01;
-      if (ttbar_mus_isoeff[i][j]<0.0) ttbar_mus_isoeff[i][j]=0.0;
+      if (ttbar_mus_isoeff[i][j]<0.0) {ttbar_mus_isoeff[i][j]=0.0;
+      std::cout << "mu iso eff [" << i << "][" << j << "] set to 0" << std::endl;}
     }
   }
-  LoopLLPred( myAccRecoIsoEffs5, myTTJetsSampleWeight, resultspredSystDn );
+  LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, resultspredSystDn );
 
+  myAccRecoIsoEffs.init();
 
-  std::cout << "mu iso syst dn:" << std::endl;
+  std::cout << "mu iso syst up:" << std::endl;
   for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
   {
     //std::cout << "resultspred[" << i_cal << "] = " << resultspred[i_cal] << std::endl;
     //std::cout << "resultspredStatUp[i_cal] = " << resultspredStatUp[i_cal] << std::endl;
     //std::cout << "resultspredStatDn[i_cal] = " << resultspredStatDn[i_cal] << std::endl;
     //if (resultspred[i_cal]>0.0) std::cout << " " << resultspred[i_cal]-resultspredStatUp[i_cal];
-    if (resultspred[i_cal]>0.0) std::cout << " " << std::abs(resultspred[i_cal]-resultspredStatUp[i_cal])/resultspred[i_cal]+std::abs(resultspred[i_cal]-resultspredSystUp[i_cal])/resultspred[i_cal];
-    else std::cout << " nan";
+    //if (resultspred[i_cal]>0.0) std::cout << " " << std::abs(resultspred[i_cal]-resultspredStatUp[i_cal])/resultspred[i_cal]+std::abs(resultspred[i_cal]-resultspredSystUp[i_cal])/resultspred[i_cal];
+    if (resultspred[i_cal]>0.0) std::cout << sqrt((resultspred[i_cal]-resultspredStatUp[i_cal])*(resultspred[i_cal]-resultspredStatUp[i_cal]) + (resultspred[i_cal]-resultspredSystUp[i_cal])*(resultspred[i_cal]-resultspredSystUp[i_cal])) / resultspred[i_cal] << " ";
+
+    else std::cout << "nan ";
   }
   std::cout << std::endl;
 
-  std::cout << "mu iso syst up:" << std::endl;
+  std::cout << "mu iso syst down:" << std::endl;
   for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
   {
     //if (resultspred[i_cal]>0.0) std::cout << " " << resultspred[i_cal]-resultspredStatDn[i_cal];
-    if (resultspred[i_cal]>0.0) std::cout << " " << std::abs(resultspred[i_cal]-resultspredStatDn[i_cal])/resultspred[i_cal]+std::abs(resultspred[i_cal]-resultspredSystDn[i_cal])/resultspred[i_cal];
-    else std::cout << " nan";
+    //if (resultspred[i_cal]>0.0) std::cout << " " << std::abs(resultspred[i_cal]-resultspredStatDn[i_cal])/resultspred[i_cal]+std::abs(resultspred[i_cal]-resultspredSystDn[i_cal])/resultspred[i_cal];
+    if (resultspred[i_cal]>0.0) std::cout << sqrt((resultspred[i_cal]-resultspredStatDn[i_cal])*(resultspred[i_cal]-resultspredStatDn[i_cal]) + (resultspred[i_cal]-resultspredSystDn[i_cal])*(resultspred[i_cal]-resultspredSystDn[i_cal])) / resultspred[i_cal] << " ";
+
+    else std::cout << "nan ";
   }
   std::cout << std::endl;
 
@@ -2525,27 +2560,30 @@ void LoopLLSyst( TTJetsSampleWeight& myTTJetsSampleWeight )
   if (dodimu)
   {
     std::cout << "Computing dimuon syst:" << std::endl;
-    AccRecoIsoEffs myAccRecoIsoEffs6;
     double resultspreddimuSyst[NSEARCH_BINS]={0};
     const double old_ttbar_corrfactor_di_mus=ttbar_corrfactor_di_mus;
     ttbar_corrfactor_di_mus=1.0-1.5*(1.0-ttbar_corrfactor_di_mus);
     if (ttbar_corrfactor_di_mus>1.0) ttbar_corrfactor_di_mus=1.0;
     if (ttbar_corrfactor_di_mus<0.0) ttbar_corrfactor_di_mus=0.0;
-    LoopLLPred( myAccRecoIsoEffs6, myTTJetsSampleWeight, resultspreddimuSyst );
+    LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, resultspreddimuSyst );
+
+    myAccRecoIsoEffs.init();
 
     std::cout << "Computing dimuon stat:" << std::endl;
-    AccRecoIsoEffs myAccRecoIsoEffs7;
     double resultspreddimuStat[NSEARCH_BINS]={0};
     ttbar_corrfactor_di_mus=old_ttbar_corrfactor_di_mus+0.0062;
     if (ttbar_corrfactor_di_mus>1.0) ttbar_corrfactor_di_mus=1.0;
     if (ttbar_corrfactor_di_mus<0.0) ttbar_corrfactor_di_mus=0.0;
-    LoopLLPred( myAccRecoIsoEffs7, myTTJetsSampleWeight, resultspreddimuStat );
+    LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, resultspreddimuStat );
+
+    myAccRecoIsoEffs.init();
 
     std::cout << "dimuon syst:" << std::endl;
     for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
     {
-      if (resultspred[i_cal]>0.0) std::cout << " " << std::abs(resultspred[i_cal]-resultspreddimuSyst[i_cal])/resultspred[i_cal]+std::abs(resultspred[i_cal]-resultspreddimuStat[i_cal])/resultspred[i_cal];
-      else std::cout << " nan";
+    if (resultspred[i_cal]>0.0) std::cout << sqrt((resultspred[i_cal]-resultspreddimuSyst[i_cal])*(resultspred[i_cal]-resultspreddimuSyst[i_cal]) + (resultspred[i_cal]-resultspreddimuStat[i_cal])*(resultspred[i_cal]-resultspreddimuStat[i_cal])) / resultspred[i_cal] << " ";
+
+    else std::cout << "nan ";
     }
     std::cout << std::endl;
 
@@ -2555,28 +2593,32 @@ void LoopLLSyst( TTJetsSampleWeight& myTTJetsSampleWeight )
 
   if (dodie)
   {
-    std::cout << "Computing die syst:" << std::endl;
-    AccRecoIsoEffs myAccRecoIsoEffs8;
+    std::cout << "Computing diel syst:" << std::endl;
     double resultspreddieSyst[NSEARCH_BINS]={0};
     const double old_ttbar_corrfactor_di_els=ttbar_corrfactor_di_els;
     ttbar_corrfactor_di_els=1.0-1.5*(1.0-ttbar_corrfactor_di_els);
     if (ttbar_corrfactor_di_els>1.0) ttbar_corrfactor_di_els=1.0;
     if (ttbar_corrfactor_di_els<0.0) ttbar_corrfactor_di_els=0.0;
-    LoopLLPred( myAccRecoIsoEffs8, myTTJetsSampleWeight, resultspreddieSyst );
+    LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, resultspreddieSyst );
 
-    std::cout << "Computing die stat:" << std::endl;
-    AccRecoIsoEffs myAccRecoIsoEffs9;
+    myAccRecoIsoEffs.init();
+
+    std::cout << "Computing diel stat:" << std::endl;
     double resultspreddieStat[NSEARCH_BINS]={0};
     ttbar_corrfactor_di_els=old_ttbar_corrfactor_di_els+0.00847;
     if (ttbar_corrfactor_di_els>1.0) ttbar_corrfactor_di_els=1.0;
     if (ttbar_corrfactor_di_els<0.0) ttbar_corrfactor_di_els=0.0;
-    LoopLLPred( myAccRecoIsoEffs9, myTTJetsSampleWeight, resultspreddieStat );
+    LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, resultspreddieStat );
+
+    myAccRecoIsoEffs.init();
 
     std::cout << "die syst:" << std::endl;
     for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
     {
-      if (resultspred[i_cal]>0.0) std::cout << " " << std::abs(resultspred[i_cal]-resultspreddieSyst[i_cal])/resultspred[i_cal]+std::abs(resultspred[i_cal]-resultspreddieStat[i_cal])/resultspred[i_cal];
-      else std::cout << " nan";
+      //if (resultspred[i_cal]>0.0) std::cout << " " << std::abs(resultspred[i_cal]-resultspreddieSyst[i_cal])/resultspred[i_cal]+std::abs(resultspred[i_cal]-resultspreddieStat[i_cal])/resultspred[i_cal];
+    if (resultspred[i_cal]>0.0) std::cout << sqrt((resultspred[i_cal]-resultspreddieSyst[i_cal])*(resultspred[i_cal]-resultspreddieSyst[i_cal]) + (resultspred[i_cal]-resultspreddieStat[i_cal])*(resultspred[i_cal]-resultspreddieStat[i_cal])) / resultspred[i_cal] << " ";
+      
+    else std::cout << "nan ";
     }
     std::cout << std::endl;
 
@@ -2587,15 +2629,14 @@ void LoopLLSyst( TTJetsSampleWeight& myTTJetsSampleWeight )
 
   if (doereco)
   {
-  std::cout << "Computing syst e reco stat up: " << std::endl;
-  AccRecoIsoEffs myAccRecoIsoEffs10;
+  std::cout << "Computing syst el reco stat up: " << std::endl;
   double resultspredStatUp[NSEARCH_BINS]={0};
   double MuRecoEff[PT_BINS][AC_BINS] = {{0}}, MuRecoEff_Stat_Unc_up[PT_BINS][AC_BINS] = {{0}}, MuRecoEff_Stat_Unc_dn[PT_BINS][AC_BINS] = {{0}};
-  TFile *fin = TFile::Open("v160714_newMuonID_Effs2dPlots.root");
+  TFile *fin = TFile::Open("v2_Effs2dPlots.root");
   TH2D * murecoeff;
   murecoeff = (TH2D*)fin->Get("els_recoeffs")->Clone();
 
-  for(int i=0;i<PT_BINS;++i)
+/*  for(int i=0;i<PT_BINS;++i)
   {
     for(int j=0;j<AC_BINS;++j)
     {
@@ -2610,31 +2651,38 @@ void LoopLLSyst( TTJetsSampleWeight& myTTJetsSampleWeight )
       //std::cout << "ttbar_mus_isoeff = " << ttbar_mus_isoeff[i][j] << std::endl;
     }
   }
-
+*/
   for(int i=0;i<PT_BINS;++i)
   {
     for(int j=0;j<AC_BINS;++j)
     {
-      //ttbar_els_recoeff[i][j]=MuRecoEff[i][j];
-      ttbar_els_recoeff[i][j]=MuRecoEff_Stat_Unc_up[i][j];
+      MuRecoEff[i][j] = murecoeff->GetBinContent(i+1,j+2);
+      ttbar_els_recoeff[i][j] = murecoeff->GetBinContent(i+1,j+2)+murecoeff->GetBinError(i+1,j+2);
+      if (ttbar_els_recoeff[i][j] > 1.0) ttbar_els_recoeff[i][j] = 1.0;
+      //ttbar_els_recoeff[i][j]=MuRecoEff_Stat_Unc_up[i][j];
     }
   }
-  LoopLLPred( myAccRecoIsoEffs10, myTTJetsSampleWeight, resultspredStatUp );
+  LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, resultspredStatUp );
 
-  std::cout << "Computing syst e reco stat dn: " << std::endl;
-  AccRecoIsoEffs myAccRecoIsoEffs11;
+  myAccRecoIsoEffs.init();
+
+  std::cout << "Computing syst el reco stat dn: " << std::endl;
   double resultspredStatDn[NSEARCH_BINS]={0};
   for(int i=0;i<PT_BINS;++i)
   {
     for(int j=0;j<AC_BINS;++j)
     {
-      ttbar_els_recoeff[i][j]=MuRecoEff_Stat_Unc_dn[i][j];
+      ttbar_els_recoeff[i][j] = murecoeff->GetBinContent(i+1,j+2)-murecoeff->GetBinError(i+1,j+2);
+      if (ttbar_els_recoeff[i][j] < 0.0) {ttbar_els_recoeff[i][j] = 0.0;
+      std::cout << "el reco eff [" << i << "][" << j << "] set to 0" << std::endl;}
+      //ttbar_els_recoeff[i][j]=MuRecoEff_Stat_Unc_dn[i][j];
     }
   }
-  LoopLLPred( myAccRecoIsoEffs11, myTTJetsSampleWeight, resultspredStatDn );
+  LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, resultspredStatDn );
 
-  std::cout << "Computing syst e reco syst up: " << std::endl;
-  AccRecoIsoEffs myAccRecoIsoEffs12;
+  myAccRecoIsoEffs.init();
+
+  std::cout << "Computing syst el reco syst up: " << std::endl;
   double resultspredSystUp[NSEARCH_BINS]={0};
   for(int i=0;i<PT_BINS;++i)
   {
@@ -2646,11 +2694,11 @@ void LoopLLSyst( TTJetsSampleWeight& myTTJetsSampleWeight )
       if (ttbar_els_recoeff[i][j]>1.0) ttbar_els_recoeff[i][j]=1.0;
     }
   }
-  LoopLLPred( myAccRecoIsoEffs12, myTTJetsSampleWeight, resultspredSystUp );
+  LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, resultspredSystUp );
 
+  myAccRecoIsoEffs.init();
 
-  std::cout << "Computing syst e reco syst dn: " << std::endl;
-  AccRecoIsoEffs myAccRecoIsoEffs13;
+  std::cout << "Computing syst el reco syst dn: " << std::endl;
   double resultspredSystDn[NSEARCH_BINS]={0};
   for(int i=0;i<PT_BINS;++i)
   {
@@ -2659,29 +2707,35 @@ void LoopLLSyst( TTJetsSampleWeight& myTTJetsSampleWeight )
       //ttbar_els_recoeff[i][j]=MuRecoEff[i][j]-0.05;
       if (i==0) ttbar_els_recoeff[i][j]=MuRecoEff[i][j]-0.055;
       else ttbar_els_recoeff[i][j]=MuRecoEff[i][j]-0.025;
-      if (ttbar_els_recoeff[i][j]<0.0) ttbar_els_recoeff[i][j]=0.0;
+      if (ttbar_els_recoeff[i][j]<0.0) {ttbar_els_recoeff[i][j]=0.0;
+      std::cout << "el reco eff [" << i << "][" << j << "] set to 0" << std::endl;}
     }
   }
-  LoopLLPred( myAccRecoIsoEffs13, myTTJetsSampleWeight, resultspredSystDn );
+  LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, resultspredSystDn );
 
-  std::cout << "e reco syst dn:" << std::endl;
+  myAccRecoIsoEffs.init();
+
+  std::cout << "el reco syst up:" << std::endl;
   for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
   {
     //std::cout << "resultspred[" << i_cal << "] = " << resultspred[i_cal] << std::endl;
     //std::cout << "resultspredStatUp[i_cal] = " << resultspredStatUp[i_cal] << std::endl;
     //std::cout << "resultspredStatDn[i_cal] = " << resultspredStatDn[i_cal] << std::endl;
     //if (resultspred[i_cal]>0.0) std::cout << " " << resultspred[i_cal]-resultspredStatUp[i_cal];
-    if (resultspred[i_cal]>0.0) std::cout << " " << std::abs(resultspred[i_cal]-resultspredStatUp[i_cal])/resultspred[i_cal]+std::abs(resultspred[i_cal]-resultspredSystUp[i_cal])/resultspred[i_cal];
-    else std::cout << " nan";
+    //if (resultspred[i_cal]>0.0) std::cout << " " << std::abs(resultspred[i_cal]-resultspredStatUp[i_cal])/resultspred[i_cal]+std::abs(resultspred[i_cal]-resultspredSystUp[i_cal])/resultspred[i_cal];
+    if (resultspred[i_cal]>0.0) std::cout << sqrt((resultspred[i_cal]-resultspredStatUp[i_cal])*(resultspred[i_cal]-resultspredStatUp[i_cal]) + (resultspred[i_cal]-resultspredSystUp[i_cal])*(resultspred[i_cal]-resultspredSystUp[i_cal])) / resultspred[i_cal] << " ";
+
+    else std::cout << "nan ";
   }
   std::cout << std::endl;
 
-  std::cout << "e reco syst up:" << std::endl;
+  std::cout << "el reco syst down:" << std::endl;
   for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
   {
     //if (resultspred[i_cal]>0.0) std::cout << " " << resultspred[i_cal]-resultspredStatDn[i_cal];
-    if (resultspred[i_cal]>0.0) std::cout << " " << std::abs(resultspred[i_cal]-resultspredStatDn[i_cal])/resultspred[i_cal]+std::abs(resultspred[i_cal]-resultspredSystDn[i_cal])/resultspred[i_cal];
-    else std::cout << " nan";
+    //if (resultspred[i_cal]>0.0) std::cout << " " << std::abs(resultspred[i_cal]-resultspredStatDn[i_cal])/resultspred[i_cal]+std::abs(resultspred[i_cal]-resultspredSystDn[i_cal])/resultspred[i_cal];
+    if (resultspred[i_cal]>0.0) std::cout << sqrt((resultspred[i_cal]-resultspredStatDn[i_cal])*(resultspred[i_cal]-resultspredStatDn[i_cal]) + (resultspred[i_cal]-resultspredSystDn[i_cal])*(resultspred[i_cal]-resultspredSystDn[i_cal])) / resultspred[i_cal] << " ";
+    else std::cout << "nan ";
   }
   std::cout << std::endl;
 
@@ -2695,20 +2749,18 @@ void LoopLLSyst( TTJetsSampleWeight& myTTJetsSampleWeight )
     }
   }
 
-
   }
 
   if (doeiso)
   {
-  std::cout << "Computing syst e iso stat up: " << std::endl;
-  AccRecoIsoEffs myAccRecoIsoEffs10;
+  std::cout << "Computing syst el iso stat up: " << std::endl;
   double resultspredStatUp[NSEARCH_BINS]={0};
   double MuRecoEff[PT_BINS][AC_BINS] = {{0}}, MuRecoEff_Stat_Unc_up[PT_BINS][AC_BINS] = {{0}}, MuRecoEff_Stat_Unc_dn[PT_BINS][AC_BINS] = {{0}};
-  TFile *fin = TFile::Open("v160714_newMuonID_Effs2dPlots.root");
+  TFile *fin = TFile::Open("v2_Effs2dPlots.root");
   TH2D * murecoeff;
   murecoeff = (TH2D*)fin->Get("els_isoeffs")->Clone();
 
-  for(int i=0;i<PT_BINS;++i)
+/*  for(int i=0;i<PT_BINS;++i)
   {
     for(int j=0;j<AC_BINS;++j)
     {
@@ -2723,31 +2775,38 @@ void LoopLLSyst( TTJetsSampleWeight& myTTJetsSampleWeight )
       //std::cout << "ttbar_mus_isoeff = " << ttbar_mus_isoeff[i][j] << std::endl;
     }
   }
-
+*/
   for(int i=0;i<PT_BINS;++i)
   {
     for(int j=0;j<AC_BINS;++j)
     {
-      //ttbar_els_isoeff[i][j]=MuRecoEff[i][j];
-      ttbar_els_isoeff[i][j]=MuRecoEff_Stat_Unc_up[i][j];
+      MuRecoEff[i][j] = murecoeff->GetBinContent(i+1,j+2);
+      ttbar_els_isoeff[i][j] = murecoeff->GetBinContent(i+1,j+2)+murecoeff->GetBinError(i+1,j+2);
+      if (ttbar_els_isoeff[i][j] > 1.0) ttbar_mus_isoeff[i][j] = 1.0; 
+      //ttbar_els_isoeff[i][j]=MuRecoEff_Stat_Unc_up[i][j];
     }
   }
-  LoopLLPred( myAccRecoIsoEffs10, myTTJetsSampleWeight, resultspredStatUp );
+  LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, resultspredStatUp );
 
-  std::cout << "Computing syst e iso stat dn: " << std::endl;
-  AccRecoIsoEffs myAccRecoIsoEffs11;
+  myAccRecoIsoEffs.init();
+
+  std::cout << "Computing syst el iso stat dn: " << std::endl;
   double resultspredStatDn[NSEARCH_BINS]={0};
   for(int i=0;i<PT_BINS;++i)
   {
     for(int j=0;j<AC_BINS;++j)
     {
-      ttbar_els_isoeff[i][j]=MuRecoEff_Stat_Unc_dn[i][j];
+      ttbar_els_isoeff[i][j] = murecoeff->GetBinContent(i+1,j+2)-murecoeff->GetBinError(i+1,j+2);
+      if (ttbar_els_isoeff[i][j] < 0.0) {ttbar_els_isoeff[i][j] = 0.0;
+      std::cout << "el iso eff [" << i << "][" << j << "] set to 0" << std::endl;}
+      //ttbar_els_isoeff[i][j]=MuRecoEff_Stat_Unc_dn[i][j];
     }
   }
-  LoopLLPred( myAccRecoIsoEffs11, myTTJetsSampleWeight, resultspredStatDn );
+  LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, resultspredStatDn );
 
-  std::cout << "Computing syst e iso syst up: " << std::endl;
-  AccRecoIsoEffs myAccRecoIsoEffs12;
+  myAccRecoIsoEffs.init();
+
+  std::cout << "Computing syst el iso syst up: " << std::endl;
   double resultspredSystUp[NSEARCH_BINS]={0};
   for(int i=0;i<PT_BINS;++i)
   {
@@ -2759,11 +2818,11 @@ void LoopLLSyst( TTJetsSampleWeight& myTTJetsSampleWeight )
       if (ttbar_els_isoeff[i][j]>1.0) ttbar_els_isoeff[i][j]=1.0;
     }
   }
-  LoopLLPred( myAccRecoIsoEffs12, myTTJetsSampleWeight, resultspredSystUp );
+  LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, resultspredSystUp );
 
+  myAccRecoIsoEffs.init();
 
-  std::cout << "Computing syst e iso syst dn: " << std::endl;
-  AccRecoIsoEffs myAccRecoIsoEffs13;
+  std::cout << "Computing syst el iso syst dn: " << std::endl;
   double resultspredSystDn[NSEARCH_BINS]={0};
   for(int i=0;i<PT_BINS;++i)
   {
@@ -2772,30 +2831,36 @@ void LoopLLSyst( TTJetsSampleWeight& myTTJetsSampleWeight )
       //ttbar_els_isoeff[i][j]=MuRecoEff[i][j]-0.04;
       if (i==0) ttbar_els_isoeff[i][j]=MuRecoEff[i][j]-0.035;
       else ttbar_els_isoeff[i][j]=MuRecoEff[i][j]-0.02;
-      if (ttbar_els_isoeff[i][j]<0.0) ttbar_els_isoeff[i][j]=0.0;
+      if (ttbar_els_isoeff[i][j]<0.0) {ttbar_els_isoeff[i][j]=0.0;
+      std::cout << "el iso eff [" << i << "][" << j << "] set to 0" << std::endl;}
     }
   }
-  LoopLLPred( myAccRecoIsoEffs13, myTTJetsSampleWeight, resultspredSystDn );
+  LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, resultspredSystDn );
 
+  myAccRecoIsoEffs.init();
 
-  std::cout << "e iso syst dn:" << std::endl;
+  std::cout << "el iso syst up:" << std::endl;
   for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
   {
     //std::cout << "resultspred[" << i_cal << "] = " << resultspred[i_cal] << std::endl;
     //std::cout << "resultspredStatUp[i_cal] = " << resultspredStatUp[i_cal] << std::endl;
     //std::cout << "resultspredStatDn[i_cal] = " << resultspredStatDn[i_cal] << std::endl;
     //if (resultspred[i_cal]>0.0) std::cout << " " << resultspred[i_cal]-resultspredStatUp[i_cal];
-    if (resultspred[i_cal]>0.0) std::cout << " " << std::abs(resultspred[i_cal]-resultspredStatUp[i_cal])/resultspred[i_cal]+std::abs(resultspred[i_cal]-resultspredSystUp[i_cal])/resultspred[i_cal];
-    else std::cout << " nan";
+    //if (resultspred[i_cal]>0.0) std::cout << " " << std::abs(resultspred[i_cal]-resultspredStatUp[i_cal])/resultspred[i_cal]+std::abs(resultspred[i_cal]-resultspredSystUp[i_cal])/resultspred[i_cal];
+    if (resultspred[i_cal]>0.0) std::cout << sqrt((resultspred[i_cal]-resultspredStatUp[i_cal])*(resultspred[i_cal]-resultspredStatUp[i_cal]) + (resultspred[i_cal]-resultspredSystUp[i_cal])*(resultspred[i_cal]-resultspredSystUp[i_cal])) / resultspred[i_cal] << " ";
+    
+    else std::cout << "nan ";
   }
   std::cout << std::endl;
 
-  std::cout << "e iso syst up:" << std::endl;
+  std::cout << "el iso syst down:" << std::endl;
   for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
   {
     //if (resultspred[i_cal]>0.0) std::cout << " " << resultspred[i_cal]-resultspredStatDn[i_cal];
-    if (resultspred[i_cal]>0.0) std::cout << " " << std::abs(resultspred[i_cal]-resultspredStatDn[i_cal])/resultspred[i_cal]+std::abs(resultspred[i_cal]-resultspredSystDn[i_cal])/resultspred[i_cal];
-    else std::cout << " nan";
+    //if (resultspred[i_cal]>0.0) std::cout << " " << std::abs(resultspred[i_cal]-resultspredStatDn[i_cal])/resultspred[i_cal]+std::abs(resultspred[i_cal]-resultspredSystDn[i_cal])/resultspred[i_cal];
+    if (resultspred[i_cal]>0.0) std::cout << sqrt((resultspred[i_cal]-resultspredStatDn[i_cal])*(resultspred[i_cal]-resultspredStatDn[i_cal]) + (resultspred[i_cal]-resultspredSystDn[i_cal])*(resultspred[i_cal]-resultspredSystDn[i_cal])) / resultspred[i_cal] << " ";
+    
+    else std::cout << "nan ";
   }
   std::cout << std::endl;
 
@@ -2809,7 +2874,7 @@ void LoopLLSyst( TTJetsSampleWeight& myTTJetsSampleWeight )
     }
   }
   }
-
+/*
   if (doacc)
   {
   std::cout << "Computing syst acc stat up: " << std::endl;
@@ -3072,10 +3137,10 @@ int main(int argc, char* argv[])
   //TTJets nominal
   //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_", 831.76, 11339232, LUMI, inputFileList_Cal );
 
-  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromT_", 831.76*0.5*TTbar_SingleLept_BR,  53057043, LUMI, inputFileList_Cal );
-  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromTbar", 831.76*0.5*TTbar_SingleLept_BR, 60494823, LUMI, inputFileList_Cal );
-  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_DiLept", 831.76*TTbar_DiLept_BR, 30682233, LUMI, inputFileList_Cal );
-/*
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromT_", 831.76*0.5*TTbar_SingleLept_BR,  53057043, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromTbar", 831.76*0.5*TTbar_SingleLept_BR, 60494823, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_DiLept", 831.76*TTbar_DiLept_BR, 30682233, LUMI, inputFileList_Cal );
+
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_top" , 35.6, 998400, LUMI, inputFileList_Cal );
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_antitop" , 35.6, 985000, LUMI, inputFileList_Cal );
 
@@ -3087,17 +3152,17 @@ int main(int argc, char* argv[])
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-800To1200" , 5.501*1.21, 7854734, LUMI, inputFileList_Cal );
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-1200To2500" , 1.329*1.21, 7023857, LUMI, inputFileList_Cal );
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-2500ToInf" , 0.03216*1.21, 2507809, LUMI, inputFileList_Cal );
-*/
+
 
   //data
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "MET" , 1, 1, 1.0, inputFileList_Cal );  
+  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "MET" , 1, 1, 1.0, inputFileList_Cal );  
 
   //LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
   //LoopLLExp( myAccRecoIsoEffs, myTTJetsSampleWeight );
-  double results[NSEARCH_BINS]={0};
-  LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, results );
+  //double results[NSEARCH_BINS]={0};
+  //LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, results );
   //std::cout << " what the hell happened!!" << std::endl;
-  //LoopLLSyst( myTTJetsSampleWeight );
+  LoopLLSyst( myTTJetsSampleWeight );
 
   std::cout << "done" << std::endl;
   //std::cout << "main: printOverview" << std::endl;
@@ -3105,6 +3170,10 @@ int main(int argc, char* argv[])
   //myAccRecoIsoEffs.NormalizeFlowNumber();
   // myAccRecoIsoEffs.printNormalizeFlowNumber();
 
+  for(auto a: myTTJetsSampleWeight.TTJetsSampleInfos)
+  {
+	a.chain->Reset();
+  }
   return 0;
 }
 

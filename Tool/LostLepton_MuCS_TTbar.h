@@ -43,6 +43,8 @@ class AccRecoIsoEffs
   void printNormalizeFlowNumber();
   void printEffsHeader();
 
+  void init();
+
   //here we define the overall information for ttbar sample
   int nevents_tot = 0;
   int nevents_sel_base = 0;
@@ -141,22 +143,6 @@ class AccRecoIsoEffs
   double corrfactor_di_mus_err = 0;
   double corrfactor_di_els_err = 0;
 
-/*  TFile *Effs2dPlots = new TFile("v3_Effs2dPlots.root", "recreate");
-  double ptbins[PT_BINS+1]={10.0,20.0,30.0,40.0,50.0,70.0,100.0,120.0};
-  double acbins[AC_BINS+2]={0.0,0.005,0.02,0.05,0.15,1.0,10.0};
-  double njetbins[NJETS_BINS+1]={3.5,4.5,5.5,6.5,7.5,8.5,9.5};
-  double htbins[NHT_BINS+1]={500.0,650.0,900.0,1400.0};
-  TH2D *mus_recoeffs2d  = new TH2D("mus_recoeffs","Muon RecoEffs",PT_BINS,ptbins,AC_BINS+1,acbins);
-  TH2D *mus_isoeffs2d  = new TH2D("mus_isoeffs","Muon IsoEffs",PT_BINS,ptbins,AC_BINS+1,acbins);
-  TH2D *els_recoeffs2d  = new TH2D("els_recoeffs","Electron RecoEffs",PT_BINS,ptbins,AC_BINS+1,acbins);
-  TH2D *els_isoeffs2d  = new TH2D("els_isoeffs","Electron IsoEffs",PT_BINS,ptbins,AC_BINS+1,acbins);
-  TH2D *mus_acc2d  = new TH2D("mus_acc","mus_acc",NJETS_BINS,njetbins,NHT_BINS,htbins);
-*/
-  //TH2D *mus_recoeffs2d  = new TH2D("mus_recoeffs","Muon RecoEffs",PT_BINS,0,PT_BINS,AC_BINS,0,AC_BINS);
-  //TH2D *mus_isoeffs2d  = new TH2D("mus_isoeffs","Muon IsoEffs",PT_BINS,0,PT_BINS,AC_BINS,0,AC_BINS);
-  //TH2D *els_recoeffs2d  = new TH2D("els_recoeffs","Electron RecoEffs",PT_BINS,0,PT_BINS,AC_BINS,0,AC_BINS);
-  //TH2D *els_isoeffs2d  = new TH2D("els_isoeffs","Electron IsoEffs",PT_BINS,0,PT_BINS,AC_BINS,0,AC_BINS);
-
   void NumberstoEffs();
   void EffsPlotsGen();
   void EffstoWeights();
@@ -172,6 +158,147 @@ class AccRecoIsoEffs
   double get_sys_Error(double r, double p);
 };
 
+
+void AccRecoIsoEffs::init()
+{
+  std::cout << "init" << std::endl;
+  nevents_tot = 0;
+  nevents_sel_base = 0;
+  nevents_sel_mus = 0;
+  nevents_sel_els = 0;
+  nevents_cs_mus = 0;
+
+  for (int sbc=0; sbc<NSEARCH_BINS; ++sbc)
+  {
+  nevents_cs_mus_sb[sbc] = 0;
+
+  nmus_MC_sb[sbc] = 0;
+  nmus_sb[sbc] = 0;
+  nmus_acc_MC_sb[sbc] = 0;
+  nmus_acc_sb[sbc] = 0;
+
+  nevents_mus_CS_SB_MC[sbc] = 0; nevents_mus_CS_SB_Normalized[sbc] = 0;
+  nevents_mus_pred_SB_MC[sbc] = 0; nevents_mus_pred_SB_Normalized[sbc] = 0;
+  nevents_mus_pred_SB_MC_err[sbc] = 0;
+  nevents_mus_exp_SB_MC[sbc] = 0; nevents_mus_exp_SB_Normalized[sbc] = 0;
+  nevents_els_pred_SB_MC[sbc] = 0; nevents_els_pred_SB_Normalized[sbc] = 0;
+  nevents_els_exp_SB_MC[sbc] = 0; nevents_els_exp_SB_Normalized[sbc] = 0;
+  nevents_lept_pred_SB_MC[sbc] = 0; nevents_lept_pred_SB_Normalized[sbc] = 0;
+  nevents_lept_exp_SB_MC[sbc] = 0; nevents_lept_exp_SB_Normalized[sbc] = 0;
+  nevents_lept_exp_SB_MC_isotrk[sbc] = 0; nevents_lept_exp_SB_Normalized_isotrk[sbc] = 0;
+  nevents_mus_pred_iso_SB_Normalized[sbc] = 0; nevents_mus_pred_reco_SB_Normalized[sbc] = 0; nevents_mus_pred_acc_SB_Normalized[sbc] = 0;
+  nevents_mus_exp_iso_SB_Normalized[sbc] = 0; nevents_mus_exp_reco_SB_Normalized[sbc] = 0; nevents_mus_exp_acc_SB_Normalized[sbc] = 0;
+  nevents_mus_exp_iso_SB_Normalized_isotrk[sbc] = 0; nevents_mus_exp_reco_SB_Normalized_isotrk[sbc] = 0; nevents_mus_exp_acc_SB_Normalized_isotrk[sbc] = 0;
+  w2_mus_exp_iso_SB_Normalized_isotrk[sbc] = 0; w2_mus_exp_reco_SB_Normalized_isotrk[sbc] = 0; w2_mus_exp_acc_SB_Normalized_isotrk[sbc] = 0;
+  nevents_els_exp_iso_SB_Normalized_isotrk[sbc] = 0; nevents_els_exp_reco_SB_Normalized_isotrk[sbc] = 0; nevents_els_exp_acc_SB_Normalized_isotrk[sbc] = 0;
+  w2_els_exp_iso_SB_Normalized_isotrk[sbc] = 0; w2_els_exp_reco_SB_Normalized_isotrk[sbc] = 0; w2_els_exp_acc_SB_Normalized_isotrk[sbc] = 0;
+
+ els_acc[sbc] = 0;
+ els_acc_err[sbc] = 0;
+ nels_MC[sbc] = 0; nels_acc_MC[sbc] = 0;
+ nels[sbc] = 0; nels_acc[sbc] = 0;
+
+
+  }
+
+  int i_cal;
+  int j_cal;
+
+  for(i_cal = 0 ; i_cal < NJETS_BINS ; i_cal++)
+  {
+    for (int htbinc=0;htbinc<NHT_BINS;++htbinc)
+    {
+      mus_acc[i_cal][htbinc] = 0;
+      mus_acc_err[i_cal][htbinc] = 0;
+      nmus_MC[i_cal][htbinc] = 0; nmus_acc_MC[i_cal][htbinc] = 0;
+      nmus[i_cal][htbinc] = 0; nmus_acc[i_cal][htbinc] = 0;
+
+    }
+  }
+
+  for(i_cal = 0 ; i_cal < PT_BINS ; i_cal++)
+  {
+    for(j_cal = 0 ; j_cal < AC_BINS ; j_cal++)
+    {
+      mus_recoeff[i_cal][j_cal] = 0; els_recoeff[i_cal][j_cal] = 0;
+      mus_isoeff[i_cal][j_cal] = 0; els_isoeff[i_cal][j_cal] = 0;
+      mus_isoeff_allreco[i_cal][j_cal] = 0; els_isoeff_allreco[i_cal][j_cal] = 0;
+ 
+      mus_recoeff_err[i_cal][j_cal] = 0; els_recoeff_err[i_cal][j_cal] = 0;
+      mus_isoeff_err[i_cal][j_cal] = 0; els_isoeff_err[i_cal][j_cal] = 0;
+      mus_isoeff_err_allreco[i_cal][j_cal] = 0; els_isoeff_err_allreco[i_cal][j_cal] = 0;
+
+      nmus_acc_bin_MC[i_cal][j_cal] = 0; nels_acc_bin_MC[i_cal][j_cal] = 0;
+      nmus_reco_MC[i_cal][j_cal] = 0; nels_reco_MC[i_cal][j_cal] = 0;
+      nmus_iso_MC[i_cal][j_cal] = 0; nels_iso_MC[i_cal][j_cal] = 0;
+
+      nmus_reco_MC_allreco[i_cal][j_cal] = 0; nels_reco_MC_allreco[i_cal][j_cal] = 0;
+      nmus_iso_MC_allreco[i_cal][j_cal] = 0; nels_iso_MC_allreco[i_cal][j_cal] = 0;
+      nmus_acc_bin[i_cal][j_cal] = 0; nels_acc_bin[i_cal][j_cal] = 0;
+      nmus_reco[i_cal][j_cal] = 0; nels_reco[i_cal][j_cal] = 0;
+      nmus_iso[i_cal][j_cal] = 0; nels_iso[i_cal][j_cal] = 0;
+
+      nmus_reco_allreco[i_cal][j_cal] = 0; nels_reco_allreco[i_cal][j_cal] = 0;
+      nmus_iso_allreco[i_cal][j_cal] = 0; nels_iso_allreco[i_cal][j_cal] = 0;
+    }
+
+    mtwcorrfactor[i_cal] = 0; mtwcorrfactor_err[i_cal] = 0;
+    mtwall_MC[i_cal] = 0; mtw100_MC[i_cal] = 0;
+    mtwall[i_cal] = 0; mtw100[i_cal] = 0;
+  }
+
+
+  int k_cal;
+
+  for( int searchbinc = 0 ; searchbinc < NSEARCH_BINS ; ++searchbinc )
+  {
+  for(i_cal = 0 ; i_cal < NJETS_BINS ; i_cal++)
+  {
+    for(j_cal = 0 ; j_cal < PT_BINS ; j_cal++)
+    {
+      for(k_cal = 0 ; k_cal < AC_BINS ; k_cal++)
+      {
+	for (int htbinc=0;htbinc<NHT_BINS;++htbinc)
+	{
+	  mus_EventWeight_iso[i_cal][j_cal][k_cal][htbinc][searchbinc] = 0; mus_EventWeight_reco[i_cal][j_cal][k_cal][htbinc][searchbinc] = 0; mus_EventWeight_acc[i_cal][j_cal][k_cal][htbinc][searchbinc] = 0;
+	  els_EventWeight_iso[i_cal][j_cal][k_cal][htbinc][searchbinc] = 0; els_EventWeight_reco[i_cal][j_cal][k_cal][htbinc][searchbinc] = 0; els_EventWeight_acc[i_cal][j_cal][k_cal][htbinc][searchbinc] = 0;
+	}
+      }
+    }
+  }
+  }
+
+  //di-lepton correction
+  nevents_single_mus = 0; nevents_di_mus = 0;
+  nevents_single_els = 0; nevents_di_els = 0;
+  
+  //flow number table
+  nevents_exp_all_mus = 0; nevents_exp_all_els = 0;
+  nevents_exp_acc_mus = 0; nevents_exp_acc_els = 0;
+  nevents_exp_id_mus = 0; nevents_exp_id_els = 0;
+  nevents_exp_iso_mus = 0; nevents_exp_iso_els = 0;
+  nevents_exp_all_mus_err = 0; nevents_exp_all_els_err = 0;
+  nevents_exp_acc_mus_err = 0; nevents_exp_acc_els_err = 0;
+  nevents_exp_id_mus_err = 0; nevents_exp_id_els_err = 0;
+  nevents_exp_iso_mus_err = 0; nevents_exp_iso_els_err = 0;
+
+  nevents_pred_all_mus = 0; nevents_pred_all_els = 0;
+  nevents_pred_acc_mus = 0; nevents_pred_acc_els = 0;
+  nevents_pred_id_mus = 0; nevents_pred_id_els = 0;
+  nevents_pred_iso_mus = 0; nevents_pred_iso_els = 0;
+  nevents_pred_all_mus_err = 0; nevents_pred_all_els_err = 0;
+  nevents_pred_acc_mus_err = 0; nevents_pred_acc_els_err = 0;
+  nevents_pred_id_mus_err = 0; nevents_pred_id_els_err = 0;
+  nevents_pred_iso_mus_err = 0; nevents_pred_iso_els_err = 0;
+
+  //di lepton correction factor
+  corrfactor_di_mus = 0;
+  corrfactor_di_els = 0;
+  corrfactor_di_mus_err = 0;
+  corrfactor_di_els_err = 0;
+
+
+}
 
 double AccRecoIsoEffs::get_stat_Error(double a, double an)
 {
