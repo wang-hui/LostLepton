@@ -59,7 +59,7 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
   BaseHistgram myBaseHistgram;
   myBaseHistgram.BookHistgram("v1_Cal.root");
 
-NTupleReader *tr =0;
+  NTupleReader *tr =0;
 
   //use class BaselineVessel in the SusyAnaTools/Tools/baselineDef.h file
   std::string spec = "lostlept";
@@ -111,8 +111,12 @@ NTupleReader *tr =0;
     //std::cout << "tr.getNextEvent()=" << tr.getNextEvent() <<std::endl;
 
     while(tr.getNextEvent())
-    //while(tr.getNextEvent() && neventc<10000)
+    //while(tr.getNextEvent() && neventc<1000)
     {
+      const double genHT = tr.hasVar("genHT") ? tr.getVar<double>("genHT") : -999;
+      if ((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_SingleLeptFromT_" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_SingleLeptFromTbar" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_DiLept" && genHT >= 600) continue; 
+      if ((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT" && genHT < 600) continue;
+      
       ++neventc;
       if(tr.getEvtNum()%20000 == 0) std::cout << tr.getEvtNum() << "\t" << ((clock() - t0)/1000000.0) << std::endl;
 
@@ -174,9 +178,6 @@ NTupleReader *tr =0;
 	//const double ht = tr.getVar<double>("ht");
 	const double ht = tr.getVar<double>("HT"+spec);
 	//std::cout << "ht = " << ht << std::endl;
-
-	//if (ht > 300) //a bad solution
-	//{
 
         int ngenmu = 0;
         int ngenel = 0;
@@ -583,7 +584,6 @@ NTupleReader *tr =0;
 
 	  }
 	 }
-	//}//end a bad solution
       }//baseline, nolepveto
     }//TTjets samples class
   }//end of first loop
@@ -604,7 +604,7 @@ NTupleReader *tr =0;
     }
   }
 
-   std::cout << "13 () = " <<(neventsSB_afterITV[13]+neventsSB_afterITV[14])/(neventsSB[13]+neventsSB[14])<< " err = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[13] + neventsSB_afterITV_MC[14] ,neventsSB_MC[13] + neventsSB_MC[14]) << std::endl;
+/*   std::cout << "13 () = " <<(neventsSB_afterITV[13]+neventsSB_afterITV[14])/(neventsSB[13]+neventsSB[14])<< " err = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[13] + neventsSB_afterITV_MC[14] ,neventsSB_MC[13] + neventsSB_MC[14]) << std::endl;
    std::cout << "18 () = " <<(neventsSB_afterITV[18]+neventsSB_afterITV[19]+neventsSB_afterITV[20])/(neventsSB[18]+neventsSB[19]+neventsSB[20])<< " err = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[18] + neventsSB_afterITV_MC[19] + neventsSB_afterITV_MC[20] ,neventsSB_MC[18] + neventsSB_MC[19] + neventsSB_MC[20]) << std::endl;
    std::cout << "19 () = " <<(neventsSB_afterITV[18]+neventsSB_afterITV[19]+neventsSB_afterITV[20])/(neventsSB[18]+neventsSB[19]+neventsSB[20])<< " err = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[18] + neventsSB_afterITV_MC[19] + neventsSB_afterITV_MC[20] ,neventsSB_MC[18] + neventsSB_MC[19] + neventsSB_MC[20]) << std::endl;
    std::cout << "20 () = " <<(neventsSB_afterITV[18]+neventsSB_afterITV[19]+neventsSB_afterITV[20])/(neventsSB[18]+neventsSB[19]+neventsSB[20])<< " err = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[18] + neventsSB_afterITV_MC[19] + neventsSB_afterITV_MC[20] ,neventsSB_MC[18] + neventsSB_MC[19] + neventsSB_MC[20]) << std::endl;
@@ -621,7 +621,7 @@ NTupleReader *tr =0;
    std::cout << "79 () = " <<(neventsSB_afterITV[79]+neventsSB_afterITV[78])/(neventsSB[79]+neventsSB[78])<< " err = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[79] + neventsSB_afterITV_MC[78] ,neventsSB_MC[79] + neventsSB_MC[78]) << std::endl;
    std::cout << "81 () = " <<(neventsSB_afterITV[81]+neventsSB_afterITV[80])/(neventsSB[81]+neventsSB[80])<< " err = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[81] + neventsSB_afterITV_MC[80] ,neventsSB_MC[81] + neventsSB_MC[80]) << std::endl;
    std::cout << "83 () = " <<(neventsSB_afterITV[83]+neventsSB_afterITV[82])/(neventsSB[83]+neventsSB[82])<< " err = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[83] + neventsSB_afterITV_MC[82] ,neventsSB_MC[83] + neventsSB_MC[82]) << std::endl;
-
+*/
   for( int searchbinc = 0 ; searchbinc < NSEARCH_BINS ; ++searchbinc )
   {
     std::cout << "isoTrackErr[" << searchbinc << "] = " << myAccRecoIsoEffs.get_stat_Error(neventsSB_afterITV_MC[searchbinc],neventsSB_MC[searchbinc]) << ";" << std::endl;
@@ -3137,32 +3137,37 @@ int main(int argc, char* argv[])
   //TTJets nominal
   //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_", 831.76, 11339232, LUMI, inputFileList_Cal );
 
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromT_", 831.76*0.5*TTbar_SingleLept_BR,  53057043, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromTbar", 831.76*0.5*TTbar_SingleLept_BR, 60494823, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_DiLept", 831.76*TTbar_DiLept_BR, 30682233, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_HT-600to800", 2.666535, 14210872, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_HT-800to1200", 1.098082, 9982765, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_HT-1200to2500", 0.198748, 2932983, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_HT-2500toInf", 0.002368413, 1519815, LUMI, inputFileList_Cal );
 
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_top" , 35.6, 998400, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_antitop" , 35.6, 985000, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromT_", 831.76*0.5*TTbar_SingleLept_BR, 61901450, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromTbar", 831.76*0.5*TTbar_SingleLept_BR, 59860282, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_DiLept", 831.76*TTbar_DiLept_BR, 30444678, LUMI, inputFileList_Cal );
+
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_top" , 35.6, 6774350, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_antitop" , 35.6, 6933094, LUMI, inputFileList_Cal );
 
 
   // 1.21 is the kf
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-200To400" , 359.7*1.21, 19591498, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-400To600" , 48.91*1.21, 7432746, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-600To800" , 12.05*1.21, 18088165, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-800To1200" , 5.501*1.21, 7854734, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-1200To2500" , 1.329*1.21, 7023857, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-2500ToInf" , 0.03216*1.21, 2507809, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-200To400" , 359.7*1.21, 38867206, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-400To600" , 48.91*1.21, 7759701, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-600To800" , 12.05*1.21, 17494743, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-800To1200" , 5.501*1.21, 7745467, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-1200To2500" , 1.329*1.21, 6801534, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-2500ToInf" , 0.03216*1.21, 2637821, LUMI, inputFileList_Cal );
 
 
   //data
   //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "MET" , 1, 1, 1.0, inputFileList_Cal );  
 
-  //LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
+  LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
   //LoopLLExp( myAccRecoIsoEffs, myTTJetsSampleWeight );
   //double results[NSEARCH_BINS]={0};
   //LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, results );
   //std::cout << " what the hell happened!!" << std::endl;
-  LoopLLSyst( myTTJetsSampleWeight );
+  //LoopLLSyst( myTTJetsSampleWeight );
 
   std::cout << "done" << std::endl;
   //std::cout << "main: printOverview" << std::endl;
@@ -3893,7 +3898,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
 void AccRecoIsoEffs::printEffsHeader()
 {
   std::ofstream EffsHeader;
-  EffsHeader.open ("v5_EffsHeader_MuCS.h");
+  EffsHeader.open ("v1_EffsHeader_MuCS.h");
 
   int i_cal = 0;
   int j_cal = 0;
@@ -3921,7 +3926,7 @@ std::cout << "mu bin " << searchbinc << " acc " << nmus_acc_sb[searchbinc] << " 
   }
 
 //for merge mu acc bins!!!
-
+/*
 std::cout << "bin 4 = " << (nmus_acc_sb[4] + nmus_acc_sb[17]) / (nmus_sb[4] + nmus_sb[17]) << " err = " << get_stat_Error(nmus_acc_MC_sb[4] + nmus_acc_MC_sb[17] ,nmus_MC_sb[4] + nmus_MC_sb[17]) << std::endl;
 std::cout << "bin 13 = " << (nmus_acc_sb[13] + nmus_acc_sb[14]) / (nmus_sb[13] + nmus_sb[14]) << " err = " << get_stat_Error(nmus_acc_MC_sb[13] + nmus_acc_MC_sb[14] ,nmus_MC_sb[13] + nmus_MC_sb[14]) << std::endl;
 std::cout << "bin 17 = " << (nmus_acc_sb[4] + nmus_acc_sb[17]) / (nmus_sb[4] + nmus_sb[17]) << " err = " << get_stat_Error(nmus_acc_MC_sb[4] + nmus_acc_MC_sb[17] ,nmus_MC_sb[4] + nmus_MC_sb[17]) << std::endl;
@@ -3947,7 +3952,7 @@ std::cout << "bin 79 = " << (nmus_acc_sb[79] + nmus_acc_sb[78]) / (nmus_sb[79] +
 std::cout << "bin 81 = " << (nmus_acc_sb[81] + nmus_acc_sb[80]) / (nmus_sb[81] + nmus_sb[80]) << " err = " << get_stat_Error(nmus_acc_MC_sb[81] + nmus_acc_MC_sb[80] ,nmus_MC_sb[81] + nmus_MC_sb[80]) << std::endl;
 std::cout << "bin 82 = " << (nmus_acc_sb[82] + nmus_acc_sb[83]) / (nmus_sb[82] + nmus_sb[83]) << " err = " << get_stat_Error(nmus_acc_MC_sb[82] + nmus_acc_MC_sb[83] ,nmus_MC_sb[82] + nmus_MC_sb[83]) << std::endl;
 std::cout << "bin 83 = " << (nmus_acc_sb[82] + nmus_acc_sb[83]) / (nmus_sb[82] + nmus_sb[83]) << " err = " << get_stat_Error(nmus_acc_MC_sb[82] + nmus_acc_MC_sb[83] ,nmus_MC_sb[82] + nmus_MC_sb[83]) << std::endl;
-
+*/
 
 
   EffsHeader << "  double ttbar_mus_recoeff[" << PT_BINS << "][" << AC_BINS << "] = ";
@@ -3995,7 +4000,7 @@ std::cout << "el bin " << searchbinc << " acc " << nels_acc[searchbinc] << " all
     if( searchbinc != NSEARCH_BINS-1 ) { EffsHeader << ","; }
     if( searchbinc == NSEARCH_BINS-1 ) { EffsHeader << "};" << std::endl; }
   }
-
+/*
 std::cout << "bin 4 = " << (nels_acc[4] + nels_acc[17]) / (nels[4] + nels[17]) << " err = " << get_stat_Error(nels_acc_MC[4] + nels_acc_MC[17] ,nels_MC[4] + nels_MC[17]) << std::endl;
 std::cout << "bin 13 = " << (nels_acc[13] + nels_acc[14]) / (nels[13] + nels[14]) << " err = " << get_stat_Error(nels_acc_MC[13] + nels_acc_MC[14] ,nels_MC[13] + nels_MC[14]) << std::endl;
 std::cout << "bin 17 = " << (nels_acc[4] + nels_acc[17]) / (nels[4] + nels[17]) << " err = " << get_stat_Error(nels_acc_MC[4] + nels_acc_MC[17] ,nels_MC[4] + nels_MC[17]) << std::endl;
@@ -4021,7 +4026,7 @@ std::cout << "bin 79 = " << (nels_acc[79] + nels_acc[78]) / (nels[79] + nels[78]
 std::cout << "bin 81 = " << (nels_acc[81] + nels_acc[80]) / (nels[81] + nels[80]) << " err = " << get_stat_Error(nels_acc_MC[81] + nels_acc_MC[80] ,nels_MC[81] + nels_MC[80]) << std::endl;
 std::cout << "bin 82 = " << (nels_acc[82] + nels_acc[83]) / (nels[82] + nels[83]) << " err = " << get_stat_Error(nels_acc_MC[82] + nels_acc_MC[83] ,nels_MC[82] + nels_MC[83]) << std::endl;
 std::cout << "bin 83 = " << (nels_acc[82] + nels_acc[83]) / (nels[82] + nels[83]) << " err = " << get_stat_Error(nels_acc_MC[82] + nels_acc_MC[83] ,nels_MC[82] + nels_MC[83]) << std::endl;
-
+*/
   EffsHeader << "  double ttbar_els_recoeff[" << PT_BINS << "][" << AC_BINS << "] = ";
   for( i_cal = 0 ; i_cal < PT_BINS ; i_cal++ )
   {
