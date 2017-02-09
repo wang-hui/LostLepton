@@ -41,7 +41,7 @@
 #include "LostLepton_MuCS_TTbar.h"
 #include "TTJetsReWeighting.h"
 //#include "v160714_newMuonID_accNoSingleTop_bin7f6_trkSF_EffsHeader_MuCS.h"
-#include "v6_EffsHeader_MuCS.h"
+#include "v2_EffsHeader_MuCS.h"
 #include "TriggerEff.h"
 //#include "SusyAnaTools/Tools/PDFUncertainty.h"
 
@@ -50,14 +50,14 @@ const bool applyisotrkveto = false; // should be false
 //const double isotrackvetoeff = 1;
 double isotrkeff[NSEARCH_BINS];
 
-const bool use_muon_control_sample = false;
-const bool use_electron_control_sample = true;
+const bool use_muon_control_sample = true;
+const bool use_electron_control_sample = false;
 const double electron_purity = 0.96;
 
 void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSampleWeight )
 {
   BaseHistgram myBaseHistgram;
-  myBaseHistgram.BookHistgram("v1_Cal.root");
+  myBaseHistgram.BookHistgram("CalLL.root");
 
   NTupleReader *tr =0;
 
@@ -353,6 +353,14 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 		std::cout << "Warning: mu pass iso but nMuons=0!" << std::endl;
 		std::cout << "reco_mus_pt = " << myLostMuonObj.reco_pt << std::endl;
 		std::cout << "reco_mus_eta = " << myLostMuonObj.reco_eta << std::endl;
+
+		std::cout << " isMu = " << myLostMuonObj.isMu << " isEl = " << myLostMuonObj.isEl << std::endl;
+		std::cout << " gen_eta = " << myLostMuonObj.gen_eta << " gen_phi = " << myLostMuonObj.gen_phi << " gen_pt = " << myLostMuonObj.gen_pt << " gen_activity = " << myLostMuonObj.gen_activity << std::endl;
+		std::cout << " reco_eta = " << myLostMuonObj.reco_eta << " reco_phi = " << myLostMuonObj.reco_phi << " reco_pt = " << myLostMuonObj.reco_pt << "reco_activity = " << myLostMuonObj.reco_activity << std::endl;
+		std::cout << " passAcc = " << myLostMuonObj.passAcc << " passId = " << myLostMuonObj.passId << " passIso = " << myLostMuonObj.passIso << std::endl;
+		std::cout << " doneAcc = " << myLostMuonObj.doneAcc << " doneId = " << myLostMuonObj.doneId << " doneIso = " << myLostMuonObj.doneIso << std::endl;
+		std::cout << " reco_index = " << myLostMuonObj.reco_index << std::endl;
+
               }
             }//if the gen particle is muon
           }//loop gen electrons/muons
@@ -502,6 +510,14 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 		std::cout << "Warning: el pass iso but nElectrons=0!" << std::endl;
 		std::cout << "reco_els_pt = " << myLostElectronObj.reco_pt << std::endl;
 		std::cout << "reco_els_eta = " << myLostElectronObj.reco_eta << std::endl;
+
+		std::cout << " isMu = " << myLostElectronObj.isMu << " isEl = " << myLostElectronObj.isEl << std::endl;
+		std::cout << " gen_eta = " << myLostElectronObj.gen_eta << " gen_phi = " << myLostElectronObj.gen_phi << " gen_pt = " << myLostElectronObj.gen_pt << " gen_activity = " << myLostElectronObj.gen_activity << std::endl;
+		std::cout << " reco_eta = " << myLostElectronObj.reco_eta << " reco_phi = " << myLostElectronObj.reco_phi << " reco_pt = " << myLostElectronObj.reco_pt << "reco_activity = " << myLostElectronObj.reco_activity << std::endl;
+		std::cout << " passAcc = " << myLostElectronObj.passAcc << " passId = " << myLostElectronObj.passId << " passIso = " << myLostElectronObj.passIso << std::endl;
+		std::cout << " doneAcc = " << myLostElectronObj.doneAcc << " doneId = " << myLostElectronObj.doneId << " doneIso = " << myLostElectronObj.doneIso << std::endl;
+		std::cout << " reco_index = " << myLostElectronObj.reco_index << std::endl;
+
               }
             }//if the gen particle is muon
           }//loop gen electrons/muons
@@ -667,7 +683,7 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
   ClosureHistgram myClosureHistgram;
   myClosureHistgram.BookHistgram("ExpLL.root");
 
-NTupleReader *tr =0;
+  NTupleReader *tr =0;
 
   //use class BaselineVessel in the SusyAnaTools/Tools/baselineDef.h file
   std::string spec = "lostlept";
@@ -692,18 +708,23 @@ NTupleReader *tr =0;
     std::cout << "Weight " << thisweight << std::endl;
     int neventc=0;
 
-    //while(tr.getNextEvent() && neventc<10000)
+    //while(tr.getNextEvent() && neventc<1000)
     while(tr.getNextEvent())
     {
+      const double genHT = tr.hasVar("genHT") ? tr.getVar<double>("genHT") : -999;
+
+      if ((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_SingleLeptFromT_" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_SingleLeptFromTbar" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_DiLept" && genHT >= 600) continue; 
+      if ((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT" && genHT < 600) continue;
+
       ++neventc;
       if(tr.getEvtNum()%20000 == 0) std::cout << tr.getEvtNum() << "\t" << ((clock() - t0)/1000000.0) << std::endl;
     
       myAccRecoIsoEffs.nevents_tot+=thisweight;
 
+      (myClosureHistgram.h_genHT)->Fill(genHT,thisweight);
+
       //baseline cut without lepton veto
       bool passBaselinelostlept = tr.getVar<bool>("passBaseline"+spec);
-
-
       bool passLeptVeto = tr.getVar<bool>("passLeptVeto"+spec);
       bool passnJets = tr.getVar<bool>("passnJets"+spec);
       bool passMET = tr.getVar<bool>("passMET"+spec);
@@ -3162,8 +3183,8 @@ int main(int argc, char* argv[])
   //data
   //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "MET" , 1, 1, 1.0, inputFileList_Cal );  
 
-  LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
-  //LoopLLExp( myAccRecoIsoEffs, myTTJetsSampleWeight );
+  //LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
+  LoopLLExp( myAccRecoIsoEffs, myTTJetsSampleWeight );
   //double results[NSEARCH_BINS]={0};
   //LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, results );
   //std::cout << " what the hell happened!!" << std::endl;
@@ -3898,7 +3919,7 @@ void AccRecoIsoEffs::printAccRecoIsoEffs()
 void AccRecoIsoEffs::printEffsHeader()
 {
   std::ofstream EffsHeader;
-  EffsHeader.open ("v1_EffsHeader_MuCS.h");
+  EffsHeader.open ("EffsHeader_MuCS.h");
 
   int i_cal = 0;
   int j_cal = 0;

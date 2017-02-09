@@ -499,6 +499,7 @@ class ClosureHistgram
 
   TFile *oFile;
   //closure plots definition
+  TH1D *h_genHT;
   TH1D *h_pred_mu_iso_met, *h_pred_mu_iso_njets, *h_pred_mu_iso_mt2, *h_pred_mu_iso_ht, *h_pred_mu_iso_mht, *h_pred_mu_iso_ntopjets;
   TH1D *h_pred_mu_id_met, *h_pred_mu_id_njets, *h_pred_mu_id_mt2, *h_pred_mu_id_ht, *h_pred_mu_id_mht, *h_pred_mu_id_ntopjets;
   TH1D *h_pred_mu_acc_met, *h_pred_mu_acc_njets, *h_pred_mu_acc_mt2, *h_pred_mu_acc_ht, *h_pred_mu_acc_mht, *h_pred_mu_acc_ntopjets;
@@ -542,6 +543,7 @@ void ClosureHistgram::BookHistgram(const char *outFileName)
 
   oFile = new TFile(outFileName, "recreate");
   //start closure plots
+  h_genHT = new TH1D("h_genHT","",60,0,3000);
   h_pred_mu_iso_met = new TH1D("h_pred_mu_iso_met","",100,0,1000);
   h_pred_mu_iso_njets = new TH1D("h_pred_mu_iso_njets","",20,0,20);
   h_pred_mu_iso_mt2 = new TH1D("h_pred_mu_iso_mt2","",100,0,1000);
