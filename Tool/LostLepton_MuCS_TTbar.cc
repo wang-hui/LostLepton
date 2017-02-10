@@ -50,8 +50,8 @@ const bool applyisotrkveto = false; // should be false
 //const double isotrackvetoeff = 1;
 double isotrkeff[NSEARCH_BINS];
 
-const bool use_muon_control_sample = true;
-const bool use_electron_control_sample = false;
+const bool use_muon_control_sample = false;
+const bool use_electron_control_sample = true;
 const double electron_purity = 0.96;
 
 void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSampleWeight )
@@ -113,12 +113,12 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
     while(tr.getNextEvent())
     //while(tr.getNextEvent() && neventc<1000)
     {
-      const double genHT = tr.hasVar("genHT") ? tr.getVar<double>("genHT") : -999;
-      if ((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_SingleLeptFromT_" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_SingleLeptFromTbar" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_DiLept" && genHT >= 600) continue; 
-      if ((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT" && genHT < 600) continue;
-      
       ++neventc;
       if(tr.getEvtNum()%20000 == 0) std::cout << tr.getEvtNum() << "\t" << ((clock() - t0)/1000000.0) << std::endl;
+
+      const double genHT = tr.hasVar("genHT") ? tr.getVar<double>("genHT") : -999;
+      if (((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_SingleLeptFromT_" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_SingleLeptFromTbar" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_DiLept") && genHT >= 600) continue; 
+      if ((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT" && genHT < 600) continue;
 
       myAccRecoIsoEffs.nevents_tot+=thisweight;
 
@@ -711,17 +711,19 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
     //while(tr.getNextEvent() && neventc<1000)
     while(tr.getNextEvent())
     {
-      const double genHT = tr.hasVar("genHT") ? tr.getVar<double>("genHT") : -999;
-
-      if ((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_SingleLeptFromT_" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_SingleLeptFromTbar" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_DiLept" && genHT >= 600) continue; 
-      if ((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT" && genHT < 600) continue;
-
       ++neventc;
       if(tr.getEvtNum()%20000 == 0) std::cout << tr.getEvtNum() << "\t" << ((clock() - t0)/1000000.0) << std::endl;
-    
-      myAccRecoIsoEffs.nevents_tot+=thisweight;
 
-      (myClosureHistgram.h_genHT)->Fill(genHT,thisweight);
+      const double genHT = tr.hasVar("genHT") ? tr.getVar<double>("genHT") : -999;
+      if (((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_SingleLeptFromT_" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_SingleLeptFromTbar" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_DiLept") && genHT >= 600) continue; 
+      if ((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT" && genHT < 600) continue;
+
+      double HT_sample_weight = thisweight;
+      //0.43930872 is single lept BR from ttbar and 0.10614564 is dilepton BR from ttbar
+      if (genHT >= 600) HT_sample_weight = thisweight * (0.43930872+0.10614564);
+      (myClosureHistgram.h_genHT)->Fill(genHT,HT_sample_weight);
+
+      myAccRecoIsoEffs.nevents_tot+=thisweight;
 
       //baseline cut without lepton veto
       bool passBaselinelostlept = tr.getVar<bool>("passBaseline"+spec);
@@ -1366,12 +1368,12 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 
 void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSampleWeight, double resultspred[NSEARCH_BINS] )
 {
-  const bool storePlots = false;  //set to false when running LLsyst
+  const bool storePlots = true;  //set to false when running LLsyst
   ClosureHistgram myClosureHistgram;
-  if (storePlots) myClosureHistgram.BookHistgram("v1_PredLL_pure_el.root");
+  if (storePlots) myClosureHistgram.BookHistgram("PredLL_el_cs.root");
   //if (storePlots) myClosureHistgram.BookHistgram("v2_PredLL_data.root");
 
-NTupleReader *tr =0;
+  NTupleReader *tr =0;
 
   //use class BaselineVessel in the SusyAnaTools/Tools/baselineDef.h file
   std::string spec = "lostlept";
@@ -1407,6 +1409,10 @@ NTupleReader *tr =0;
     {
       ++neventc;
       if(trCS.getEvtNum()%20000 == 0) std::cout << trCS.getEvtNum() << "\t" << ((clock() - t0)/1000000.0) << std::endl;
+
+      const double genHT = trCS.hasVar("genHT") ? trCS.getVar<double>("genHT") : -999;
+      if (((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_SingleLeptFromT_" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_SingleLeptFromTbar" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_DiLept") && genHT >= 600) continue; 
+      if ((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT" && genHT < 600) continue;
 
       bool passBaselinelostlept = trCS.getVar<bool>("passBaseline"+spec);
  
@@ -2097,7 +2103,7 @@ NTupleReader *tr =0;
   //std::cout.precision(1);
   //std::cout.precision(3);
   std::cout.precision(5);
- std::cout << std::fixed;
+  std::cout << std::fixed;
   for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
   {
 
@@ -3183,8 +3189,8 @@ int main(int argc, char* argv[])
   //data
   //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "MET" , 1, 1, 1.0, inputFileList_Cal );  
 
-  //LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
-  LoopLLExp( myAccRecoIsoEffs, myTTJetsSampleWeight );
+  LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
+  //LoopLLExp( myAccRecoIsoEffs, myTTJetsSampleWeight );
   //double results[NSEARCH_BINS]={0};
   //LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, results );
   //std::cout << " what the hell happened!!" << std::endl;

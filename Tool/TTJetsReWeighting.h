@@ -14,7 +14,7 @@
 #include "TMath.h"
 
 #include "SusyAnaTools/Tools/NTupleReader.h"
-#define LUMI 36352.970569733
+#define LUMI 36813.714859265
 //in ICHEP 2016 we use 12877.0846508279992
 
 //Fill chain from txt file
