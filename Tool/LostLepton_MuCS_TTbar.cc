@@ -41,7 +41,7 @@
 #include "LostLepton_MuCS_TTbar.h"
 #include "TTJetsReWeighting.h"
 //#include "v160714_newMuonID_accNoSingleTop_bin7f6_trkSF_EffsHeader_MuCS.h"
-#include "v2_EffsHeader_MuCS.h"
+#include "v5_EffsHeader_MuCS.h"
 #include "TriggerEff.h"
 //#include "SusyAnaTools/Tools/PDFUncertainty.h"
 
@@ -115,11 +115,11 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
     {
       ++neventc;
       if(tr.getEvtNum()%20000 == 0) std::cout << tr.getEvtNum() << "\t" << ((clock() - t0)/1000000.0) << std::endl;
-
+/*
       const double genHT = tr.hasVar("genHT") ? tr.getVar<double>("genHT") : -999;
       if (((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_SingleLeptFromT_" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_SingleLeptFromTbar" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_DiLept") && genHT >= 600) continue; 
-      if ((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT" && genHT < 600) continue;
-
+      if (((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-600to800" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-800to1200" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-1200to2500" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-2500toInf") && genHT < 600) continue;
+*/
       myAccRecoIsoEffs.nevents_tot+=thisweight;
 
       bool passLeptVeto = tr.getVar<bool>("passLeptVeto"+spec);
@@ -716,11 +716,10 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 
       const double genHT = tr.hasVar("genHT") ? tr.getVar<double>("genHT") : -999;
       if (((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_SingleLeptFromT_" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_SingleLeptFromTbar" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_DiLept") && genHT >= 600) continue; 
-      if ((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT" && genHT < 600) continue;
-
+      if (((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-600to800" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-800to1200" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-1200to2500" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-2500toInf") && genHT < 600) continue; 
       double HT_sample_weight = thisweight;
       //0.43930872 is single lept BR from ttbar and 0.10614564 is dilepton BR from ttbar
-      if (genHT >= 600) HT_sample_weight = thisweight * (0.43930872+0.10614564);
+      if ((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-600to800" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-800to1200" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-1200to2500" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-2500toInf") HT_sample_weight = thisweight * (0.43930872+0.10614564);
       (myClosureHistgram.h_genHT)->Fill(genHT,HT_sample_weight);
 
       myAccRecoIsoEffs.nevents_tot+=thisweight;
@@ -1368,9 +1367,9 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 
 void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSampleWeight, double resultspred[NSEARCH_BINS] )
 {
-  const bool storePlots = true;  //set to false when running LLsyst
+  const bool storePlots = false;  //set to false when running LLsyst
   ClosureHistgram myClosureHistgram;
-  if (storePlots) myClosureHistgram.BookHistgram("PredLL_el_cs.root");
+  if (storePlots) myClosureHistgram.BookHistgram("PredLL_mu_cs_data.root");
   //if (storePlots) myClosureHistgram.BookHistgram("v2_PredLL_data.root");
 
   NTupleReader *tr =0;
@@ -1409,17 +1408,19 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
     {
       ++neventc;
       if(trCS.getEvtNum()%20000 == 0) std::cout << trCS.getEvtNum() << "\t" << ((clock() - t0)/1000000.0) << std::endl;
-
+/*
+      //for MC only!!    start
       const double genHT = trCS.hasVar("genHT") ? trCS.getVar<double>("genHT") : -999;
       if (((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_SingleLeptFromT_" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_SingleLeptFromTbar" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_DiLept") && genHT >= 600) continue; 
-      if ((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT" && genHT < 600) continue;
-
+      if (((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-600to800" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-800to1200" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-1200to2500" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-2500toInf") && genHT < 600) continue;
+      //for MC only!!    end
+*/
       bool passBaselinelostlept = trCS.getVar<bool>("passBaseline"+spec);
  
       //const double& SusyMotherMass  = trCS.getVar<double>("SusyMotherMass");
       //const double& SusyLSPMass     = trCS.getVar<double>("SusyLSPMass");
 
-/*      //for data only!!  start
+      //for data only!!  start
       std::vector<std::string> TriggerNames = trCS.getVec<std::string>("TriggerNames");
       std::vector<int> PassTrigger = trCS.getVec<int>("PassTrigger");
       bool foundTrigger = false;
@@ -1429,14 +1430,14 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
 	using namespace std;
 
 	//if( TriggerNames[it].find("HLT_PFHT350_PFMET100_JetIdCleaned_v") || TriggerNames[it].find("HLT_PFHT350_PFMET100_NoiseCleaned_v") || TriggerNames[it].find("HLT_PFHT350_PFMET100_v*") )
-	if( TriggerNames[it].find("HLT_PFMET170_NoiseCleaned_v")!= string::npos || TriggerNames[it].find("HLT_PFMET170_JetIdCleaned_v") != string::npos || TriggerNames[it].find("HLT_PFMET170_HBHECleaned_v") != string::npos || TriggerNames[it].find("HLT_PFMET100_PFMHT100_IDTight_v") != string::npos || TriggerNames[it].find("HLT_PFMET110_PFMHT110_IDTight_v")!= string::npos || TriggerNames[it].find("HLT_PFMET120_PFMHT120_IDTight_v")!= string::npos || TriggerNames[it].find("HLT_PFMET130_PFMHT130_IDTight_v")!= string::npos || TriggerNames[it].find("HLT_PFMET140_PFMHT140_IDTight_v")!= string::npos || TriggerNames[it].find("HLT_PFMET150_PFMHT150_IDTight_v")!= string::npos)
+	if( TriggerNames[it].find("HLT_PFMET170_NoiseCleaned_v")!= string::npos || TriggerNames[it].find("HLT_PFMET170_JetIdCleaned_v") != string::npos || TriggerNames[it].find("HLT_PFMET170_HBHECleaned_v") != string::npos || TriggerNames[it].find("HLT_PFMET100_PFMHT100_IDTight_v") != string::npos || TriggerNames[it].find("HLT_PFMET110_PFMHT110_IDTight_v")!= string::npos || TriggerNames[it].find("HLT_PFMET120_PFMHT120_IDTight_v")!= string::npos || TriggerNames[it].find("HLT_PFMET130_PFMHT130_IDTight_v")!= string::npos || TriggerNames[it].find("HLT_PFMET140_PFMHT140_IDTight_v")!= string::npos || TriggerNames[it].find("HLT_PFMET150_PFMHT150_IDTight_v")!= string::npos || TriggerNames[it].find("HLT_PFMETNoMu100_PFMHTNoMu100_IDTight_v") != string::npos || TriggerNames[it].find("HLT_PFMETNoMu110_PFMHTNoMu110_IDTight_v") != string::npos || TriggerNames[it].find("HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_v") != string::npos)
 
 	{
 	  if( PassTrigger[it] ) foundTrigger = true;
 	}
       }
       if( !foundTrigger ) continue;
-*/      //for data only!!  end
+      //for data only!!  end
 
       bool passLeptVeto = trCS.getVar<bool>("passLeptVeto"+spec);
       bool passnJets = trCS.getVar<bool>("passnJets"+spec);
@@ -1500,6 +1501,7 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
         {
           //counting the events for muon control sample
           myAccRecoIsoEffs.nevents_cs_mus++;
+
           //get reco muon variables
   	  std::vector<TLorentzVector> muonsLVec = trCS.getVec<TLorentzVector>("muonsLVec");
           std::vector<double> muonspfActivity = trCS.getVec<double>("muonspfActivity");
@@ -1565,6 +1567,9 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
 	    myAccRecoIsoEffs.EffstoWeights_fromH();
 
 	    ++myAccRecoIsoEffs.nevents_cs_mus_sb[searchbin_id];
+
+	    myAccRecoIsoEffs.nevents_mus_CS_SB_MC[searchbin_id]++;
+	    myAccRecoIsoEffs.nevents_mus_CS_SB_Normalized[searchbin_id]+=thisweight;
 
 	    //std::cout << "ttbar_mtwcorrfactor[0] = " << ttbar_mtwcorrfactor[0] << std::endl;
 	    //mtwcorrfactor
@@ -1846,9 +1851,10 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
 
 	    myAccRecoIsoEffs.EffstoWeights_fromH();
 
-	    //std::cout << "nevents_cs_mus_sb before = " << myAccRecoIsoEffs.nevents_cs_mus_sb[searchbin_id] << std::endl;
 	    ++myAccRecoIsoEffs.nevents_cs_mus_sb[searchbin_id];
-	    //std::cout << "nevents_cs_mus_sb after = " << myAccRecoIsoEffs.nevents_cs_mus_sb[searchbin_id] << std::endl;
+
+	    myAccRecoIsoEffs.nevents_mus_CS_SB_MC[searchbin_id]++;
+ 	    myAccRecoIsoEffs.nevents_mus_CS_SB_Normalized[searchbin_id]+=thisweight;
 
 	    //std::cout << "ttbar_mtwcorrfactor[0] = " << ttbar_mtwcorrfactor[0] << std::endl;
 	    //mtwcorrfactor
@@ -2088,22 +2094,20 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
   //std::cout << "sidebandHighMT2 = " << sidebandHighMT2 << std::endl;
 
   // TF muon CS
-  //double aveTFfromMC[84]={0.64718, 0.54607, 0.68486, 0.72258, 0.53391, 0.62296, 0.64942, 0.54682, 0.72027, 0.57920, 0.61270, 0.61530, 0.62862, 0.37975, 0.45417, 0.54550, 0.45707, 0.29137, 0.64549, 0.99841, 0.89697, 0.63376, 0.58900, 0.48153, 0.65243, 0.27659, 0.53326, 0.57811, 0.47716, 0.47412, 0.67794, 0.44542, 0.73614, 0.55661, 0.18247, 0.24244, 0.54556, 0.62026, 0.72007, 0.61392, 0.55420, 0.52652, 0.66536, 0.57971, 0.89502, 0.62887, 0.52408, 0.79464, 0.36406, 0.30258, 0.71393, 0.49519, 0.63497, 0.45040, 0.30237, 0.41106, 0.88353, 0.40487, 0.32024, 0.37574, 0.30400, 0.27665, 0.56934, 0.50703, 0.66099, 0.59415, 0.54465, 0.48374, 0.75598, 0.62101, 0.38479, 0.81652, 0.24710, 0.34828, 0.34683, 0.54442, 0.27696, 0.24813, 0.30250, 0.54704, 0.40792, 0.37645, 0.35962, 0.37900};
+//double aveTFfromMC[84]={0.642531519, 0.54357282, 0.608104908, 0.519389836, 0.32293815, 0.632981081, 0.656870362, 0.582975854, 0.50870746, 0.505819523, 0.626267645, 0.583704663, 0.531137679, 0.355219624, 0.312695143, 0.493440055, 0.545974563, 0.470652833, 0.936358705, 0.405992112, 0.444167089, 0.614641206, 0.583445566, 0.57352299, 0.667928465, 0.529051882, 0.594277533, 0.85420289, 0.550349874, 0.851635305, 0.621007033, 0.481736896, 0.33211934, 0.462099286, 0.568974523, 0.482622433, 0.346337751, 0.675488786, 0.683505891, 0.692643107, 0.47687282, 0.532654884, 0.605280335, 0.636309113, 0.591667704, 0.547187946, 0.605098038, 0.551883924, 0.357271486, 0.29774241, 0.462347252, 0.327845488, 0.627688522, 0.570660351, 0.448683383, 0.613372668, 0.640831784, 0.424091188, 0.331128187, 0.357053553, 0.436221594, 0.372714609, 0.604405869, 0.50628049, 0.493642658, 0.68334772, 0.498620714, 0.463848805, 0.45223666, 0.725186336, 0.404134203, 0.477652538, 0.115450581, 0.606666884, 0.325975996, 0.457766537, 0.375115728, 0.498270651, 0.388946409, 0.192648261, 0.295020786, 0.493394069, 0.226107074, 0.268595278};
 
   // TF ele CS
-  double aveTFfromMC[84]={0.76810, 0.67570, 0.92517, 0.79962, 0.58213, 0.72719, 0.77320, 0.52420, 0.63397, 0.70466, 0.73023, 0.63788, 0.63530, 0.36003, 0.46102, 0.75163, 0.60728, 0.32000, 0.5, 1.35187, 0.73699, 0.72565, 0.70838, 0.53720, 0.61524, 0.27198, 0.64912, 0.62166, 0.73962, 0.49458, 0.95204, 0.65817, 0.56362, 0.59732, 0.5, 0.29122, 0.24607, 0.76121, 0.83031, 0.99158, 0.74341, 0.53957, 0.75386, 0.77088, 0.76271, 0.59959, 0.76396, 0.59704, 0.43387, 0.34557, 0.83736, 0.49554, 0.73161, 0.52211, 0.53665, 0.39873, 0.88512, 0.46192, 0.37563, 0.43773, 0.29540, 0.49586, 0.69239, 0.53031, 0.66728, 0.71600, 1.05441, 0.51507, 0.85732, 0.94921, 0.51798, 0.67811, 0.30192, 0.35386, 0.48773, 0.58158, 0.43956, 0.33780, 0.42080, 0.35928, 0.55627, 0.56943, 0.64673, 0.64023};
+double aveTFfromMC[84]={0.768069021, 0.65313737, 0.864786685, 0.605287604, 0.448842393, 0.74016213, 0.756405248, 0.748400253, 0.613059487, 0.599319057, 0.778777668, 0.744523353, 0.670958408, 0.395087478, 0.369547365, 0.563182084, 0.612026352, 0.555957757, 0.524948843, 0.433307735, 0.502328224, 0.739674883, 0.6997887, 0.627757632, 1.072193557, 0.692190157, 0.7030028, 1.012148485, 0.550948921, 0.768308772, 0.659147532, 0.46670938, 0.357694242, 0.38424583, 0.703286082, 0.944711755, 0.267783542, 0.858551794, 0.779270963, 0.738666234, 0.75341206, 0.648863001, 0.739692747, 0.817662011, 0.767351138, 0.699703371, 0.740517918, 0.670780819, 0.43818293, 0.426032627, 0.484914822, 0.480024939, 0.841380238, 0.772053405, 0.535504998, 0.640003458, 0.86229817, 0.659313661, 0.379055279, 0.482365386, 0.4613808, 0.418413355, 0.716700405, 0.595759624, 0.721588156, 0.784504424, 1.151850707, 0.450531161, 0.490711029, 0.866999318, 0.457587933, 0.788994852, 0.087244134, 0.571585935, 0.4177332, 0.454703065, 0.48210461, 0.547145684, 0.390802736, 0.445390178, 0.476439461, 0.49970854, 0.414192583, 0.408957795};
 
+//double aveTFfromMC[84];
 
+//if (use_muon_control_sample) std::copy(aveTFfromMC,aveTFfromMC+84,aveTFfromMC_mu_cs);
+//if (use_electron_control_sample) std::copy(aveTFfromMC,aveTFfromMC+84,aveTFfromMC_el_cs);
 
   double psystup[84]={0.222331 ,  0.232846 ,  0.365067 ,  0.693452 ,  0.533625 ,  0.210093 ,  0.235539 ,  0.427174 ,  0.508428 ,  0.279131 ,  0.27366 ,  0.280738 ,  0.362284 ,  1.34308 ,  0.512719 ,  0.395768 ,  0.347547 ,  0.768519 ,  1.18455 ,  0.794172 ,  0.679942 ,  0.215124 ,  0.260163 ,  0.370625 ,  0.443297 ,  1.04235 ,  0.300143 ,  0.363733 ,  0.563737 ,  0.684077 ,  0.677213 ,  0.356993 ,  0.378372 ,  0.912265 ,  1.16299 ,  1.198 ,  11.3234 ,  0.23611 ,  0.282095 ,  0.405362 ,  0.618342 ,  0.287652 ,  0.385904 ,  0.652676 ,  1.37527 ,  0.451081 ,  0.782247 ,  0.601983 ,  0.233522 ,  0.398513 ,  1.38303 ,  0.655637 ,  0.24922 ,  0.348807 ,  0.753337 ,  0.592553 ,  0.447955 ,  1.15275 ,  0.231433 ,  0.536916 ,  0.531596 ,  0.794419 ,  0.262598 ,  0.424343 ,  0.574137 ,  0.321691 ,  0.551045 ,  2.09576 ,  0.846289 ,  0.738532 ,  0.317367 ,  0.70955 ,  1.01619 ,  0.455137 ,  0.495764 ,  0.495544 ,  1.05361 ,  1.4284 ,  0.667495 ,  0.759063 ,  0.60185 ,  0.719594 ,  1.15249 ,  1.69776};
   double psystdown[84]={0.22234 ,  0.232854 ,  0.365073 ,  0.693455 ,  0.533629 ,  0.210102 ,  0.235547 ,  0.427179 ,  0.508432 ,  0.279138 ,  0.273668 ,  0.280745 ,  0.36229 ,  1.34308 ,  0.512723 ,  0.395773 ,  0.347553 ,  0.768521 ,  1.18455 ,  0.794174 ,  0.679945 ,  0.215133 ,  0.26017 ,  0.370631 ,  0.443301 ,  1.04235 ,  0.30015 ,  0.363739 ,  0.56374 ,  0.68408 ,  0.677216 ,  0.356999 ,  0.378377 ,  0.912267 ,  1.16299 ,  1.198 ,  11.3234 ,  0.236118 ,  0.282102 ,  0.405367 ,  0.618345 ,  0.287659 ,  0.385909 ,  0.652679 ,  1.37527 ,  0.451085 ,  0.782249 ,  0.601986 ,  0.23353 ,  0.398519 ,  1.38303 ,  0.65564 ,  0.249228 ,  0.348812 ,  0.753339 ,  0.592556 ,  0.44796 ,  1.15276 ,  0.231442 ,  0.53692 ,  0.531599 ,  0.794421 ,  0.262606 ,  0.424348 ,  0.57414 ,  0.321697 ,  0.551049 ,  2.09576 ,  0.846291 ,  0.738534 ,  0.317374 ,  0.709553 ,  1.01619 ,  0.455142 ,  0.495768 ,  0.495548 ,  1.05361 ,  1.4284 ,  0.667498 ,  0.759066 ,  0.601853 ,  0.719596 ,  1.15249 ,  1.69776};
 
 
-
-  //std::cout.precision(1);
-  //std::cout.precision(3);
-  std::cout.precision(5);
-  std::cout << std::fixed;
   for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
   {
 
@@ -2135,7 +2139,8 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
     //std::cout << "N events [" << i_cal << "] = " << myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal] << " , pred = " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal] << std::endl;
  
     // data card
-    std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal];
+    //std::cout << "\n";
+    //std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal];
     //std::cout << " " << myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal];
     //std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]/myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal]*1.8*(60144642+59816364+30498962)/2262.946/831.76;
     //std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]/myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal]*1.83333*(59654914+51873969+30587326)/4004.345/831.76;
@@ -2149,6 +2154,7 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
     // 1.83333 c'est 1/(0.43930872+0.10614564)
     //std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]/myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal];
     //std::cout << " " << (std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isoTrackEff_SB[i_cal];
+    //relative stat unc
     //if (myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]==0.0) std::cout << " 0";
     //else std::cout << " " << (std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))/myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal];
     //if (myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]==0.0) std::cout << " 0";
@@ -2177,7 +2183,7 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
 
 
 
-    if (false)
+    if (true)
     {
     if (i_cal == 0) std::cout  <<  "0 &               1 &               1 &         200-300 &         250-400 & ";
     if (i_cal == 1) std::cout  <<  "1 &               1 &               1 &         200-300 &         400-500 & ";
@@ -2264,15 +2270,41 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
     if (i_cal == 82) std::cout  <<  "82 &              3+ &              3+ &            200+ &         250-350 & ";
     if (i_cal == 83) std::cout  <<  "83 &              3+ &              3+ &            200+ &            350+ & ";
 
-
+    std::cout.precision(3);
+    std::cout << std::fixed;
 
     std::cout << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal] << " $^{+" << std::sqrt(((std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isoTrackEff_SB[i_cal])*((std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isoTrackEff_SB[i_cal])+1.8333*aveTFfromMC[i_cal]*1.8333*aveTFfromMC[i_cal]) << "}_{-" << (std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))*isoTrackEff_SB[i_cal] << "}$ $^{+" << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]*psystup[i_cal] << "}_{-" << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]*psystdown[i_cal] << "}$" << " \\\\ " << 
 std::endl;
     std::cout << "\\hline" << std::endl;
     }
-
   }
+
   std::cout  << std::endl;
+
+  std::cout.precision(5);
+  std::cout << std::fixed;
+
+  std::cout << "\n data card # Predicted central numbers " << std::endl;
+  for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ ) {std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal];}
+
+  std::cout << "\n data card # Control sample events " << std::endl;
+  for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ ) { std::cout << " " << myAccRecoIsoEffs.nevents_cs_mus_sb[i_cal]; }
+
+  std::cout << "\n data card  # Average weight " << std::endl;
+  for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ ) 
+  {if (myAccRecoIsoEffs.nevents_mus_CS_SB_Normalized[i_cal] == 0) std::cout << " 0";
+  else  std::cout << " " << myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]*isoTrackEff_SB[i_cal]/myAccRecoIsoEffs.nevents_mus_CS_SB_Normalized[i_cal]; }
+
+  std::cout << "\n data card stat unc" << std::endl;
+  for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ ) 
+  {if (myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal]==0.0) std::cout << " 0";
+  else std::cout << " " << (std::sqrt(myAccRecoIsoEffs.nevents_mus_pred_SB_MC[i_cal])+std::sqrt(myAccRecoIsoEffs.nevents_els_pred_SB_MC[i_cal]))/myAccRecoIsoEffs.nevents_lept_pred_SB_Normalized[i_cal];}
+
+  std::cout << "\n Muon CS # in Search Bins: " << std::endl;
+  for( int searchbinc = 0 ; searchbinc < NSEARCH_BINS ; ++searchbinc )
+  {
+  std::cout << "bin " << searchbinc << " raw events " << myAccRecoIsoEffs.nevents_mus_CS_SB_MC[searchbinc] << " weighted events " << myAccRecoIsoEffs.nevents_mus_CS_SB_Normalized[searchbinc] << std::endl;
+  }
 
 //  for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
 //  {
@@ -3163,7 +3195,7 @@ int main(int argc, char* argv[])
   // https://github.com/susy2015/SusyAnaTools/blob/master/Tools/samples.cc
   //TTJets nominal
   //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_", 831.76, 11339232, LUMI, inputFileList_Cal );
-
+/*
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_HT-600to800", 2.666535, 14210872, LUMI, inputFileList_Cal );
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_HT-800to1200", 1.098082, 9982765, LUMI, inputFileList_Cal );
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_HT-1200to2500", 0.198748, 2932983, LUMI, inputFileList_Cal );
@@ -3173,8 +3205,8 @@ int main(int argc, char* argv[])
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_SingleLeptFromTbar", 831.76*0.5*TTbar_SingleLept_BR, 59860282, LUMI, inputFileList_Cal );
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_DiLept", 831.76*TTbar_DiLept_BR, 30444678, LUMI, inputFileList_Cal );
 
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_top" , 35.6, 6774350, LUMI, inputFileList_Cal );
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_antitop" , 35.6, 6933094, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_top_5f_inclusiveDecays" , 35.6, 6774350, LUMI, inputFileList_Cal );
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_antitop_5f_inclusiveDecays" , 35.6, 6933094, LUMI, inputFileList_Cal );
 
 
   // 1.21 is the kf
@@ -3184,15 +3216,15 @@ int main(int argc, char* argv[])
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-800To1200" , 5.501*1.21, 7745467, LUMI, inputFileList_Cal );
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-1200To2500" , 1.329*1.21, 6801534, LUMI, inputFileList_Cal );
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-2500ToInf" , 0.03216*1.21, 2637821, LUMI, inputFileList_Cal );
-
+*/
 
   //data
-  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "MET" , 1, 1, 1.0, inputFileList_Cal );  
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "MET" , 1, 1, 1.0, inputFileList_Cal );  
 
-  LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
+  //LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
   //LoopLLExp( myAccRecoIsoEffs, myTTJetsSampleWeight );
-  //double results[NSEARCH_BINS]={0};
-  //LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, results );
+  double results[NSEARCH_BINS]={0};
+  LoopLLPred( myAccRecoIsoEffs, myTTJetsSampleWeight, results );
   //std::cout << " what the hell happened!!" << std::endl;
   //LoopLLSyst( myTTJetsSampleWeight );
 

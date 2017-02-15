@@ -55,8 +55,8 @@ class ClosurePlots
 
 void ClosurePlots::Initialization()
 {
-  fin = TFile::Open("ExpLL.root");
-  fin2 = TFile::Open("v1_PredLL_pure_el.root");
+  fin = TFile::Open("v5_ExpLL.root");
+  fin2 = TFile::Open("v5_PredLL_el_cs.root");
   list = fin->GetListOfKeys();
   list2 = fin2->GetListOfKeys();
   scale=1.0;
@@ -71,7 +71,6 @@ void ClosurePlots::PrintPlotsName()
   
   return ;
 }
-
 
 void ClosurePlots::SetScale(
                             double Nevents,
@@ -211,6 +210,7 @@ void ClosurePlots::ClosureTemplate(
   h_ratio->SetTitle("");
   h_ratio->SetStats(0);
   h_ratio->SetLineWidth(1);
+  h_ratio->GetYaxis()->SetNdivisions(505);
   h_ratio->GetYaxis()->SetTitleSize(0.15);
   h_ratio->GetYaxis()->SetTitleOffset(0.3);
   h_ratio->GetYaxis()->SetTitleFont(42);
