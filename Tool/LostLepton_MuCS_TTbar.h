@@ -78,6 +78,12 @@ class AccRecoIsoEffs
   double nmus_acc_MC_sb[NSEARCH_BINS] = {0};
   double nmus_acc_sb[NSEARCH_BINS] = {0};
 
+  double nmus_acc_weight_squar[NSEARCH_BINS] = {0};
+  double nmus_not_acc_weight_squar[NSEARCH_BINS] = {0};
+
+  double nels_acc_weight_squar[NSEARCH_BINS] = {0};
+  double nels_not_acc_weight_squar[NSEARCH_BINS] = {0};
+
   double nmus_reco_MC_allreco[PT_BINS][AC_BINS] = {{0}}, nels_reco_MC_allreco[PT_BINS][AC_BINS] = {{0}};
   double nmus_iso_MC_allreco[PT_BINS][AC_BINS] = {{0}}, nels_iso_MC_allreco[PT_BINS][AC_BINS] = {{0}};
 
@@ -151,7 +157,7 @@ class AccRecoIsoEffs
   void NormalizeFlowNumber();
   //void printSearchBin(ClosureHistgram& myClosureHistgram);
   double get_stat_Error(double a, double an);
-
+  double get_ratio_Error(double x, double y, double ux, double uy);
  private:
   double scale = 1;  
   double get_stat_Error_APNOA(double a, double an,double ua, double un);
@@ -322,6 +328,14 @@ double AccRecoIsoEffs::get_stat_Error(double a, double an)
     return -1;
   }
 }
+
+double AccRecoIsoEffs::get_ratio_Error(double x, double y, double ux, double uy)
+{
+// give the unc of ratio = x/(x+y)
+if ((x+y) == 0) return 0;
+else return sqrt(y*y*ux*ux + x*x*uy*uy)/((x+y)*(x+y));
+}
+
 
 double AccRecoIsoEffs::get_stat_Error_APNOA(double a, double an,double ua, double un)
 {

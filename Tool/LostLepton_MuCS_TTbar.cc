@@ -41,7 +41,7 @@
 #include "LostLepton_MuCS_TTbar.h"
 #include "TTJetsReWeighting.h"
 //#include "v160714_newMuonID_accNoSingleTop_bin7f6_trkSF_EffsHeader_MuCS.h"
-#include "v5_EffsHeader_MuCS.h"
+#include "v6_EffsHeader_MuCS.h"
 #include "TriggerEff.h"
 //#include "SusyAnaTools/Tools/PDFUncertainty.h"
 
@@ -50,8 +50,8 @@ const bool applyisotrkveto = false; // should be false
 //const double isotrackvetoeff = 1;
 double isotrkeff[NSEARCH_BINS];
 
-const bool use_muon_control_sample = false;
-const bool use_electron_control_sample = true;
+const bool use_muon_control_sample = true;
+const bool use_electron_control_sample = false;
 const double electron_purity = 0.96;
 
 void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSampleWeight )
@@ -88,24 +88,20 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
   for(iter_TTJetsSampleInfos = myTTJetsSampleWeight.TTJetsSampleInfos.begin(); iter_TTJetsSampleInfos != myTTJetsSampleWeight.TTJetsSampleInfos.end(); iter_TTJetsSampleInfos++)
   {  
     //use class NTupleReader in the SusyAnaTools/Tools/NTupleReader.h file
-    
-    //std::cout << "start ntuple reader" << std::endl;
 
     NTupleReader tr((*iter_TTJetsSampleInfos).chain);
     //initialize the type3Ptr defined in the customize.h
     //AnaFunctions::prepareTopTagger();
 
-    //std::cout << "The passBaseline is registered here" << std::endl;
-
     tr.registerFunction(&mypassBaselineFunc);    
-
-    //std::cout << "The PDFUncertainty is registered here" << std::endl;
  
     //PDFUncertainty pdf;
     //tr.registerFunction(pdf);
 
     double thisweight = (*iter_TTJetsSampleInfos).weight;
-    std::cout << "Weight " << thisweight << std::endl;
+
+    std::cout << (*iter_TTJetsSampleInfos).TTJetsTag << " Weight: " << thisweight << std::endl;
+
     int neventc=0;
 
     //std::cout << "tr.getNextEvent()=" << tr.getNextEvent() <<std::endl;
@@ -115,11 +111,11 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
     {
       ++neventc;
       if(tr.getEvtNum()%20000 == 0) std::cout << tr.getEvtNum() << "\t" << ((clock() - t0)/1000000.0) << std::endl;
-/*
+
       const double genHT = tr.hasVar("genHT") ? tr.getVar<double>("genHT") : -999;
       if (((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_SingleLeptFromT_" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_SingleLeptFromTbar" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_DiLept") && genHT >= 600) continue; 
       if (((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-600to800" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-800to1200" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-1200to2500" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-2500toInf") && genHT < 600) continue;
-*/
+
       myAccRecoIsoEffs.nevents_tot+=thisweight;
 
       bool passLeptVeto = tr.getVar<bool>("passLeptVeto"+spec);
@@ -294,7 +290,11 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 
 		myAccRecoIsoEffs.nmus_acc_sb[searchbin_id]+=thisweight*systWeight;
 		myAccRecoIsoEffs.nmus_acc_MC_sb[searchbin_id]++;
+
+		myAccRecoIsoEffs.nmus_acc_weight_squar[searchbin_id]+=thisweight*thisweight;
               }
+
+	      else myAccRecoIsoEffs.nmus_not_acc_weight_squar[searchbin_id]+=thisweight*thisweight;
 
 		// apply muon tracking SF:
 		double TrkSF=1.0;
@@ -429,12 +429,16 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
                 myAccRecoIsoEffs.nels_acc[searchbin_id]+=thisweight*systWeight;
                 myAccRecoIsoEffs.nels_acc_MC[searchbin_id]++;
 
+		myAccRecoIsoEffs.nels_acc_weight_squar[searchbin_id]+=thisweight*thisweight;
+
                 int ptbin_number = Set_ptbin_number(myLostElectronObj.gen_pt);
                 int acbin_number = Set_acbin_number(myLostElectronObj.gen_activity);
 
                 myAccRecoIsoEffs.nels_acc_bin[ptbin_number][acbin_number]+=thisweight;
                 myAccRecoIsoEffs.nels_acc_bin_MC[ptbin_number][acbin_number]++;
               }
+
+	      else myAccRecoIsoEffs.nels_not_acc_weight_squar[searchbin_id]+=thisweight*thisweight;
 
 		// apply electron tracking SF:
 		// check with POG
@@ -705,7 +709,7 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
     tr.registerFunction(&mypassBaselineFunc);    
  
     double thisweight = (*iter_TTJetsSampleInfos).weight;
-    std::cout << "Weight " << thisweight << std::endl;
+    std::cout << (*iter_TTJetsSampleInfos).TTJetsTag << " Weight: " << thisweight << std::endl;
     int neventc=0;
 
     //while(tr.getNextEvent() && neventc<1000)
@@ -719,7 +723,7 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
       if (((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-600to800" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-800to1200" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-1200to2500" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-2500toInf") && genHT < 600) continue; 
       double HT_sample_weight = thisweight;
       //0.43930872 is single lept BR from ttbar and 0.10614564 is dilepton BR from ttbar
-      if ((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-600to800" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-800to1200" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-1200to2500" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-2500toInf") HT_sample_weight = thisweight * (0.43930872+0.10614564);
+      //if ((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-600to800" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-800to1200" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-1200to2500" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-2500toInf") HT_sample_weight = thisweight * (0.43930872+0.10614564);
       (myClosureHistgram.h_genHT)->Fill(genHT,HT_sample_weight);
 
       myAccRecoIsoEffs.nevents_tot+=thisweight;
@@ -1367,9 +1371,9 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 
 void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSampleWeight, double resultspred[NSEARCH_BINS] )
 {
-  const bool storePlots = false;  //set to false when running LLsyst
+  const bool storePlots = true;  //set to false when running LLsyst
   ClosureHistgram myClosureHistgram;
-  if (storePlots) myClosureHistgram.BookHistgram("PredLL_mu_cs_data.root");
+  if (storePlots) myClosureHistgram.BookHistgram("PredLL_mu_cs.root");
   //if (storePlots) myClosureHistgram.BookHistgram("v2_PredLL_data.root");
 
   NTupleReader *tr =0;
@@ -1400,7 +1404,9 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
     trCS.registerFunction(&mypassBaselineFunc);
 
     double thisweight = (*iter_TTJetsSampleInfos).weight;
-    std::cout << "Weight " << thisweight << std::endl;
+
+    std::cout << (*iter_TTJetsSampleInfos).TTJetsTag << " Weight: " << thisweight << std::endl;
+
     int neventc=0;
 
     //while(trCS.getNextEvent() && neventc<1000)
@@ -1408,19 +1414,19 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
     {
       ++neventc;
       if(trCS.getEvtNum()%20000 == 0) std::cout << trCS.getEvtNum() << "\t" << ((clock() - t0)/1000000.0) << std::endl;
-/*
+
       //for MC only!!    start
       const double genHT = trCS.hasVar("genHT") ? trCS.getVar<double>("genHT") : -999;
       if (((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_SingleLeptFromT_" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_SingleLeptFromTbar" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_DiLept") && genHT >= 600) continue; 
       if (((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-600to800" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-800to1200" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-1200to2500" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-2500toInf") && genHT < 600) continue;
       //for MC only!!    end
-*/
+
       bool passBaselinelostlept = trCS.getVar<bool>("passBaseline"+spec);
  
       //const double& SusyMotherMass  = trCS.getVar<double>("SusyMotherMass");
       //const double& SusyLSPMass     = trCS.getVar<double>("SusyLSPMass");
 
-      //for data only!!  start
+/*      //for data only!!  start
       std::vector<std::string> TriggerNames = trCS.getVec<std::string>("TriggerNames");
       std::vector<int> PassTrigger = trCS.getVec<int>("PassTrigger");
       bool foundTrigger = false;
@@ -1437,7 +1443,7 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
 	}
       }
       if( !foundTrigger ) continue;
-      //for data only!!  end
+*/      //for data only!!  end
 
       bool passLeptVeto = trCS.getVar<bool>("passLeptVeto"+spec);
       bool passnJets = trCS.getVar<bool>("passnJets"+spec);
@@ -3195,7 +3201,7 @@ int main(int argc, char* argv[])
   // https://github.com/susy2015/SusyAnaTools/blob/master/Tools/samples.cc
   //TTJets nominal
   //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_", 831.76, 11339232, LUMI, inputFileList_Cal );
-/*
+
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_HT-600to800", 2.666535, 14210872, LUMI, inputFileList_Cal );
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_HT-800to1200", 1.098082, 9982765, LUMI, inputFileList_Cal );
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "TTJets_HT-1200to2500", 0.198748, 2932983, LUMI, inputFileList_Cal );
@@ -3208,7 +3214,6 @@ int main(int argc, char* argv[])
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_top_5f_inclusiveDecays" , 35.6, 6774350, LUMI, inputFileList_Cal );
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "tW_antitop_5f_inclusiveDecays" , 35.6, 6933094, LUMI, inputFileList_Cal );
 
-
   // 1.21 is the kf
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-200To400" , 359.7*1.21, 38867206, LUMI, inputFileList_Cal );
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-400To600" , 48.91*1.21, 7759701, LUMI, inputFileList_Cal );
@@ -3216,10 +3221,10 @@ int main(int argc, char* argv[])
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-800To1200" , 5.501*1.21, 7745467, LUMI, inputFileList_Cal );
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-1200To2500" , 1.329*1.21, 6801534, LUMI, inputFileList_Cal );
   myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "WJetsToLNu_HT-2500ToInf" , 0.03216*1.21, 2637821, LUMI, inputFileList_Cal );
-*/
+
 
   //data
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "MET" , 1, 1, 1.0, inputFileList_Cal );  
+  //myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "MET" , 1, 1, 1.0, inputFileList_Cal );  
 
   //LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
   //LoopLLExp( myAccRecoIsoEffs, myTTJetsSampleWeight );
@@ -3281,21 +3286,17 @@ void AccRecoIsoEffs::NumberstoEffs()
 
   for( int searchbinc = 0 ; searchbinc < NSEARCH_BINS ; ++searchbinc )
   {
-    //std::cout << "acc[" << searchbinc << "] = " << nmus_acc_sb[searchbinc]/nmus_sb[searchbinc] << ";" << std::endl;
-    std::cout << "err_acc[" << searchbinc << "] = " << get_stat_Error(nmus_acc_MC_sb[searchbinc],nmus_MC_sb[searchbinc]) << ";" << std::endl;
 
-	//let us move!!
-
-    //els_acc[searchbinc] = nels_acc[searchbinc]/nels[searchbinc];
-    //els_acc_err[searchbinc] = get_stat_Error(nels_acc_MC[searchbinc],nels_MC[searchbinc]);
+  std::cout << "err_acc_mu[" << searchbinc << "] = " << get_ratio_Error(nmus_acc_sb[searchbinc], nmus_sb[searchbinc]-nmus_acc_sb[searchbinc], sqrt(nmus_acc_weight_squar[searchbinc]), sqrt(nmus_not_acc_weight_squar[searchbinc])) << ";" << std::endl;
+    //std::cout << "err_acc[" << searchbinc << "] = " << get_stat_Error(nmus_acc_MC_sb[searchbinc],nmus_MC_sb[searchbinc]) << ";" << std::endl;
   }
 
 
   for( int searchbinc = 0 ; searchbinc < NSEARCH_BINS ; ++searchbinc )
   {
-    //std::cout << "err_acc_el[" << searchbinc << "] = " << els_acc_err[searchbinc] << ";" << std::endl;
-    std::cout << "err_acc_el[" << searchbinc << "] = " << get_stat_Error(nels_acc_MC[searchbinc],nels_MC[searchbinc]) << ";" << std::endl;
 
+   std::cout << "err_acc_el[" << searchbinc << "] = " << get_ratio_Error(nels_acc[searchbinc], nels[searchbinc]-nels_acc[searchbinc], sqrt(nels_acc_weight_squar[searchbinc]), sqrt(nels_not_acc_weight_squar[searchbinc])) << ";" << std::endl;
+    //std::cout << "err_acc_el[" << searchbinc << "] = " << get_stat_Error(nels_acc_MC[searchbinc],nels_MC[searchbinc]) << ";" << std::endl;
   }
 
 
