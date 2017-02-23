@@ -2,7 +2,7 @@
 
 void Plot_eff()
 {
-  TFile f_eff("v5_Effs2dPlots.root");
+  TFile f_eff("v1_Effs2dPlots.root");
 
   const std::string titre="CMS Supplementary";
 
@@ -16,7 +16,8 @@ void Plot_eff()
   //Float_t ybins[9]={0.0,5.0,10.0,20.0,40.0,60.0,80.0,100.0,120.0};
   const int nybin=5;
   Float_t ybins[nybin+1]={0.005,0.02,0.05,0.15,1.0,10.0};
- 
+  const int ETA_BINS=7;
+  Float_t etabins[ETA_BINS+1]={0.0, 0.2, 0.3, 0.9, 1.2, 1.6, 2.1, 2.5};
 
   if (do_c1)
   {
@@ -85,7 +86,7 @@ void Plot_eff()
   TH2F *h_els_iso_eff;
   //Float_t xbins[9]={5.0,10.0,20.0,30.0,40.0,50.0,70.0,100.0,120.0};
   //Float_t ybins[9]={0.0,5.0,10.0,20.0,40.0,60.0,80.0,100.0,120.0};
-  h_els_iso_eff = new TH2F("h_els_iso_eff", "h_els_iso_eff", 7, xbins, nybin, ybins);
+  h_els_iso_eff = new TH2F("h_els_iso_eff", "h_els_iso_eff", nxbin, xbins, nybin, ybins);
   h_els_iso_eff->SetTitle("");
   h_els_iso_eff->SetXTitle("electron p_{T} [GeV]");
   h_els_iso_eff->SetYTitle("activity");
@@ -130,7 +131,7 @@ void Plot_eff()
   TCanvas *c3 = new TCanvas("c3", "c3",0,51,1920,1004);
   c3->SetFillColor(0);
   c3->cd();
-  c3->SetLogy();
+  //c3->SetLogy();
 
   TH2F *h_mus_reco_eff_ori = (TH2F*)f_eff.Get("mus_recoeffs");
   //h_mus_reco_eff_ori->Draw("colztext");
@@ -138,24 +139,24 @@ void Plot_eff()
   TH2F *h_mus_reco_eff;
   //Float_t xbins[9]={5.0,10.0,20.0,30.0,40.0,50.0,70.0,100.0,120.0};
   //Float_t ybins[9]={0.0,5.0,10.0,20.0,40.0,60.0,80.0,100.0,120.0};
-  h_mus_reco_eff = new TH2F("h_mus_reco_eff", "h_mus_reco_eff", 7, xbins, nybin, ybins);
+  h_mus_reco_eff = new TH2F("h_mus_reco_eff", "h_mus_reco_eff", nxbin, xbins, ETA_BINS, etabins);
   h_mus_reco_eff->SetTitle("");
   h_mus_reco_eff->SetXTitle("muon p_{T} [GeV]");
-  h_mus_reco_eff->SetYTitle("activity");
+  h_mus_reco_eff->SetYTitle("Eta");
   h_mus_reco_eff->SetStats(0);
   h_mus_reco_eff->SetMarkerSize(1.5);
 
   for (Int_t musonptc=1;musonptc<nxbin+1;++musonptc) {
-    for (int activityc=1;activityc<nybin+1;++activityc)
+    for (int i = 1; i < ETA_BINS+1; ++i)
     {
-      h_mus_reco_eff->SetBinContent(musonptc,activityc,h_mus_reco_eff_ori->GetBinContent(musonptc,activityc+1));
-      h_mus_reco_eff->SetBinError(musonptc,activityc,h_mus_reco_eff_ori->GetBinError(musonptc,activityc+1));
+      h_mus_reco_eff->SetBinContent(musonptc,i,h_mus_reco_eff_ori->GetBinContent(musonptc,i));
+      h_mus_reco_eff->SetBinError(musonptc,i,h_mus_reco_eff_ori->GetBinError(musonptc,i));
     }
   }
-  h_mus_reco_eff->SetMinimum(0.5);
 
   gStyle->SetPaintTextFormat("1.2f");
   h_mus_reco_eff->Draw("colztexte");
+  //h_mus_reco_eff->GetYaxis()->SetRangeUser(0,2.5);
 
 //  title->SetNDC();
 //  title->SetTextSize(0.045);
@@ -182,7 +183,7 @@ void Plot_eff()
   TCanvas *c4 = new TCanvas("c4", "c4",0,51,1920,1004);
   c4->SetFillColor(0);
   c4->cd();
-  c4->SetLogy();
+  //c4->SetLogy();
 
   TH2F *h_els_reco_eff_ori = (TH2F*)f_eff.Get("els_recoeffs");
   //h_els_reco_eff_ori->Draw("colztext");
@@ -190,23 +191,24 @@ void Plot_eff()
   TH2F *h_els_reco_eff;
   //Float_t xbins[9]={5.0,10.0,20.0,30.0,40.0,50.0,70.0,100.0,120.0};
   //Float_t ybins[9]={0.0,5.0,10.0,20.0,40.0,60.0,80.0,100.0,120.0};
-  h_els_reco_eff = new TH2F("h_els_reco_eff", "h_els_reco_eff", 7, xbins, nybin, ybins);
+  h_els_reco_eff = new TH2F("h_els_reco_eff", "h_els_reco_eff", nxbin, xbins, ETA_BINS, etabins);
   h_els_reco_eff->SetTitle("");
   h_els_reco_eff->SetXTitle("electron p_{T} [GeV]");
-  h_els_reco_eff->SetYTitle("activity");
+  h_els_reco_eff->SetYTitle("Eta");
   h_els_reco_eff->SetStats(0);
   h_els_reco_eff->SetMarkerSize(1.5);
 
   for (Int_t elsonptc=1;elsonptc<nxbin+1;++elsonptc) {
-    for (int activityc=1;activityc<nybin+1;++activityc)
+    for (int i = 1; i < ETA_BINS+1; ++i)
     {
-      h_els_reco_eff->SetBinContent(elsonptc,activityc,h_els_reco_eff_ori->GetBinContent(elsonptc,activityc+1));
-      h_els_reco_eff->SetBinError(elsonptc,activityc,h_els_reco_eff_ori->GetBinError(elsonptc,activityc+1));
+      h_els_reco_eff->SetBinContent(elsonptc,i,h_els_reco_eff_ori->GetBinContent(elsonptc,i));
+      h_els_reco_eff->SetBinError(elsonptc,i,h_els_reco_eff_ori->GetBinError(elsonptc,i));
     }
   }
 
   gStyle->SetPaintTextFormat("1.2f");
   h_els_reco_eff->Draw("colztexte");
+  //h_els_reco_eff->GetYaxis()->SetRangeUser(0,2.5);
 
 //  title->SetNDC();
 //  title->SetTextSize(0.045);

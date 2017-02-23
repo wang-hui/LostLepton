@@ -1,5 +1,6 @@
 #define PT_BINS 7
 #define AC_BINS 5
+#define ETA_BINS 7
 #define NJETS_BINS 6
 #define NHT_BINS 3
 
@@ -51,6 +52,50 @@ int Set_ptbin_number(
   }
 
   return ptbin_num;
+}
+
+//############determine the Eta bin number############
+int Set_Etabin_number(
+                     double lep_Eta
+                    )
+{
+  int Etabin_num;
+
+  if(lep_Eta >= 0 && lep_Eta < 0.2)
+  {
+    Etabin_num = 0;
+  }
+  else if(lep_Eta >= 0.2 && lep_Eta < 0.3)
+  {
+    Etabin_num = 1;
+  }
+  else if(lep_Eta >= 0.3 && lep_Eta < 0.9)
+  {
+    Etabin_num = 2;
+  }
+  else if(lep_Eta >= 0.9 && lep_Eta < 1.2) 
+  {
+    Etabin_num = 3;
+  }
+  else if(lep_Eta >= 1.2 && lep_Eta < 1.6) 
+  {
+    Etabin_num = 4;
+  }
+  else if(lep_Eta >= 1.6 && lep_Eta < 2.1)
+  {
+    Etabin_num = 5;
+  }
+  else if(lep_Eta >= 2.1 )
+  {
+    Etabin_num = 6;
+  }
+  else
+  {
+    Etabin_num = -100;
+    std::cout << "Invalid Eta bin! Please check!" << std::endl;
+  }
+
+  return Etabin_num;
 }
 
 //############determine the activity bin number############

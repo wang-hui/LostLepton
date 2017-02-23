@@ -69,8 +69,8 @@ class AccRecoIsoEffs
  
   //here we define the muon/electron number we need to count in the loop
   double nmus_MC[NJETS_BINS][NHT_BINS] = {{0}}, nmus_acc_MC[NJETS_BINS][NHT_BINS] = {{0}}, nels_MC[NSEARCH_BINS] = {0}, nels_acc_MC[NSEARCH_BINS] = {0};
-  double nmus_acc_bin_MC[PT_BINS][AC_BINS] = {{0}}, nels_acc_bin_MC[PT_BINS][AC_BINS] = {{0}};
-  double nmus_reco_MC[PT_BINS][AC_BINS] = {{0}}, nels_reco_MC[PT_BINS][AC_BINS] = {{0}};
+  double nmus_acc_bin_MC[PT_BINS][ETA_BINS] = {{0}}, nels_acc_bin_MC[PT_BINS][ETA_BINS] = {{0}};
+  double nmus_reco_MC[PT_BINS][ETA_BINS] = {{0}}, nels_reco_MC[PT_BINS][ETA_BINS] = {{0}};
   double nmus_iso_MC[PT_BINS][AC_BINS] = {{0}}, nels_iso_MC[PT_BINS][AC_BINS] = {{0}};
 
   double nmus_MC_sb[NSEARCH_BINS] = {0};
@@ -90,8 +90,8 @@ class AccRecoIsoEffs
   double mtwall_MC[PT_BINS] = {0}, mtw100_MC[PT_BINS] = {0};
 
   double nmus[NJETS_BINS][NHT_BINS] = {{0}}, nmus_acc[NJETS_BINS][NHT_BINS] = {{0}}, nels[NSEARCH_BINS] = {0}, nels_acc[NSEARCH_BINS] = {0};
-  double nmus_acc_bin[PT_BINS][AC_BINS] = {{0}}, nels_acc_bin[PT_BINS][AC_BINS] = {{0}};
-  double nmus_reco[PT_BINS][AC_BINS] = {{0}}, nels_reco[PT_BINS][AC_BINS] = {{0}};
+  double nmus_acc_bin[PT_BINS][ETA_BINS] = {{0}}, nels_acc_bin[PT_BINS][ETA_BINS] = {{0}};
+  double nmus_reco[PT_BINS][ETA_BINS] = {{0}}, nels_reco[PT_BINS][ETA_BINS] = {{0}};
   double nmus_iso[PT_BINS][AC_BINS] = {{0}}, nels_iso[PT_BINS][AC_BINS] = {{0}};
 
   double nmus_reco_allreco[PT_BINS][AC_BINS] = {{0}}, nels_reco_allreco[PT_BINS][AC_BINS] = {{0}};
@@ -100,8 +100,8 @@ class AccRecoIsoEffs
   double mtwall[PT_BINS] = {0}, mtw100[PT_BINS] = {0};
 
   //here we define the event weight we are going to use in the second loop ( muon/electron CS and prediction plots)
-  double mus_EventWeight_iso[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS][NSEARCH_BINS] = {{{{{0}}}}}, mus_EventWeight_reco[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS][NSEARCH_BINS] = {{{{{0}}}}}, mus_EventWeight_acc[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS][NSEARCH_BINS] = {{{{{0}}}}};
-  double els_EventWeight_iso[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS][NSEARCH_BINS] = {{{{{0}}}}}, els_EventWeight_reco[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS][NSEARCH_BINS] = {{{{{0}}}}}, els_EventWeight_acc[NJETS_BINS][PT_BINS][AC_BINS][NHT_BINS][NSEARCH_BINS] = {{{{{0}}}}};
+  double mus_EventWeight_iso[NJETS_BINS][PT_BINS][AC_BINS][ETA_BINS][NSEARCH_BINS] = {{{{{0}}}}}, mus_EventWeight_reco[NJETS_BINS][PT_BINS][AC_BINS][ETA_BINS][NSEARCH_BINS] = {{{{{0}}}}}, mus_EventWeight_acc[NJETS_BINS][PT_BINS][AC_BINS][ETA_BINS][NSEARCH_BINS] = {{{{{0}}}}};
+  double els_EventWeight_iso[NJETS_BINS][PT_BINS][AC_BINS][ETA_BINS][NSEARCH_BINS] = {{{{{0}}}}}, els_EventWeight_reco[NJETS_BINS][PT_BINS][AC_BINS][ETA_BINS][NSEARCH_BINS] = {{{{{0}}}}}, els_EventWeight_acc[NJETS_BINS][PT_BINS][AC_BINS][ETA_BINS][NSEARCH_BINS] = {{{{{0}}}}};
 
   //here we define the search bin variables
   double nevents_mus_CS_SB_MC[NSEARCH_BINS] = {0}, nevents_mus_CS_SB_Normalized[NSEARCH_BINS] = {0};
