@@ -50,8 +50,8 @@ const bool applyisotrkveto = false; // should be false
 //const double isotrackvetoeff = 1;
 double isotrkeff[NSEARCH_BINS];
 
-const bool use_muon_control_sample = true;
-const bool use_electron_control_sample = false;
+const bool use_muon_control_sample = false;
+const bool use_electron_control_sample = true;
 const double electron_purity = 0.96;
 
 void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSampleWeight )
@@ -1377,7 +1377,7 @@ void LoopLLExp( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 
 void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSampleWeight, double resultspred[NSEARCH_BINS] )
 {
-  const bool storePlots = true;  //set to false when running LLsyst
+  const bool storePlots = false;  //set to false when running LLsyst
   ClosureHistgram myClosureHistgram;
   if (storePlots) myClosureHistgram.BookHistgram("PredLL_mu_cs_data.root");
   //if (storePlots) myClosureHistgram.BookHistgram("v2_PredLL_data.root");
@@ -3230,7 +3230,7 @@ int main(int argc, char* argv[])
 */
 
   //data
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "MET" , 1, 1, 1.0, inputFileList_Cal );  
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "MET-Run2016H" , 1, 1, 1.0, inputFileList_Cal );  
 
   //LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
   //LoopLLExp( myAccRecoIsoEffs, myTTJetsSampleWeight );
@@ -4157,10 +4157,10 @@ std::cout << "bin 83 = " << (nels_acc[82] + nels_acc[83]) / (nels[82] + nels[83]
   EffsHeader << "  double isoTrackEff_SB[" << NSEARCH_BINS << "] = {" << std::endl;
   for( int searchbinc = 0 ; searchbinc < NSEARCH_BINS ; ++searchbinc )
   {
-    EffsHeader << isotrkeff[searchbinc] << ", ";
+    EffsHeader << isotrkeff[searchbinc];
+    if( searchbinc != NSEARCH_BINS-1 ) { EffsHeader << ","; }
+    if( searchbinc == NSEARCH_BINS-1 ) { EffsHeader << "};" << std::endl; }
   }
-  EffsHeader << "};" << std::endl;
-
   EffsHeader.close();
 }
 
