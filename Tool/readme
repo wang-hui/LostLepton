@@ -1,3 +1,33 @@
 source $CMSSW_BASE/src/SusyAnaTools/Tools/setup.csh
-/uscms_data/d3/benwu/StopHad/CMSSW_8_0_23/src/UserCode/SbottomAna/Tool/FileList
 
+
+mus_isoeff_allreco[i_cal][j_cal] = nmus_iso_allreco[i_cal][j_cal]/nmus_reco_allreco[i_cal][j_cal];
+ 383                 int ptbin_number_allreco = Set_ptbin_number(myLostMuonObj.reco_pt);
+ 384                 int acbin_number_allreco = Set_acbin_number(myLostMuonObj.reco_activity);
+ 385 
+ 386                 myAccRecoIsoEffs.nmus_iso_allreco[ptbin_number_allreco][acbin_number_allreco]+=thisweight*TrkSF*mu_trk_SF*mu_id_SF*mu_iso_SF;
+
+ 364                 int ptbin_number_allreco = Set_ptbin_number(myLostMuonObj.reco_pt);
+ 365                 int acbin_number_allreco = Set_acbin_number(myLostMuonObj.reco_activity);
+ 366 
+ 367                 myAccRecoIsoEffs.nmus_reco_allreco[ptbin_number_allreco][acbin_number_allreco]+=thisweight*TrkSF*mu_trk_SF*mu_id_SF;
+
+mus_recoeff[i_cal][j_cal] = nmus_reco[i_cal][j_cal]/nmus_acc_bin[i_cal][j_cal];
+ 356                 int ptbin_number = Set_ptbin_number(myLostMuonObj.gen_pt);
+ 358                 int Etabin_number = Set_Etabin_number(fabs(myLostMuonObj.gen_eta));
+ 359 
+ 360                 myAccRecoIsoEffs.nmus_reco[ptbin_number][Etabin_number]+=thisweight*TrkSF*mu_trk_SF*mu_id_SF;
+
+ 323                 int ptbin_number = Set_ptbin_number(myLostMuonObj.gen_pt);
+ 325                 int Etabin_number = Set_Etabin_number(fabs(myLostMuonObj.gen_eta));
+ 327 
+ 328                 myAccRecoIsoEffs.nmus_acc_bin[ptbin_number][Etabin_number]+=thisweight;
+
+EffsHeader << nmus_acc_sb[searchbinc]/nmus_sb[searchbinc];
+ 274               const int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met, ht);
+ 293               myAccRecoIsoEffs.nmus_sb[searchbin_id]+=thisweight*systWeight;
+
+ 317               if( myLostMuonObj.passAcc )
+ 331                 myAccRecoIsoEffs.nmus_acc_sb[searchbin_id]+=thisweight*systWeight;
+
+//old staff	mus_acc[i_cal][htbinc] = nmus_acc[i_cal][htbinc]/nmus[i_cal][htbinc];

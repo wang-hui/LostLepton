@@ -2,7 +2,7 @@
 
 void Plot_eff()
 {
-  TFile f_eff("v1_Effs2dPlots.root");
+  TFile f_eff("v3_Effs2dPlots_data_no_baseline.root");
 
   const std::string titre="CMS Supplementary";
 

@@ -387,6 +387,7 @@ class BaseHistgram
   void BookHistgram(const char *);
 
   TFile *oFile;
+  TH1D *h_iso_track_veto_nb, *h_iso_track_veto_nb_all, *h_iso_track_veto_nt, *h_iso_track_veto_nt_all, *h_iso_track_veto_ht, *h_iso_track_veto_ht_all, *h_iso_track_veto_mt2, *h_iso_track_veto_mt2_all, *h_iso_track_veto_met, *h_iso_track_veto_met_all;
   TH1D *h_b_all_MET;
   TH1D *h_b_baseline_nMuons, *h_b_baseline_njets, *h_b_baseline_nbjetsCSVM, *h_b_baseline_MET, *h_b_baseline_jetpt2, *h_b_baseline_jetpt4, *h_b_baseline_jet1_met_phi_diff, *h_b_baseline_jet2_met_phi_diff, *h_b_baseline_jet3_met_phi_diff;
   TH1D *h_b_acc_njets, *h_b_acc_nbjetsCSVM, *h_b_acc_MET, *h_b_acc_jetpt2, *h_b_acc_jetpt4, *h_b_acc_jet1_met_phi_diff, *h_b_acc_jet2_met_phi_diff, *h_b_acc_jet3_met_phi_diff;
@@ -411,6 +412,21 @@ class BaseHistgram
 void BaseHistgram::BookHistgram(const char *outFileName)
 {
   oFile = new TFile(outFileName, "recreate");
+
+  h_iso_track_veto_nb = new TH1D("h_iso_track_veto_nb","",20,0,20);
+  h_iso_track_veto_nb_all = new TH1D("h_iso_track_veto_nb_all","",20,0,20);
+
+  h_iso_track_veto_nt = new TH1D("h_iso_track_veto_nt","",20,0,20);
+  h_iso_track_veto_nt_all = new TH1D("h_iso_track_veto_nt_all","",20,0,20);
+
+  h_iso_track_veto_ht = new TH1D("h_iso_track_veto_ht","",20,0,2000);
+  h_iso_track_veto_ht_all = new TH1D("h_iso_track_veto_ht_all","",20,0,2000);
+
+  h_iso_track_veto_mt2 = new TH1D("h_iso_track_veto_mt2","",20,0,1000);
+  h_iso_track_veto_mt2_all = new TH1D("h_iso_track_veto_mt2_all","",20,0,1000);
+
+  h_iso_track_veto_met = new TH1D("h_iso_track_veto_met","",20,0,1000);
+  h_iso_track_veto_met_all = new TH1D("h_iso_track_veto_met_all","",20,0,1000);
 
   h_b_all_MET = new TH1D("h_b_all_MET","",1000,0,1000);
 

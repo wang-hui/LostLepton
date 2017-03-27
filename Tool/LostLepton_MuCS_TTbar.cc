@@ -30,6 +30,7 @@
 #include "TStyle.h"
 #include "TStopwatch.h"
 #include "TString.h"
+#include "TGraphAsymmErrors.h"
 
 #include "Math/QuantFuncMathCore.h"
 #include "TMath.h"
@@ -41,7 +42,7 @@
 #include "LostLepton_MuCS_TTbar.h"
 #include "TTJetsReWeighting.h"
 //#include "v160714_newMuonID_accNoSingleTop_bin7f6_trkSF_EffsHeader_MuCS.h"
-#include "v2_EffsHeader_MuCS.h"
+#include "v3_EffsHeader_MuCS_data.h"
 #include "TriggerEff.h"
 //#include "SusyAnaTools/Tools/PDFUncertainty.h"
 
@@ -53,6 +54,7 @@ double isotrkeff[NSEARCH_BINS];
 const bool use_muon_control_sample = false;
 const bool use_electron_control_sample = true;
 const double electron_purity = 0.96;
+const bool isData = true;
 
 void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSampleWeight )
 {
@@ -84,6 +86,26 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
     neventsSB_afterITV_MC[searchbinc]=0.0;
     isotrkeff[searchbinc]=0.0;
   }
+
+	TH2D * mu_mediumID_SF = 0, * mu_miniISO_SF = 0;
+	TGraphAsymmErrors * mu_trkptGT10_SF = 0, * mu_trkptLT10_SF = 0;
+
+	TH2D * ele_VetoID_SF = 0, * ele_miniISO_SF = 0;
+	TH2D * ele_trkpt_SF = 0;
+		
+	if( isData ){
+    	// Lepton SF
+	TFile * allINone_leptonSF_file = new TFile("allINone_leptonSF_Moriond17.root");
+    	mu_mediumID_SF = (TH2D*) allINone_leptonSF_file->Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0");
+      	mu_miniISO_SF = (TH2D*) allINone_leptonSF_file->Get("pt_abseta_PLOT_pair_probeMultiplicity_bin0_&_Medium2016_pass");
+	// SF for muon tracks
+      	mu_trkptGT10_SF = (TGraphAsymmErrors*) allINone_leptonSF_file->Get("ratio_eff_eta3_dr030e030_corr");
+      	mu_trkptLT10_SF = (TGraphAsymmErrors*) allINone_leptonSF_file->Get("ratio_eff_eta3_tk0_dr030e030_corr");
+  
+     	ele_VetoID_SF = (TH2D*) allINone_leptonSF_file->Get("GsfElectronToVeto");
+      	ele_miniISO_SF = (TH2D*) allINone_leptonSF_file->Get("MVAVLooseElectronToMini");
+      	ele_trkpt_SF = (TH2D*) allINone_leptonSF_file->Get("EGamma_SF2D");
+      	}
 
   for(iter_TTJetsSampleInfos = myTTJetsSampleWeight.TTJetsSampleInfos.begin(); iter_TTJetsSampleInfos != myTTJetsSampleWeight.TTJetsSampleInfos.end(); iter_TTJetsSampleInfos++)
   {  
@@ -142,8 +164,9 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
       //baseline cut without lepton veto
       bool passBaselinelostlept = tr.getVar<bool>("passBaseline"+spec);
 
-      if (passBaselinelostlept)
-	//if (passInvertedBaseline)
+
+      //if (passBaselinelostlept)
+      if (true)		//for iso and reco only!!!
       {
 	//const double pdf_Unc_Up = tr.getVar<double>("NNPDF_From_Median_Up");
 	//const double pdf_Unc_Down = tr.getVar<double>("NNPDF_From_Median_Down");
@@ -233,7 +256,7 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
                                    muonspfActivity,
                                    muonsMiniIso
                                  );
-
+	
             if( myLostMuonObj.isMu )
             {
 	      ngenmu++;
@@ -250,32 +273,39 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 	      //59 bins
 	      const int searchbin_id = theSearchBins.find_Binning_Index( nbottomjets , ntopjets , MT2, met, ht);
 
-		/*if (searchbin_id==83)
-		  {
- 		  std::cout << "thisweight["<< searchbin_id << "] = " << thisweight << std::endl;
-		  std::cout << "systWeight["<< searchbin_id << "] = " << systWeight << std::endl;
-		  std::cout << "nmus_sb["<< searchbin_id << "] = " << myAccRecoIsoEffs.nmus_sb[searchbin_id] << std::endl;
- 		  std::cout << "nmus_MC_sb["<< searchbin_id << "] = " << myAccRecoIsoEffs.nmus_MC_sb[searchbin_id] << " " << __LINE__<< std::endl;
-		  std::cout << "nbottomjets["<< searchbin_id << "] = " << nbottomjets << std::endl;
-		  std::cout << "ntopjets["<< searchbin_id << "] = " << ntopjets << std::endl;
-		  std::cout << "MT2["<< searchbin_id << "] = " << MT2 << std::endl;
-		  std::cout << "met["<< searchbin_id << "] = " << met << std::endl;
-		  std::cout << "ht["<< searchbin_id << "] = " << ht << std::endl;
- 		  }*/
-
-		//std::cout << "start nmus_MC_sb[83] = " << myAccRecoIsoEffs.nmus_MC_sb[83] << " # " << tr.getEvtNum() << " "  << __LINE__ << std::endl;
-          	//std::cout << "nmus_sb["<< searchbin_id << "] = " << myAccRecoIsoEffs.nmus_sb[searchbin_id] << " " << __LINE__<< std::endl;
-		//std::cout << "nmus_MC_sb["<< searchbin_id << "] = " << myAccRecoIsoEffs.nmus_MC_sb[searchbin_id] << " " << __LINE__<< std::endl;
- 
 	      myAccRecoIsoEffs.nmus_sb[searchbin_id]+=thisweight*systWeight;
-
-		//std::cout << "nmus_sb["<< searchbin_id << "] = " << myAccRecoIsoEffs.nmus_sb[searchbin_id]<< " " << __LINE__ << std::endl;
-		//std::cout << "nmus_MC_sb["<< searchbin_id << "] = " << myAccRecoIsoEffs.nmus_MC_sb[searchbin_id] << " " << __LINE__<< std::endl;
-		//std::cout << "middle nmus_MC_sb[83] = " << myAccRecoIsoEffs.nmus_MC_sb[83] << " # " << tr.getEvtNum() << " "  << __LINE__ << std::endl;
 
 	      myAccRecoIsoEffs.nmus_MC_sb[searchbin_id]++;
 
-		//std::cout << "end nmus_MC_sb[83] = " << myAccRecoIsoEffs.nmus_MC_sb[83] << " # " << tr.getEvtNum() << " "  << __LINE__ << std::endl;
+		double mu_id_SF = 1.0, mu_iso_SF = 1.0, mu_trk_SF = 1.0;
+		double mu_id_SF_allreco = 1.0, mu_iso_SF_allreco = 1.0, mu_trk_SF_allreco = 1.0;	
+	
+		if (isData)
+		{	
+		mu_id_SF = mu_mediumID_SF->GetBinContent(mu_mediumID_SF->FindBin(myLostMuonObj.gen_pt, fabs(myLostMuonObj.gen_eta)));
+		if( mu_id_SF == 0 ) mu_id_SF = 1.0; // very simple way dealing with out of range issue of the TH2D
+
+      		mu_iso_SF = mu_miniISO_SF->GetBinContent(mu_miniISO_SF->FindBin(myLostMuonObj.gen_pt, fabs(myLostMuonObj.gen_eta)));
+		if( mu_iso_SF == 0 ) mu_iso_SF = 1.0;
+
+       		if( myLostMuonObj.gen_pt < 10 ){ mu_trk_SF = mu_trkptLT10_SF->Eval(myLostMuonObj.gen_eta); if( mu_trk_SF == 0 ) mu_trk_SF = 1.0;}
+    		if( myLostMuonObj.gen_pt >= 10 ){ mu_trk_SF = mu_trkptGT10_SF->Eval(myLostMuonObj.gen_eta); if( mu_trk_SF == 0 ) mu_trk_SF = 1.0;}
+        	//mu_id_SF_err = mu_id_SF * 0.03;
+		
+		mu_id_SF_allreco = mu_mediumID_SF->GetBinContent(mu_mediumID_SF->FindBin(myLostMuonObj.reco_pt, fabs(myLostMuonObj.reco_eta)));
+		if( mu_id_SF_allreco == 0 ) mu_id_SF_allreco = 1.0; // very simple way dealing with out of range issue of the TH2D
+
+      		mu_iso_SF_allreco = mu_miniISO_SF->GetBinContent(mu_miniISO_SF->FindBin(myLostMuonObj.reco_pt, fabs(myLostMuonObj.reco_eta)));
+		if( mu_iso_SF_allreco == 0 ) mu_iso_SF_allreco = 1.0;
+
+       		if( myLostMuonObj.reco_pt < 10 )
+		{mu_trk_SF_allreco = mu_trkptLT10_SF->Eval(myLostMuonObj.reco_eta);
+		if( mu_trk_SF_allreco == 0 ) mu_trk_SF_allreco = 1.0;}
+
+    		if( myLostMuonObj.reco_pt >= 10 )
+		{mu_trk_SF_allreco = mu_trkptGT10_SF->Eval(myLostMuonObj.reco_eta);
+		if( mu_trk_SF_allreco == 0 ) mu_trk_SF_allreco = 1.0;}
+		}
 
               if( myLostMuonObj.passAcc )
               {
@@ -301,7 +331,7 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 
 		// apply muon tracking SF:
 		double TrkSF=1.0;
-		if (myLostMuonObj.reco_eta<-2.1) TrkSF=0.982399;
+		/*if (myLostMuonObj.reco_eta<-2.1) TrkSF=0.982399;
 		else if (myLostMuonObj.reco_eta<-1.6) TrkSF=0.9917468;
 		else if (myLostMuonObj.reco_eta<-1.1) TrkSF=0.995945;
 		else if (myLostMuonObj.reco_eta<-0.6) TrkSF=0.9934131;
@@ -311,7 +341,7 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 		else if (myLostMuonObj.reco_eta<1.6) TrkSF=0.9949339;
 		else if (myLostMuonObj.reco_eta<2.1) TrkSF=0.9911866;
 		else TrkSF=0.9768119;
-
+		*/
               //call another process for iso eff calculation, reset pt bin number for iso efficiency, as reco_pt
 
 	      if( myLostMuonObj.passId )
@@ -320,18 +350,18 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
                 int acbin_number = Set_acbin_number(myLostMuonObj.gen_activity);
                 int Etabin_number = Set_Etabin_number(fabs(myLostMuonObj.gen_eta));
 
-                myAccRecoIsoEffs.nmus_reco[ptbin_number][Etabin_number]+=thisweight*TrkSF;
+                myAccRecoIsoEffs.nmus_reco[ptbin_number][Etabin_number]+=thisweight*TrkSF*mu_trk_SF*mu_id_SF;
                 myAccRecoIsoEffs.nmus_reco_MC[ptbin_number][Etabin_number]++;
 
                 //call another process for iso eff calculation, reset pt bin number for iso efficiency, as reco_pt
                 int ptbin_number_allreco = Set_ptbin_number(myLostMuonObj.reco_pt);
                 int acbin_number_allreco = Set_acbin_number(myLostMuonObj.reco_activity);
 
-                myAccRecoIsoEffs.nmus_reco_allreco[ptbin_number_allreco][acbin_number_allreco]+=thisweight*TrkSF;
+                myAccRecoIsoEffs.nmus_reco_allreco[ptbin_number_allreco][acbin_number_allreco]+=thisweight*TrkSF*mu_trk_SF_allreco*mu_id_SF_allreco;
                 myAccRecoIsoEffs.nmus_reco_MC_allreco[ptbin_number_allreco][acbin_number_allreco]++;
                 //std::cout << myLostMuonObj.gen_activity <<"," << myLostMuonObj.reco_activity << std::endl;
-                (myBaseHistgram.h_id_genactivity_mus)->Fill(myLostMuonObj.gen_activity,thisweight*TrkSF);
-                (myBaseHistgram.h_id_recoactivity_mus)->Fill(myLostMuonObj.reco_activity,thisweight*TrkSF);
+                (myBaseHistgram.h_id_genactivity_mus)->Fill(myLostMuonObj.gen_activity,thisweight*TrkSF*mu_trk_SF*mu_id_SF);
+                (myBaseHistgram.h_id_recoactivity_mus)->Fill(myLostMuonObj.reco_activity,thisweight*TrkSF*mu_trk_SF_allreco*mu_id_SF_allreco);
               }
 
               if( myLostMuonObj.passIso )
@@ -339,14 +369,14 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
                 int ptbin_number = Set_ptbin_number(myLostMuonObj.gen_pt);
                 int acbin_number = Set_acbin_number(myLostMuonObj.gen_activity);
 
-                myAccRecoIsoEffs.nmus_iso[ptbin_number][acbin_number]+=thisweight*TrkSF;
+                myAccRecoIsoEffs.nmus_iso[ptbin_number][acbin_number]+=thisweight*TrkSF*mu_trk_SF*mu_id_SF*mu_iso_SF;
                 myAccRecoIsoEffs.nmus_iso_MC[ptbin_number][acbin_number]++;
               
                 //call another process for iso eff calculation, reset pt bin number for iso efficiency, as reco_pt
                 int ptbin_number_allreco = Set_ptbin_number(myLostMuonObj.reco_pt);
                 int acbin_number_allreco = Set_acbin_number(myLostMuonObj.reco_activity);
                 
-                myAccRecoIsoEffs.nmus_iso_allreco[ptbin_number_allreco][acbin_number_allreco]+=thisweight*TrkSF;
+                myAccRecoIsoEffs.nmus_iso_allreco[ptbin_number_allreco][acbin_number_allreco]+=thisweight*TrkSF*mu_trk_SF_allreco*mu_id_SF_allreco*mu_iso_SF_allreco;
                 myAccRecoIsoEffs.nmus_iso_MC_allreco[ptbin_number_allreco][acbin_number_allreco]++;
                 //std::cout << muonsMiniIso.size() << "," << myLostMuonObj.reco_index << "ISO:" << muonsMiniIso.at(myLostMuonObj.reco_index) << std::endl;
               }
@@ -426,6 +456,42 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 	      myAccRecoIsoEffs.nels[searchbin_id]+=thisweight*systWeight;
 	      myAccRecoIsoEffs.nels_MC[searchbin_id]++;
 
+	      double ele_id_SF = 1.0, ele_iso_SF = 1.0, ele_trk_SF = 1.0;
+      	      double ele_id_SF_err = 0.0, ele_iso_SF_err = 0.0, ele_trk_SF_err = 0.0;
+	      
+	      double ele_id_SF_allreco = 1.0, ele_iso_SF_allreco = 1.0, ele_trk_SF_allreco = 1.0;
+      	      double ele_id_SF_err_allreco = 0.0, ele_iso_SF_err_allreco = 0.0, ele_trk_SF_err_allreco = 0.0;
+
+	      if( isData )
+      	      {
+          	ele_id_SF = ele_VetoID_SF->GetBinContent(ele_VetoID_SF->FindBin(myLostElectronObj.gen_pt, fabs(myLostElectronObj.gen_eta)));
+          	ele_id_SF_err = ele_VetoID_SF->GetBinError(ele_VetoID_SF->FindBin(myLostElectronObj.gen_pt, fabs(myLostElectronObj.gen_eta)));
+          	if( ele_id_SF == 0 ){ ele_id_SF = 1.0; ele_id_SF_err = 0.0; }
+        	// very simple way dealing with out of range issue of the TH2D
+          	
+		ele_iso_SF = ele_miniISO_SF->GetBinContent(ele_miniISO_SF->FindBin(myLostElectronObj.gen_pt, fabs(myLostElectronObj.gen_eta)));
+          	ele_iso_SF_err = ele_miniISO_SF->GetBinError(ele_miniISO_SF->FindBin(myLostElectronObj.gen_pt, fabs(myLostElectronObj.gen_eta)));
+          	if( ele_iso_SF == 0 ){ ele_iso_SF = 1.0; ele_iso_SF_err = 0.0; }
+        	
+        	
+          	ele_trk_SF = ele_trkpt_SF->GetBinContent(ele_trkpt_SF->FindBin(myLostElectronObj.gen_eta, myLostElectronObj.gen_pt));
+          	ele_trk_SF_err = myLostElectronObj.gen_pt<20 || myLostElectronObj.gen_pt>80? 0.01: 0.00;
+          	if( ele_trk_SF == 0 ){ ele_trk_SF = 1.0; ele_trk_SF_err = 0.0; }
+          	
+		ele_id_SF_allreco = ele_VetoID_SF->GetBinContent(ele_VetoID_SF->FindBin(myLostElectronObj.reco_pt, fabs(myLostElectronObj.reco_eta)));
+          	ele_id_SF_err_allreco = ele_VetoID_SF->GetBinError(ele_VetoID_SF->FindBin(myLostElectronObj.reco_pt, fabs(myLostElectronObj.reco_eta)));
+          	if( ele_id_SF_allreco == 0 ){ ele_id_SF_allreco = 1.0; ele_id_SF_err_allreco = 0.0; }
+        	// very simple way dealing with out of range issue of the TH2D
+          	
+		ele_iso_SF_allreco = ele_miniISO_SF->GetBinContent(ele_miniISO_SF->FindBin(myLostElectronObj.reco_pt, fabs(myLostElectronObj.reco_eta)));
+          	ele_iso_SF_err_allreco = ele_miniISO_SF->GetBinError(ele_miniISO_SF->FindBin(myLostElectronObj.reco_pt, fabs(myLostElectronObj.reco_eta)));
+          	if( ele_iso_SF_allreco == 0 ){ ele_iso_SF_allreco = 1.0; ele_iso_SF_err_allreco = 0.0; }
+        	
+        	
+          	ele_trk_SF_allreco = ele_trkpt_SF->GetBinContent(ele_trkpt_SF->FindBin(myLostElectronObj.reco_eta, myLostElectronObj.reco_pt));
+          	ele_trk_SF_err_allreco = myLostElectronObj.reco_pt<20 || myLostElectronObj.reco_pt>80? 0.01: 0.00;
+          	if( ele_trk_SF_allreco == 0 ){ ele_trk_SF_allreco = 1.0; ele_trk_SF_err_allreco = 0.0; }
+      	      }
               if( myLostElectronObj.passAcc )
               {
                 //myAccRecoIsoEffs.nels_acc[njetsbin_number]+=thisweight;
@@ -448,7 +514,7 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 		// apply electron tracking SF:
 		// check with POG
 		double TrkSF=1.0;
-		if (myLostElectronObj.reco_eta<-2.4) TrkSF=1.170338;
+		/*if (myLostElectronObj.reco_eta<-2.4) TrkSF=1.170338;
 		else if (myLostElectronObj.reco_eta<-2.3) TrkSF=1.00852;
 		else if (myLostElectronObj.reco_eta<-2.2) TrkSF=1.010471;
 		else if (myLostElectronObj.reco_eta<-2.0) TrkSF=1.005187;
@@ -476,7 +542,7 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
 		else if (myLostElectronObj.reco_eta<2.3) TrkSF=0.9927686;
 		else if (myLostElectronObj.reco_eta<2.4) TrkSF=0.9666319;
 		else TrkSF=0.8840206;
-
+		*/
               //call another process for iso eff calculation, reset pt bin number for iso efficiency, as reco_pt
               if( myLostElectronObj.passId )
               {
@@ -485,18 +551,18 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
                 int acbin_number = Set_acbin_number(myLostElectronObj.gen_activity);
                 int Etabin_number = Set_Etabin_number(fabs(myLostElectronObj.gen_eta));
 
-                myAccRecoIsoEffs.nels_reco[ptbin_number][Etabin_number]+=thisweight*TrkSF;
+                myAccRecoIsoEffs.nels_reco[ptbin_number][Etabin_number]+=thisweight*TrkSF*ele_trk_SF*ele_id_SF;
                 myAccRecoIsoEffs.nels_reco_MC[ptbin_number][Etabin_number]++;
 
                 //call another process for iso eff calculation, reset pt bin number for iso efficiency, as reco_pt
                 int ptbin_number_allreco = Set_ptbin_number(myLostElectronObj.reco_pt);
                 int acbin_number_allreco = Set_acbin_number(myLostElectronObj.reco_activity);
 
-                myAccRecoIsoEffs.nels_reco_allreco[ptbin_number_allreco][acbin_number_allreco]+=thisweight*TrkSF;
+                myAccRecoIsoEffs.nels_reco_allreco[ptbin_number_allreco][acbin_number_allreco]+=thisweight*TrkSF*ele_trk_SF_allreco*ele_id_SF_allreco;
                 myAccRecoIsoEffs.nels_reco_MC_allreco[ptbin_number_allreco][acbin_number_allreco]++;
 
-                (myBaseHistgram.h_id_genactivity_els)->Fill(myLostElectronObj.gen_activity,thisweight*TrkSF);
-                (myBaseHistgram.h_id_recoactivity_els)->Fill(myLostElectronObj.reco_activity,thisweight*TrkSF);
+                (myBaseHistgram.h_id_genactivity_els)->Fill(myLostElectronObj.gen_activity,thisweight*TrkSF*ele_trk_SF*ele_id_SF);
+                (myBaseHistgram.h_id_recoactivity_els)->Fill(myLostElectronObj.reco_activity,thisweight*TrkSF*ele_trk_SF_allreco*ele_id_SF_allreco);
               }
 
               if( myLostElectronObj.passIso )
@@ -504,14 +570,14 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
                 int ptbin_number = Set_ptbin_number(myLostElectronObj.gen_pt);
                 int acbin_number = Set_acbin_number(myLostElectronObj.gen_activity);
 
-                myAccRecoIsoEffs.nels_iso[ptbin_number][acbin_number]+=thisweight*TrkSF;
+                myAccRecoIsoEffs.nels_iso[ptbin_number][acbin_number]+=thisweight*TrkSF*ele_trk_SF*ele_id_SF*ele_iso_SF;
                 myAccRecoIsoEffs.nels_iso_MC[ptbin_number][acbin_number]++;
               
                 //call another process for iso eff calculation, reset pt bin number for iso efficiency, as reco_pt
                 int ptbin_number_allreco = Set_ptbin_number(myLostElectronObj.reco_pt);
                 int acbin_number_allreco = Set_acbin_number(myLostElectronObj.reco_activity);
                 
-                myAccRecoIsoEffs.nels_iso_allreco[ptbin_number_allreco][acbin_number_allreco]+=thisweight*TrkSF;
+                myAccRecoIsoEffs.nels_iso_allreco[ptbin_number_allreco][acbin_number_allreco]+=thisweight*TrkSF*ele_trk_SF_allreco*ele_id_SF_allreco*ele_iso_SF_allreco;
                 myAccRecoIsoEffs.nels_iso_MC_allreco[ptbin_number_allreco][acbin_number_allreco]++;
               }
               //check warning function when we calculate the efficienies!
@@ -599,7 +665,20 @@ void LoopLLCal( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsSa
           if( searchbin_id >= 0 )
           {
 	    neventsSB[searchbin_id]+=thisweight;
-	    if (nIsoTrks==0) neventsSB_afterITV[searchbin_id]+=thisweight;
+	    (myBaseHistgram.h_iso_track_veto_nb_all)->Fill(nbottomjets,thisweight);
+	    (myBaseHistgram.h_iso_track_veto_nt_all)->Fill(ntopjets,thisweight);
+	    (myBaseHistgram.h_iso_track_veto_mt2_all)->Fill(MT2,thisweight);
+	    (myBaseHistgram.h_iso_track_veto_met_all)->Fill(met,thisweight);
+	    (myBaseHistgram.h_iso_track_veto_ht_all)->Fill(ht,thisweight);
+
+	    if (nIsoTrks==0)
+		{neventsSB_afterITV[searchbin_id]+=thisweight;
+		 (myBaseHistgram.h_iso_track_veto_nb)->Fill(nbottomjets,thisweight);
+                 (myBaseHistgram.h_iso_track_veto_nt)->Fill(ntopjets,thisweight);
+                 (myBaseHistgram.h_iso_track_veto_mt2)->Fill(MT2,thisweight);
+                 (myBaseHistgram.h_iso_track_veto_met)->Fill(met,thisweight);
+                 (myBaseHistgram.h_iso_track_veto_ht)->Fill(ht,thisweight);
+		}
 
 	    if (neventsSB_afterITV[searchbin_id]>neventsSB[searchbin_id]) std::cout << "neventsSB_afterITV[searchbin_id]>neventsSB[searchbin_id]" << std::endl;
 
@@ -1379,7 +1458,7 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
 {
   const bool storePlots = false;  //set to false when running LLsyst
   ClosureHistgram myClosureHistgram;
-  if (storePlots) myClosureHistgram.BookHistgram("PredLL_mu_cs_data.root");
+  if (storePlots) myClosureHistgram.BookHistgram("PredLL_mu_cs.root");
   //if (storePlots) myClosureHistgram.BookHistgram("v2_PredLL_data.root");
 
   NTupleReader *tr =0;
@@ -1420,8 +1499,8 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
     {
       ++neventc;
       if(trCS.getEvtNum()%20000 == 0) std::cout << trCS.getEvtNum() << "\t" << ((clock() - t0)/1000000.0) << std::endl;
-/*
-      //for MC only!!    start
+
+/*      //for MC only!!    start
       const double genHT = trCS.hasVar("genHT") ? trCS.getVar<double>("genHT") : -999;
       if (((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_SingleLeptFromT_" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_SingleLeptFromTbar" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_DiLept") && genHT >= 600) continue; 
       if (((*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-600to800" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-800to1200" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-1200to2500" || (*iter_TTJetsSampleInfos).TTJetsTag == "TTJets_HT-2500toInf") && genHT < 600) continue;
@@ -1550,7 +1629,7 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
 	  //  std::cout << "mtW_mus = " << mtW_mus << std::endl;
 	  //  std::cout << "muon pt = " << reco_mus_pt << std::endl;
 	  //}
-
+	  //if (true)	//mtw test
           if ( mtW_mus < 100.0 )
           {
 	    //////////////////////////
@@ -1585,7 +1664,7 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
 
 	    //std::cout << "ttbar_mtwcorrfactor[0] = " << ttbar_mtwcorrfactor[0] << std::endl;
 	    //mtwcorrfactor
-	    EventWeight_mus = EventWeight_mus * ttbar_mtwcorrfactor[ptbin_number];
+	    EventWeight_mus = EventWeight_mus * ttbar_mtwcorrfactor[ptbin_number];	//mtw test
 	    //dimuon correction factor
             EventWeight_mus = EventWeight_mus * ttbar_corrfactor_di_mus;
 
@@ -1689,7 +1768,7 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
             //begin to predict lost electrons from muon CS
             double EventWeight_els = thisweight;
             //mtwcorrfactor
-            EventWeight_els = EventWeight_els * ttbar_mtwcorrfactor[ptbin_number];
+            EventWeight_els = EventWeight_els * ttbar_mtwcorrfactor[ptbin_number];	//mtw test
             //dielectron correction factor
             EventWeight_els = EventWeight_els * ttbar_corrfactor_di_els;
   
@@ -2106,19 +2185,33 @@ void LoopLLPred( AccRecoIsoEffs& myAccRecoIsoEffs, TTJetsSampleWeight& myTTJetsS
   //std::cout << "sidebandHighMT2 = " << sidebandHighMT2 << std::endl;
 
   // TF muon CS
-//double aveTFfromMC[84]={0.642531519, 0.54357282, 0.608104908, 0.519389836, 0.32293815, 0.632981081, 0.656870362, 0.582975854, 0.50870746, 0.505819523, 0.626267645, 0.583704663, 0.531137679, 0.355219624, 0.312695143, 0.493440055, 0.545974563, 0.470652833, 0.936358705, 0.405992112, 0.444167089, 0.614641206, 0.583445566, 0.57352299, 0.667928465, 0.529051882, 0.594277533, 0.85420289, 0.550349874, 0.851635305, 0.621007033, 0.481736896, 0.33211934, 0.462099286, 0.568974523, 0.482622433, 0.346337751, 0.675488786, 0.683505891, 0.692643107, 0.47687282, 0.532654884, 0.605280335, 0.636309113, 0.591667704, 0.547187946, 0.605098038, 0.551883924, 0.357271486, 0.29774241, 0.462347252, 0.327845488, 0.627688522, 0.570660351, 0.448683383, 0.613372668, 0.640831784, 0.424091188, 0.331128187, 0.357053553, 0.436221594, 0.372714609, 0.604405869, 0.50628049, 0.493642658, 0.68334772, 0.498620714, 0.463848805, 0.45223666, 0.725186336, 0.404134203, 0.477652538, 0.115450581, 0.606666884, 0.325975996, 0.457766537, 0.375115728, 0.498270651, 0.388946409, 0.192648261, 0.295020786, 0.493394069, 0.226107074, 0.268595278};
+std::array <double, 84> aveTFfromMC_mu_cs={0.65452, 0.53775, 0.58909, 0.41141, 0.30614, 0.62969, 0.65089, 0.65674, 0.50386, 0.45485, 0.61707, 0.51231, 0.48089, 0.28145, 0.33864, 0.48679, 0.55109, 0.54004, 0.90584, 0.54099, 0.52136, 0.59685, 0.56194, 0.52321, 0.67406, 0.53257, 0.60314, 0.85751, 0.57650, 0.59478, 0.60984, 0.48227, 0.32457, 0.48768, 0.69924, 0.61275, 0.51995, 0.64178, 0.63747, 0.68836, 0.43362, 0.54726, 0.54114, 0.56058, 0.64455, 0.47306, 0.53588, 0.55759, 0.32667, 0.29986, 0.32745, 0.38446, 0.64409, 0.51746, 0.45185, 0.49802, 0.99901, 0.35219, 0.31627, 0.31500, 0.29196, 0.35471, 0.53624, 0.59835, 0.51133, 0.44067, 0.47647, 0.56281, 0.38735, 0.77547, 0.41253, 0.38302, 0.70333, 0.62000, 0.32163, 0.37719, 0.31216, 0.41283, 0.36693, 0.36078, 0.20553, 0.34576, 0.29329, 0.22609};
 
   // TF ele CS
-double aveTFfromMC[84]={0.768069021, 0.65313737, 0.864786685, 0.605287604, 0.448842393, 0.74016213, 0.756405248, 0.748400253, 0.613059487, 0.599319057, 0.778777668, 0.744523353, 0.670958408, 0.395087478, 0.369547365, 0.563182084, 0.612026352, 0.555957757, 0.524948843, 0.433307735, 0.502328224, 0.739674883, 0.6997887, 0.627757632, 1.072193557, 0.692190157, 0.7030028, 1.012148485, 0.550948921, 0.768308772, 0.659147532, 0.46670938, 0.357694242, 0.38424583, 0.703286082, 0.944711755, 0.267783542, 0.858551794, 0.779270963, 0.738666234, 0.75341206, 0.648863001, 0.739692747, 0.817662011, 0.767351138, 0.699703371, 0.740517918, 0.670780819, 0.43818293, 0.426032627, 0.484914822, 0.480024939, 0.841380238, 0.772053405, 0.535504998, 0.640003458, 0.86229817, 0.659313661, 0.379055279, 0.482365386, 0.4613808, 0.418413355, 0.716700405, 0.595759624, 0.721588156, 0.784504424, 1.151850707, 0.450531161, 0.490711029, 0.866999318, 0.457587933, 0.788994852, 0.087244134, 0.571585935, 0.4177332, 0.454703065, 0.48210461, 0.547145684, 0.390802736, 0.445390178, 0.476439461, 0.49970854, 0.414192583, 0.408957795};
+std::array <double, 84> aveTFfromMC_el_cs={0.76111, 0.64307, 0.81815, 0.49388, 0.40288, 0.71423, 0.71977, 0.86432, 0.52828, 0.54922, 0.75247, 0.67931, 0.60780, 0.33887, 0.42287, 0.52772, 0.60815, 0.55598, 0.42422, 0.68920, 0.51671, 0.70016, 0.63413, 0.55442, 0.97103, 0.62896, 0.67011, 1.01647, 0.61673, 0.52730, 0.59042, 0.56515, 0.33646, 0.43478, 0.78056, 0.82275, 0.47275, 0.81923, 0.68846, 0.72558, 0.78916, 0.58734, 0.61198, 0.68876, 0.76163, 0.57087, 0.66599, 0.67437, 0.38373, 0.46969, 0.32441, 0.60692, 0.83025, 0.72363, 0.51538, 0.62168, 0.92336, 0.67919, 0.35023, 0.44408, 0.33970, 0.45095, 0.63113, 0.64244, 0.79089, 0.59042, 0.67512, 0.60941, 0.39625, 0.84927, 0.46653, 0.58492, 0.72392, 0.64514, 0.51673, 0.37487, 0.35070, 0.41767, 0.48407, 0.38646, 0.32989, 0.35159, 0.63034, 0.31140};
 
-//double aveTFfromMC[84];
+std::array <double, 84> aveTFfromMC;
 
-//if (use_muon_control_sample) std::copy(aveTFfromMC,aveTFfromMC+84,aveTFfromMC_mu_cs);
-//if (use_electron_control_sample) std::copy(aveTFfromMC,aveTFfromMC+84,aveTFfromMC_el_cs);
+if (use_muon_control_sample) aveTFfromMC = aveTFfromMC_mu_cs;
+if (use_electron_control_sample) aveTFfromMC = aveTFfromMC_el_cs;
 
-  double psystup[84]={0.222331 ,  0.232846 ,  0.365067 ,  0.693452 ,  0.533625 ,  0.210093 ,  0.235539 ,  0.427174 ,  0.508428 ,  0.279131 ,  0.27366 ,  0.280738 ,  0.362284 ,  1.34308 ,  0.512719 ,  0.395768 ,  0.347547 ,  0.768519 ,  1.18455 ,  0.794172 ,  0.679942 ,  0.215124 ,  0.260163 ,  0.370625 ,  0.443297 ,  1.04235 ,  0.300143 ,  0.363733 ,  0.563737 ,  0.684077 ,  0.677213 ,  0.356993 ,  0.378372 ,  0.912265 ,  1.16299 ,  1.198 ,  11.3234 ,  0.23611 ,  0.282095 ,  0.405362 ,  0.618342 ,  0.287652 ,  0.385904 ,  0.652676 ,  1.37527 ,  0.451081 ,  0.782247 ,  0.601983 ,  0.233522 ,  0.398513 ,  1.38303 ,  0.655637 ,  0.24922 ,  0.348807 ,  0.753337 ,  0.592553 ,  0.447955 ,  1.15275 ,  0.231433 ,  0.536916 ,  0.531596 ,  0.794419 ,  0.262598 ,  0.424343 ,  0.574137 ,  0.321691 ,  0.551045 ,  2.09576 ,  0.846289 ,  0.738532 ,  0.317367 ,  0.70955 ,  1.01619 ,  0.455137 ,  0.495764 ,  0.495544 ,  1.05361 ,  1.4284 ,  0.667495 ,  0.759063 ,  0.60185 ,  0.719594 ,  1.15249 ,  1.69776};
-  double psystdown[84]={0.22234 ,  0.232854 ,  0.365073 ,  0.693455 ,  0.533629 ,  0.210102 ,  0.235547 ,  0.427179 ,  0.508432 ,  0.279138 ,  0.273668 ,  0.280745 ,  0.36229 ,  1.34308 ,  0.512723 ,  0.395773 ,  0.347553 ,  0.768521 ,  1.18455 ,  0.794174 ,  0.679945 ,  0.215133 ,  0.26017 ,  0.370631 ,  0.443301 ,  1.04235 ,  0.30015 ,  0.363739 ,  0.56374 ,  0.68408 ,  0.677216 ,  0.356999 ,  0.378377 ,  0.912267 ,  1.16299 ,  1.198 ,  11.3234 ,  0.236118 ,  0.282102 ,  0.405367 ,  0.618345 ,  0.287659 ,  0.385909 ,  0.652679 ,  1.37527 ,  0.451085 ,  0.782249 ,  0.601986 ,  0.23353 ,  0.398519 ,  1.38303 ,  0.65564 ,  0.249228 ,  0.348812 ,  0.753339 ,  0.592556 ,  0.44796 ,  1.15276 ,  0.231442 ,  0.53692 ,  0.531599 ,  0.794421 ,  0.262606 ,  0.424348 ,  0.57414 ,  0.321697 ,  0.551049 ,  2.09576 ,  0.846291 ,  0.738534 ,  0.317374 ,  0.709553 ,  1.01619 ,  0.455142 ,  0.495768 ,  0.495548 ,  1.05361 ,  1.4284 ,  0.667498 ,  0.759066 ,  0.601853 ,  0.719596 ,  1.15249 ,  1.69776};
+// sys unc on mu cs
+std::array <double, 84> psystup_mu_cs = {0.141396, 0.164841, 0.281423, 0.550958, 0.648367, 0.141798, 0.168322, 0.327499, 0.41299, 0.234346, 0.206379, 0.244513, 0.343945, 1.03763, 0.427655, 0.315673, 0.294014, 0.670768, 0.987603, 0.8371, 0.54593, 0.135934, 0.192384, 0.311753, 0.404397, 0.871196, 0.277264, 0.295366, 0.492708, 0.642887, 0.545674, 0.299616, 0.353631, 0.729562, 0.927877, 1.04834, 8.01852, 0.186901, 0.229194, 0.421644, 0.750882, 0.223623, 0.31601, 0.526376, 1.2957, 0.336038, 0.577684, 0.513048, 0.176665, 0.346984, 1.01585, 0.5955, 0.187025, 0.30519, 0.606232, 0.528413, 0.420343, 1.14631, 0.183418, 0.40556, 0.552962, 0.744836, 0.201447, 0.355197, 0.499681, 0.301073, 0.657972, 1.54633, 0.836082, 0.684243, 0.297229, 0.677555, 1.10599, 0.382347, 0.444965, 0.405665, 0.822449, 1.02792, 0.734019, 0.656343, 0.594371, 0.651944, 1.13586, 1.30939};
+std::array <double, 84> psystdown_el_cs = {0.149493, 0.172479, 0.286882, 0.552634, 0.65103, 0.15044, 0.175667, 0.332019, 0.415796, 0.240966, 0.212587, 0.25, 0.347237, 1.03983, 0.432305, 0.321864, 0.299818, 0.674733, 0.98935, 0.838822, 0.548159, 0.144552, 0.198913, 0.31716, 0.40666, 0.878702, 0.282733, 0.29907, 0.496128, 0.645953, 0.547966, 0.305743, 0.355815, 0.731546, 0.933677, 1.05362, 8.01878, 0.193064, 0.233899, 0.424834, 0.752536, 0.229386, 0.318895, 0.529877, 1.29668, 0.341896, 0.580697, 0.519686, 0.189061, 0.355912, 1.01742, 0.598775, 0.194091, 0.31108, 0.609808, 0.532074, 0.422819, 1.14844, 0.196324, 0.410935, 0.557477, 0.749531, 0.207757, 0.359112, 0.501791, 0.305005, 0.660483, 1.54707, 0.838382, 0.685479, 0.303382, 0.679131, 1.10882, 0.388115, 0.452696, 0.409691, 0.826608, 1.0327, 0.737954, 0.65902, 0.598382, 0.655214, 1.13834, 1.3112};
 
+// sys unc on el cs
+std::array <double, 84> psystup_el_cs = {0.154295, 0.191414, 0.362809, 0.540923, 0.522177, 0.150224, 0.18141, 0.373475, 0.44063, 0.281002, 0.215485, 0.249879, 0.327023, 0.993055, 0.473444, 0.319877, 0.302917, 0.680006, 1.04907, 0.718578, 0.556834, 0.153884, 0.211554, 0.325141, 0.47482, 1.06294, 0.250852, 0.394599, 0.471205, 0.636345, 0.578839, 0.339602, 0.383172, 0.725312, 0.882582, 1.21453, 8.02166, 0.201669, 0.267404, 0.477176, 1.12334, 0.246705, 0.353836, 0.511175, 1.04908, 0.334567, 0.614135, 0.516546, 0.19208, 0.521113, 1.02876, 0.581841, 0.235654, 0.413865, 0.58624, 0.483952, 0.415642, 1.02568, 0.192338, 0.467486, 0.460686, 0.68916, 0.224666, 0.38204, 0.553185, 0.368383, 0.580351, 1.50633, 0.719894, 0.929591, 0.302475, 0.823748, 1.11267, 0.410347, 0.707959, 0.416347, 0.791454, 1.0399, 0.746679, 0.624194, 0.595999, 0.629583, 1.00861, 1.4951};
+std::array <double, 84> psystdown_el_cs = {0.161887, 0.19875, 0.366249, 0.54414, 0.525293, 0.158665, 0.188352, 0.377104, 0.44367, 0.286191, 0.221962, 0.255088, 0.332355, 0.99485, 0.476667, 0.324602, 0.307886, 0.682786, 1.0511, 0.721829, 0.558917, 0.161826, 0.218304, 0.329587, 0.476709, 1.06646, 0.256893, 0.397064, 0.474211, 0.638404, 0.580851, 0.345704, 0.385644, 0.727238, 0.886169, 1.21832, 8.0222, 0.207716, 0.271371, 0.480688, 1.12461, 0.25377, 0.358627, 0.513713, 1.0499, 0.339432, 0.616853, 0.519375, 0.202692, 0.525846, 1.03051, 0.585382, 0.240967, 0.41756, 0.590592, 0.487342, 0.418706, 1.02691, 0.203409, 0.4718, 0.466704, 0.693208, 0.231233, 0.387406, 0.555583, 0.371799, 0.582851, 1.50892, 0.722541, 0.930919, 0.307333, 0.825173, 1.11473, 0.415139, 0.711888, 0.420162, 0.794276, 1.04178, 0.74911, 0.628642, 0.598487, 0.63184, 1.01015, 1.4958};
+
+std::array <double, 84> psystup;
+
+if (use_muon_control_sample) psystup = psystup_mu_cs;
+if (use_electron_control_sample) psystup = psystup_el_cs;
+
+std::array <double, 84> psystdown;
+
+if (use_muon_control_sample) psystdown = psystdown_mu_cs;
+if (use_electron_control_sample) psystdown = psystdown_el_cs;
 
   for( int i_cal = 0 ; i_cal < NSEARCH_BINS ; i_cal++ )
   {
@@ -3230,7 +3323,7 @@ int main(int argc, char* argv[])
 */
 
   //data
-  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "MET-Run2016H" , 1, 1, 1.0, inputFileList_Cal );  
+  myTTJetsSampleWeight.TTJetsSampleInfo_push_back( "MET" , 1, 1, 1.0, inputFileList_Cal );  
 
   //LoopLLCal( myAccRecoIsoEffs, myTTJetsSampleWeight );
   //LoopLLExp( myAccRecoIsoEffs, myTTJetsSampleWeight );
@@ -4154,7 +4247,7 @@ std::cout << "bin 83 = " << (nels_acc[82] + nels_acc[83]) / (nels[82] + nels[83]
   EffsHeader << "  double ttbar_corrfactor_di_mus = " << corrfactor_di_mus << ";" << std::endl;
   EffsHeader << "  double ttbar_corrfactor_di_els = " << corrfactor_di_els << ";" << std::endl;
 
-  EffsHeader << "  double isoTrackEff_SB[" << NSEARCH_BINS << "] = {" << std::endl;
+  EffsHeader << "  double isoTrackEff_SB[" << NSEARCH_BINS << "] = {";
   for( int searchbinc = 0 ; searchbinc < NSEARCH_BINS ; ++searchbinc )
   {
     EffsHeader << isotrkeff[searchbinc];

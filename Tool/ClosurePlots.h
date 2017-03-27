@@ -56,7 +56,7 @@ class ClosurePlots
 void ClosurePlots::Initialization()
 {
   fin = TFile::Open("v1_ExpLL.root");
-  fin2 = TFile::Open("v2_PredLL_mu_cs.root");
+  fin2 = TFile::Open("v3_PredLL_mu_cs_mtw.root");
   list = fin->GetListOfKeys();
   list2 = fin2->GetListOfKeys();
   scale=1.0;

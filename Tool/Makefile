@@ -25,7 +25,7 @@ LIBS      += -L$(CMSSW_BASE)/src/SusyAnaTools/Tools/obj -lSusyAnaTools
 LIBS      += -L$(CMSSW_BASE)/src/TopTagger/TopTagger/test -lTopTagger
 LIBS      += -L$(OPENCV_DIRECTORY)/lib/ -lopencv_ml -lopencv_core
 LIBS      += -L$(CMSSW_BASE)/lib/${SCRAM_ARCH}/ -lrecipeAUXOxbridgeMT2
-LIBS      += -L$(CMSSW_RELEASE_BASE)/lib/${SCRAM_ARCH}/ -lPhysicsToolsHeppy
+#LIBS      += -L$(CMSSW_RELEASE_BASE)/lib/${SCRAM_ARCH}/ -lPhysicsToolsHeppy
 
 LHAPDFLIB = -L$(LHAPDF_DATA_PATH)/../../lib -lLHAPDF
 
@@ -58,13 +58,13 @@ LostLepton_MuCS_TTbar: $(ODIR)/LostLepton_MuCS_TTbar.o $(ODIR)/NTupleReader.o $(
 	$(LD) $^ $(LIBS) -L${CMSSW_BASE}/lib/${SCRAM_ARCH}/ -lrecipeAUXOxbridgeMT2 $(LHAPDFLIB) -o $@
 
 ClosurePlots: $(ODIR)/ClosurePlots.o $(ODIR)/searchBins.o
-	$(LD) $^ $(LIBS)  -o $@
+	$(LD) $^ $(LIBS) -L${CMSSW_BASE}/lib/${SCRAM_ARCH}/ -lrecipeAUXOxbridgeMT2 $(LHAPDFLIB) -o $@
 
 TagAndProbeAnalysis:$(ODIR)/TagAndProbeAnalysis.o $(ODIR)/NTupleReader.o
-	$(LD) $^ $(LIBS) -L${CMSSW_BASE}/lib/${SCRAM_ARCH}/ -lrecipeAUXOxbridgeMT2 -o $@
+	$(LD) $^ $(LIBS) -L${CMSSW_BASE}/lib/${SCRAM_ARCH}/ -lrecipeAUXOxbridgeMT2 $(LHAPDFLIB) -o $@
 
 MtW: $(ODIR)/MtW.o $(ODIR)/NTupleReader.o
-	$(LD) $^ $(LIBS) -L${CMSSW_BASE}/lib/${SCRAM_ARCH}/ -lrecipeAUXOxbridgeMT2 -o $@
+	$(LD) $^ $(LIBS) -L${CMSSW_BASE}/lib/${SCRAM_ARCH}/ -lrecipeAUXOxbridgeMT2 $(LHAPDFLIB) -o $@
 
 clean:
 	rm -f $(ODIR)/*.o $(ODIR)/*.d $(PROGRAMS) core 
